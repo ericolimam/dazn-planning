@@ -15,25 +15,29 @@ import { Search, X } from "lucide-react";
 interface ProgramFiltersProps {
   genres: string[];
   years: number[];
-  onFilter: (filters: { genre: string; year: string }) => void;
+  series: string[];
+  onFilter: (filters: { genre: string; year: string; serie: string }) => void;
   isLoading?: boolean;
 }
 
-export function ProgramFilters({ genres, years, onFilter, isLoading }: ProgramFiltersProps) {
+export function ProgramFilters({ genres, years, series, onFilter, isLoading }: ProgramFiltersProps) {
   const [selectedGenre, setSelectedGenre] = useState<string>("all");
   const [selectedYear, setSelectedYear] = useState<string>("all");
+  const [selectedSerie, setSelectedSerie] = useState<string>("all");
 
   const handleFilter = () => {
     onFilter({
       genre: selectedGenre === "all" ? "" : selectedGenre,
       year: selectedYear === "all" ? "" : selectedYear,
+      serie: selectedSerie === "all" ? "" : selectedSerie,
     });
   };
 
   const handleClear = () => {
     setSelectedGenre("all");
     setSelectedYear("all");
-    onFilter({ genre: "", year: "" });
+    setSelectedSerie("all");
+    onFilter({ genre: "", year: "", serie: "" });
   };
 
   return (
@@ -44,7 +48,7 @@ export function ProgramFilters({ genres, years, onFilter, isLoading }: ProgramFi
           <h2 className="text-lg font-semibold">Filtros</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="space-y-2">
             <Label htmlFor="genre">Gênero</Label>
             <Select value={selectedGenre} onValueChange={setSelectedGenre} disabled={isLoading}>
@@ -73,6 +77,23 @@ export function ProgramFilters({ genres, years, onFilter, isLoading }: ProgramFi
                 {years.map((year) => (
                   <SelectItem key={year} value={year.toString()}>
                     {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="serie">Série</Label>
+            <Select value={selectedSerie} onValueChange={setSelectedSerie} disabled={isLoading}>
+              <SelectTrigger id="serie" className="bg-background">
+                <SelectValue placeholder="Todas as séries" />
+              </SelectTrigger>
+              <SelectContent className="bg-background z-50 max-h-[300px]">
+                <SelectItem value="all">Todas as séries</SelectItem>
+                {series.map((serie) => (
+                  <SelectItem key={serie} value={serie}>
+                    {serie}
                   </SelectItem>
                 ))}
               </SelectContent>

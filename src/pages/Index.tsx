@@ -14,6 +14,7 @@ const Index = () => {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [genres, setGenres] = useState<string[]>([]);
   const [years, setYears] = useState<number[]>([]);
+  const [series, setSeries] = useState<string[]>([]);
 
   // Load filter options on mount, but don't show programs in table
   useEffect(() => {
@@ -46,6 +47,12 @@ const Index = () => {
         const uniqueYears = [...new Set(programsData.map(p => p.YEAR).filter(Boolean))].sort((a, b) => b - a);
         setYears(uniqueYears);
         
+        // Extract unique series
+        const uniqueSeries = [...new Set(programsData.map(p => p.SERIE_TITLE).filter(Boolean))].sort();
+        setSeries(uniqueSeries);
+        
+        console.log(`Genres: ${uniqueGenres.length}, Years: ${uniqueYears.length}, Series: ${uniqueSeries.length}`);
+        
         toast.success(`${programsData.length} programas carregados. Use os filtros para buscar.`);
       }
     } catch (error: any) {
@@ -56,7 +63,7 @@ const Index = () => {
     }
   };
 
-  const fetchPrograms = async (filters: { genre: string; year: string }) => {
+  const fetchPrograms = async (filters: { genre: string; year: string; serie: string }) => {
     setIsLoading(true);
     
     try {
@@ -75,12 +82,15 @@ const Index = () => {
           const programsData = data.data as Program[];
           setAllPrograms(programsData);
           
-          // Extract unique genres and years
+          // Extract unique genres, years and series
           const uniqueGenres = [...new Set(programsData.map(p => p.GENRE).filter(Boolean))].sort();
           setGenres(uniqueGenres);
           
           const uniqueYears = [...new Set(programsData.map(p => p.YEAR).filter(Boolean))].sort((a, b) => b - a);
           setYears(uniqueYears);
+          
+          const uniqueSeries = [...new Set(programsData.map(p => p.SERIE_TITLE).filter(Boolean))].sort();
+          setSeries(uniqueSeries);
           
           // Apply filters locally
           const filtered = filterProgramsLocally(programsData, filters);
@@ -104,16 +114,48 @@ const Index = () => {
     }
   };
 
-  const filterProgramsLocally = (data: Program[], filters: { genre: string; year: string }): Program[] => {
+  const filterProgramsLocally = (data: Program[], filters: { genre: string; year: string; serie: string }): Program[] => {
+    console.log('=== FILTERING LOCALLY ===');
+    console.log('Total programs:', data.length);
+    console.log('Filters:', filters);
+    
     let filtered = [...data];
     
     if (filters.genre) {
       filtered = filtered.filter(p => p.GENRE === filters.genre);
+      console.log(`After genre filter (${filters.genre}):`, filtered.length);
     }
     
     if (filters.year) {
       const yearNum = parseInt(filters.year);
       filtered = filtered.filter(p => p.YEAR === yearNum);
+      console.log(`After year filter (${filters.year}):`, filtered.length);
+    }
+    
+    if (filters.serie) {
+      filtered = filtered.filter(p => p.SERIE_TITLE === filters.serie);
+      console.log(`After serie filter (${filters.serie}):`, filtered.length);
+    }
+    
+    // Log first 3 results for debugging
+    if (filtered.length > 0) {
+      console.log('First 3 results:', filtered.slice(0, 3).map(p => ({
+        title: p.TITLE,
+        genre: p.GENRE,
+        year: p.YEAR,
+        serie: p.SERIE_TITLE
+      })));
+    } else {
+      console.log('No results found. Checking if data exists in original dataset...');
+      if (filters.genre) {
+        const genreMatches = data.filter(p => p.GENRE === filters.genre);
+        console.log(`Programs with genre ${filters.genre}:`, genreMatches.length);
+      }
+      if (filters.year) {
+        const yearNum = parseInt(filters.year);
+        const yearMatches = data.filter(p => p.YEAR === yearNum);
+        console.log(`Programs with year ${filters.year}:`, yearMatches.length);
+      }
     }
     
     return filtered;
@@ -157,6 +199,7 @@ const Index = () => {
               <ProgramFilters
                 genres={genres}
                 years={years}
+                series={series}
                 onFilter={fetchPrograms}
                 isLoading={isLoading}
               />
