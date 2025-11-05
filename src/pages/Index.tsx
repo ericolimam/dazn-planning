@@ -166,6 +166,10 @@ const Index = () => {
     setIsModalOpen(true);
   };
 
+  const handleClearFilters = () => {
+    setPrograms([]);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
       {/* Header */}
@@ -201,6 +205,7 @@ const Index = () => {
                 years={years}
                 series={series}
                 onFilter={fetchPrograms}
+                onClear={handleClearFilters}
                 isLoading={isLoading}
               />
 

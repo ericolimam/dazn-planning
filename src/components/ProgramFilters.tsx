@@ -17,10 +17,11 @@ interface ProgramFiltersProps {
   years: number[];
   series: string[];
   onFilter: (filters: { genre: string; year: string; serie: string }) => void;
+  onClear: () => void;
   isLoading?: boolean;
 }
 
-export function ProgramFilters({ genres, years, series, onFilter, isLoading }: ProgramFiltersProps) {
+export function ProgramFilters({ genres, years, series, onFilter, onClear, isLoading }: ProgramFiltersProps) {
   const [selectedGenre, setSelectedGenre] = useState<string>("all");
   const [selectedYear, setSelectedYear] = useState<string>("all");
   const [selectedSerie, setSelectedSerie] = useState<string>("all");
@@ -37,7 +38,7 @@ export function ProgramFilters({ genres, years, series, onFilter, isLoading }: P
     setSelectedGenre("all");
     setSelectedYear("all");
     setSelectedSerie("all");
-    onFilter({ genre: "", year: "", serie: "" });
+    onClear();
   };
 
   return (
