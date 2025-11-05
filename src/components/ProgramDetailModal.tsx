@@ -9,6 +9,28 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Program } from "./ProgramTable";
 
+const getGenreColor = (genre: string) => {
+  const colors: Record<string, string> = {
+    'FUTEBOL': 'bg-slate-700 text-white border-slate-700',
+    'BASQUETEBOL': 'bg-zinc-700 text-white border-zinc-700',
+    'ATLETISMO': 'bg-gray-700 text-white border-gray-700',
+    'BOXE': 'bg-neutral-700 text-white border-neutral-700',
+    'PROGRAMAS': 'bg-stone-700 text-white border-stone-700',
+    'MMA': 'bg-slate-600 text-white border-slate-600',
+    'TÉNIS': 'bg-zinc-600 text-white border-zinc-600',
+    'DARDOS': 'bg-gray-600 text-white border-gray-600',
+    'HÓQUEI': 'bg-neutral-600 text-white border-neutral-600',
+    'RÂGUEBI': 'bg-stone-600 text-white border-stone-600',
+    'ANDEBOL': 'bg-slate-800 text-white border-slate-800',
+    'TÉNIS DE MESA': 'bg-zinc-800 text-white border-zinc-800',
+    'VOLEIBOL': 'bg-gray-800 text-white border-gray-800',
+    'CICLISMO': 'bg-neutral-800 text-white border-neutral-800',
+    'AUTOMOBILISMO': 'bg-stone-800 text-white border-stone-800',
+  };
+  
+  return colors[genre] || 'bg-muted text-foreground border-border';
+};
+
 interface ProgramDetailModalProps {
   program: Program | null;
   open: boolean;
@@ -40,7 +62,7 @@ export function ProgramDetailModal({ program, open, onOpenChange }: ProgramDetai
               <div className="space-y-2">
                 <InfoRow label="ID" value={program.ID} />
                 <InfoRow label="Gênero">
-                  <Badge variant="secondary" className="bg-muted border-border">
+                  <Badge variant="secondary" className={getGenreColor(program.GENRE)}>
                     {program.GENRE || '-'}
                   </Badge>
                 </InfoRow>
