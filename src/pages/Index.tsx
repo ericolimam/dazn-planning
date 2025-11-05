@@ -14,7 +14,38 @@ const Index = () => {
   const [genres, setGenres] = useState<string[]>([]);
   const [years, setYears] = useState<number[]>([]);
 
-  // Removed auto-fetch on mount - user must click "Buscar" to load data
+  // Load filter options on mount, but don't show programs in table
+  useEffect(() => {
+    loadFilterOptions();
+  }, []);
+
+  const loadFilterOptions = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('list-programs', {
+        body: {
+          genre: undefined,
+          year: undefined,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.success && data?.data) {
+        const programsData = data.data as Program[];
+        setAllPrograms(programsData);
+        
+        // Extract unique genres
+        const uniqueGenres = [...new Set(programsData.map(p => p.GENRE).filter(Boolean))].sort();
+        setGenres(uniqueGenres);
+        
+        // Extract unique years
+        const uniqueYears = [...new Set(programsData.map(p => p.YEAR).filter(Boolean))].sort((a, b) => b - a);
+        setYears(uniqueYears);
+      }
+    } catch (error: any) {
+      console.error('Error loading filter options:', error);
+    }
+  };
 
   const fetchPrograms = async (filters: { genre: string; year: string }) => {
     setIsLoading(true);
@@ -31,20 +62,6 @@ const Index = () => {
       if (data?.success && data?.data) {
         const programsData = data.data as Program[];
         setPrograms(programsData);
-        
-        // Store all programs for extracting unique filters
-        if (!filters.genre && !filters.year) {
-          setAllPrograms(programsData);
-          
-          // Extract unique genres
-          const uniqueGenres = [...new Set(programsData.map(p => p.GENRE).filter(Boolean))].sort();
-          setGenres(uniqueGenres);
-          
-          // Extract unique years
-          const uniqueYears = [...new Set(programsData.map(p => p.YEAR).filter(Boolean))].sort((a, b) => b - a);
-          setYears(uniqueYears);
-        }
-        
         toast.success(`${programsData.length} programas encontrados`);
       } else {
         throw new Error('Resposta inválida da API');
