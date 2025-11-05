@@ -45,6 +45,11 @@ export function ProgramDetailModal({ program, open, onOpenChange }: ProgramDetai
                   </Badge>
                 </InfoRow>
                 <InfoRow label="Ano" value={program.YEAR} />
+                <InfoRow label="Estado/Evento">
+                  <Badge variant="outline" className="bg-secondary/10 border-secondary/20">
+                    {program.STATE_EVENT || '-'}
+                  </Badge>
+                </InfoRow>
               </div>
             </div>
 

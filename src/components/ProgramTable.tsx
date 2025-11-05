@@ -25,6 +25,7 @@ export interface Program {
   DESTAQUE_SEMANA: boolean;
   PROMO_DAZN: boolean;
   YEAR: number;
+  STATE_EVENT: string;
 }
 
 interface ProgramTableProps {
@@ -110,6 +111,9 @@ export function ProgramTable({ programs, onProgramClick, isLoading }: ProgramTab
               <TableHead onClick={() => handleSort('YEAR')} className="cursor-pointer hover:bg-muted transition-colors">
                 Ano {sortColumn === 'YEAR' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
+              <TableHead onClick={() => handleSort('STATE_EVENT')} className="cursor-pointer hover:bg-muted transition-colors">
+                Estado/Evento {sortColumn === 'STATE_EVENT' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </TableHead>
               <TableHead>Tipo Prog.</TableHead>
               <TableHead>Categoria</TableHead>
               <TableHead>Tags</TableHead>
@@ -131,6 +135,11 @@ export function ProgramTable({ programs, onProgramClick, isLoading }: ProgramTab
                   </Badge>
                 </TableCell>
                 <TableCell>{program.YEAR || '-'}</TableCell>
+                <TableCell>
+                  <Badge variant="outline" className="bg-secondary/10 border-secondary/20">
+                    {program.STATE_EVENT || '-'}
+                  </Badge>
+                </TableCell>
                 <TableCell className="text-sm text-muted-foreground">{program.PROG_TYPE || '-'}</TableCell>
                 <TableCell className="text-sm text-muted-foreground">{program.PROG_CATEGORY || '-'}</TableCell>
                 <TableCell>
