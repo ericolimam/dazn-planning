@@ -5,6 +5,7 @@ import { ProgramDetailModal } from "@/components/ProgramDetailModal";
 import { ProgramFilters } from "@/components/ProgramFilters";
 import { ProgramStatistics } from "@/components/ProgramStatistics";
 import { toast } from "sonner";
+import daznLogo from "@/assets/dazn-logo.png";
 
 const Index = () => {
   const [programs, setPrograms] = useState<Program[]>([]);
@@ -223,8 +224,8 @@ const Index = () => {
       <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-40 shadow-[var(--shadow-card)]">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-              <span className="text-xl font-bold text-primary-foreground">P</span>
+            <div className="h-10 w-10 rounded-lg overflow-hidden bg-white flex items-center justify-center">
+              <img src={daznLogo} alt="DAZN Logo" className="h-full w-full object-contain" />
             </div>
             <div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
