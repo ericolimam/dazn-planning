@@ -20,19 +20,19 @@ interface ProgramFiltersProps {
 }
 
 export function ProgramFilters({ genres, years, onFilter, isLoading }: ProgramFiltersProps) {
-  const [selectedGenre, setSelectedGenre] = useState<string>("");
-  const [selectedYear, setSelectedYear] = useState<string>("");
+  const [selectedGenre, setSelectedGenre] = useState<string>("all");
+  const [selectedYear, setSelectedYear] = useState<string>("all");
 
   const handleFilter = () => {
     onFilter({
-      genre: selectedGenre,
-      year: selectedYear,
+      genre: selectedGenre === "all" ? "" : selectedGenre,
+      year: selectedYear === "all" ? "" : selectedYear,
     });
   };
 
   const handleClear = () => {
-    setSelectedGenre("");
-    setSelectedYear("");
+    setSelectedGenre("all");
+    setSelectedYear("all");
     onFilter({ genre: "", year: "" });
   };
 
@@ -52,7 +52,7 @@ export function ProgramFilters({ genres, years, onFilter, isLoading }: ProgramFi
                 <SelectValue placeholder="Todos os gêneros" />
               </SelectTrigger>
               <SelectContent className="bg-background z-50">
-                <SelectItem value="">Todos os gêneros</SelectItem>
+                <SelectItem value="all">Todos os gêneros</SelectItem>
                 {genres.map((genre) => (
                   <SelectItem key={genre} value={genre}>
                     {genre}
@@ -69,7 +69,7 @@ export function ProgramFilters({ genres, years, onFilter, isLoading }: ProgramFi
                 <SelectValue placeholder="Todos os anos" />
               </SelectTrigger>
               <SelectContent className="bg-background z-50">
-                <SelectItem value="">Todos os anos</SelectItem>
+                <SelectItem value="all">Todos os anos</SelectItem>
                 {years.map((year) => (
                   <SelectItem key={year} value={year.toString()}>
                     {year}
