@@ -22,7 +22,7 @@ export function ProgramDetailModal({ program, open, onOpenChange }: ProgramDetai
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <DialogTitle className="text-2xl font-bold text-foreground">
             {program.TITLE}
           </DialogTitle>
           <DialogDescription className="text-base">
@@ -40,13 +40,13 @@ export function ProgramDetailModal({ program, open, onOpenChange }: ProgramDetai
               <div className="space-y-2">
                 <InfoRow label="ID" value={program.ID} />
                 <InfoRow label="Gênero">
-                  <Badge variant="secondary" className="bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
+                  <Badge variant="secondary" className="bg-muted border-border">
                     {program.GENRE || '-'}
                   </Badge>
                 </InfoRow>
                 <InfoRow label="Ano" value={program.YEAR} />
                 <InfoRow label="Estado/Evento">
-                  <Badge variant="outline" className="bg-secondary/10 border-secondary/20">
+                  <Badge variant="outline" className="bg-muted border-border">
                     {program.STATE_EVENT || '-'}
                   </Badge>
                 </InfoRow>
@@ -87,13 +87,13 @@ export function ProgramDetailModal({ program, open, onOpenChange }: ProgramDetai
               Características
             </h3>
             <div className="flex flex-wrap gap-2">
-              <Badge variant={program.RESUMO ? "default" : "outline"} className={program.RESUMO ? "bg-primary" : ""}>
+              <Badge variant={program.RESUMO ? "default" : "outline"}>
                 {program.RESUMO ? '✓' : '✗'} Resumo
               </Badge>
-              <Badge variant={program.DESTAQUE_SEMANA ? "default" : "outline"} className={program.DESTAQUE_SEMANA ? "bg-accent" : ""}>
+              <Badge variant={program.DESTAQUE_SEMANA ? "default" : "outline"}>
                 {program.DESTAQUE_SEMANA ? '✓' : '✗'} Destaque da Semana
               </Badge>
-              <Badge variant={program.PROMO_DAZN ? "default" : "outline"} className={program.PROMO_DAZN ? "bg-secondary" : ""}>
+              <Badge variant={program.PROMO_DAZN ? "default" : "outline"}>
                 {program.PROMO_DAZN ? '✓' : '✗'} Promo DAZN
               </Badge>
             </div>

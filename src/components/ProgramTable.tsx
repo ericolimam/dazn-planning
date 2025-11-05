@@ -111,9 +111,6 @@ export function ProgramTable({ programs, onProgramClick, isLoading }: ProgramTab
               <TableHead onClick={() => handleSort('YEAR')} className="cursor-pointer hover:bg-muted transition-colors">
                 Ano {sortColumn === 'YEAR' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
-              <TableHead onClick={() => handleSort('STATE_EVENT')} className="cursor-pointer hover:bg-muted transition-colors">
-                Estado/Evento {sortColumn === 'STATE_EVENT' && (sortDirection === 'asc' ? '↑' : '↓')}
-              </TableHead>
               <TableHead>Tipo Prog.</TableHead>
               <TableHead>Categoria</TableHead>
               <TableHead>Tags</TableHead>
@@ -130,23 +127,18 @@ export function ProgramTable({ programs, onProgramClick, isLoading }: ProgramTab
                 <TableCell className="font-semibold">{program.TITLE || '-'}</TableCell>
                 <TableCell>{program.SERIE_TITLE || '-'}</TableCell>
                 <TableCell>
-                  <Badge variant="secondary" className="bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
+                  <Badge variant="secondary" className="bg-muted border-border">
                     {program.GENRE || '-'}
                   </Badge>
                 </TableCell>
                 <TableCell>{program.YEAR || '-'}</TableCell>
-                <TableCell>
-                  <Badge variant="outline" className="bg-secondary/10 border-secondary/20">
-                    {program.STATE_EVENT || '-'}
-                  </Badge>
-                </TableCell>
                 <TableCell className="text-sm text-muted-foreground">{program.PROG_TYPE || '-'}</TableCell>
                 <TableCell className="text-sm text-muted-foreground">{program.PROG_CATEGORY || '-'}</TableCell>
                 <TableCell>
                   <div className="flex gap-1 flex-wrap">
                     {program.RESUMO && <Badge variant="outline" className="text-xs">Resumo</Badge>}
-                    {program.DESTAQUE_SEMANA && <Badge variant="outline" className="text-xs bg-accent/10">Destaque</Badge>}
-                    {program.PROMO_DAZN && <Badge variant="outline" className="text-xs bg-primary/10">DAZN</Badge>}
+                    {program.DESTAQUE_SEMANA && <Badge variant="outline" className="text-xs">Destaque</Badge>}
+                    {program.PROMO_DAZN && <Badge variant="outline" className="text-xs">DAZN</Badge>}
                   </div>
                 </TableCell>
               </TableRow>

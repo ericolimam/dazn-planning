@@ -219,16 +219,16 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-40 shadow-[var(--shadow-card)]">
+      <header className="border-b bg-card backdrop-blur-sm sticky top-0 z-40 shadow-sm">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-lg overflow-hidden bg-white flex items-center justify-center">
               <img src={daznLogo} alt="DAZN Logo" className="h-full w-full object-contain" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold text-foreground">
                 Controle de Produção
               </h1>
               <p className="text-sm text-muted-foreground">Sistema de consulta Programas</p>

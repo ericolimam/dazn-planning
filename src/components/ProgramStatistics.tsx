@@ -50,13 +50,13 @@ export const ProgramStatistics = ({ programs }: ProgramStatisticsProps) => {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
       {/* Total Programs */}
-      <Card className="bg-card/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-colors">
+      <Card className="bg-card/50 backdrop-blur-sm border-border hover:border-foreground/20 transition-colors">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total de Programas</CardTitle>
-          <Film className="h-4 w-4 text-primary" />
+          <Film className="h-4 w-4 text-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-primary">{totalPrograms}</div>
+          <div className="text-2xl font-bold text-foreground">{totalPrograms}</div>
           <p className="text-xs text-muted-foreground mt-1">
             Carregados no sistema
           </p>
@@ -64,10 +64,10 @@ export const ProgramStatistics = ({ programs }: ProgramStatisticsProps) => {
       </Card>
 
       {/* Top Genres */}
-      <Card className="bg-card/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-colors">
+      <Card className="bg-card/50 backdrop-blur-sm border-border hover:border-foreground/20 transition-colors">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Por Gênero</CardTitle>
-          <BarChart3 className="h-4 w-4 text-accent" />
+          <BarChart3 className="h-4 w-4 text-foreground" />
         </CardHeader>
         <CardContent>
           <div className="space-y-1">
@@ -87,10 +87,10 @@ export const ProgramStatistics = ({ programs }: ProgramStatisticsProps) => {
       </Card>
 
       {/* Top Years */}
-      <Card className="bg-card/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-colors">
+      <Card className="bg-card/50 backdrop-blur-sm border-border hover:border-foreground/20 transition-colors">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Por Ano</CardTitle>
-          <Calendar className="h-4 w-4 text-accent" />
+          <Calendar className="h-4 w-4 text-foreground" />
         </CardHeader>
         <CardContent>
           <div className="space-y-1">
@@ -110,10 +110,10 @@ export const ProgramStatistics = ({ programs }: ProgramStatisticsProps) => {
       </Card>
 
       {/* Top Program Types */}
-      <Card className="bg-card/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-colors">
+      <Card className="bg-card/50 backdrop-blur-sm border-border hover:border-foreground/20 transition-colors">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Por Tipo</CardTitle>
-          <TrendingUp className="h-4 w-4 text-accent" />
+          <TrendingUp className="h-4 w-4 text-foreground" />
         </CardHeader>
         <CardContent>
           <div className="space-y-1">
