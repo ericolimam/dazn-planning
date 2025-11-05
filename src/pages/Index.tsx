@@ -14,9 +14,7 @@ const Index = () => {
   const [genres, setGenres] = useState<string[]>([]);
   const [years, setYears] = useState<number[]>([]);
 
-  useEffect(() => {
-    fetchPrograms({ genre: "", year: "" });
-  }, []);
+  // Removed auto-fetch on mount - user must click "Buscar" to load data
 
   const fetchPrograms = async (filters: { genre: string; year: string }) => {
     setIsLoading(true);
@@ -95,14 +93,22 @@ const Index = () => {
           />
 
           <div>
-            <div className="mb-4 flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">
-                {isLoading ? 'Carregando...' : `${programs.length} programas encontrados`}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Clique duas vezes em uma linha para ver detalhes
-              </p>
-            </div>
+            {programs.length === 0 && !isLoading ? (
+              <div className="mb-4">
+                <p className="text-sm text-muted-foreground text-center">
+                  Selecione os filtros e clique em "Buscar" para carregar os programas
+                </p>
+              </div>
+            ) : (
+              <div className="mb-4 flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">
+                  {isLoading ? 'Carregando...' : `${programs.length} programas encontrados`}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Clique duas vezes em uma linha para ver detalhes
+                </p>
+              </div>
+            )}
             
             <ProgramTable
               programs={programs}

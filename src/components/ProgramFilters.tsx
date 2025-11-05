@@ -92,9 +92,10 @@ export function ProgramFilters({ genres, years, onFilter, isLoading }: ProgramFi
               onClick={handleClear}
               variant="outline"
               disabled={isLoading}
-              className="px-3"
+              className="min-w-[100px]"
             >
-              <X className="h-4 w-4" />
+              <X className="mr-2 h-4 w-4" />
+              Limpar
             </Button>
           </div>
         </div>
