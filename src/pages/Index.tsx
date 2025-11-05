@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProgramTable, Program } from "@/components/ProgramTable";
 import { ProgramDetailModal } from "@/components/ProgramDetailModal";
 import { ProgramFilters } from "@/components/ProgramFilters";
+import { ProgramStatistics } from "@/components/ProgramStatistics";
 import { toast } from "sonner";
 
 const Index = () => {
@@ -227,9 +228,9 @@ const Index = () => {
             </div>
             <div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Gerenciador de Programas
+                Controle de Produção
               </h1>
-              <p className="text-sm text-muted-foreground">Sistema de consulta PROG</p>
+              <p className="text-sm text-muted-foreground">Sistema de consulta Programas</p>
             </div>
           </div>
         </div>
@@ -246,6 +247,10 @@ const Index = () => {
             </div>
           ) : (
             <>
+              {allPrograms.length > 0 && (
+                <ProgramStatistics programs={allPrograms} />
+              )}
+              
               <ProgramFilters
                 genres={genres}
                 years={years}
