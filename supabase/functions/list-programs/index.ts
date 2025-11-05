@@ -14,6 +14,10 @@ serve(async (req) => {
   try {
     const { genre, year } = await req.json();
     
+    console.log('=== FILTER REQUEST ===');
+    console.log('Genre:', genre);
+    console.log('Year:', year);
+    
     const username = Deno.env.get('PROVYS_API_USERNAME');
     const password = Deno.env.get('PROVYS_API_PASSWORD');
     
@@ -67,7 +71,8 @@ serve(async (req) => {
       requestBody.CONDITIONS = conditions;
     }
 
-    console.log('Calling PROVYS API with filters:', { genre, year });
+    console.log('=== API REQUEST BODY ===');
+    console.log(JSON.stringify(requestBody, null, 2));
 
     // Make API call
     const encodedCredentials = btoa(`${username}:${password}`);
@@ -88,7 +93,16 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log('PROVYS API response received, rows:', data.ROWS?.length || 0);
+    console.log('=== PROVYS API RESPONSE ===');
+    console.log('Total rows received:', data.ROWS?.length || 0);
+    
+    // Log first 3 programs to verify filtering
+    if (data.ROWS && data.ROWS.length > 0) {
+      console.log('First 3 programs:');
+      data.ROWS.slice(0, 3).forEach((row: any, idx: number) => {
+        console.log(`  ${idx + 1}. ${row.TITLE} - Genre: ${row.GENRE}, Year: ${row.YEAR}`);
+      });
+    }
 
     // Return the rows
     return new Response(
