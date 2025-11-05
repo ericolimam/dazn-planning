@@ -11,6 +11,7 @@ const Index = () => {
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [genres, setGenres] = useState<string[]>([]);
   const [years, setYears] = useState<number[]>([]);
 
@@ -20,7 +21,9 @@ const Index = () => {
   }, []);
 
   const loadFilterOptions = async () => {
+    setIsInitialLoading(true);
     try {
+      console.log('Loading all programs for filtering...');
       const { data, error } = await supabase.functions.invoke('list-programs', {
         body: {
           genre: undefined,
@@ -32,6 +35,7 @@ const Index = () => {
 
       if (data?.success && data?.data) {
         const programsData = data.data as Program[];
+        console.log(`Loaded ${programsData.length} programs into cache`);
         setAllPrograms(programsData);
         
         // Extract unique genres
@@ -41,30 +45,55 @@ const Index = () => {
         // Extract unique years
         const uniqueYears = [...new Set(programsData.map(p => p.YEAR).filter(Boolean))].sort((a, b) => b - a);
         setYears(uniqueYears);
+        
+        toast.success(`${programsData.length} programas carregados. Use os filtros para buscar.`);
       }
     } catch (error: any) {
       console.error('Error loading filter options:', error);
+      toast.error('Erro ao carregar dados: ' + (error.message || 'Erro desconhecido'));
+    } finally {
+      setIsInitialLoading(false);
     }
   };
 
   const fetchPrograms = async (filters: { genre: string; year: string }) => {
     setIsLoading(true);
+    
     try {
-      const { data, error } = await supabase.functions.invoke('list-programs', {
-        body: {
-          genre: filters.genre || undefined,
-          year: filters.year ? parseInt(filters.year) : undefined,
-        },
-      });
+      // If we don't have all programs yet, fetch them
+      if (allPrograms.length === 0) {
+        const { data, error } = await supabase.functions.invoke('list-programs', {
+          body: {
+            genre: undefined,
+            year: undefined,
+          },
+        });
 
-      if (error) throw error;
+        if (error) throw error;
 
-      if (data?.success && data?.data) {
-        const programsData = data.data as Program[];
-        setPrograms(programsData);
-        toast.success(`${programsData.length} programas encontrados`);
+        if (data?.success && data?.data) {
+          const programsData = data.data as Program[];
+          setAllPrograms(programsData);
+          
+          // Extract unique genres and years
+          const uniqueGenres = [...new Set(programsData.map(p => p.GENRE).filter(Boolean))].sort();
+          setGenres(uniqueGenres);
+          
+          const uniqueYears = [...new Set(programsData.map(p => p.YEAR).filter(Boolean))].sort((a, b) => b - a);
+          setYears(uniqueYears);
+          
+          // Apply filters locally
+          const filtered = filterProgramsLocally(programsData, filters);
+          setPrograms(filtered);
+          toast.success(`${filtered.length} programas encontrados`);
+        } else {
+          throw new Error('Resposta inválida da API');
+        }
       } else {
-        throw new Error('Resposta inválida da API');
+        // We already have all programs, just filter locally
+        const filtered = filterProgramsLocally(allPrograms, filters);
+        setPrograms(filtered);
+        toast.success(`${filtered.length} programas encontrados`);
       }
     } catch (error: any) {
       console.error('Error fetching programs:', error);
@@ -73,6 +102,21 @@ const Index = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const filterProgramsLocally = (data: Program[], filters: { genre: string; year: string }): Program[] => {
+    let filtered = [...data];
+    
+    if (filters.genre) {
+      filtered = filtered.filter(p => p.GENRE === filters.genre);
+    }
+    
+    if (filters.year) {
+      const yearNum = parseInt(filters.year);
+      filtered = filtered.filter(p => p.YEAR === yearNum);
+    }
+    
+    return filtered;
   };
 
   const handleProgramClick = (program: Program) => {
@@ -102,37 +146,47 @@ const Index = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="space-y-6">
-          <ProgramFilters
-            genres={genres}
-            years={years}
-            onFilter={fetchPrograms}
-            isLoading={isLoading}
-          />
+          {isInitialLoading ? (
+            <div className="flex flex-col items-center justify-center py-16">
+              <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent mb-4"></div>
+              <p className="text-lg font-semibold text-foreground">Carregando dados...</p>
+              <p className="text-sm text-muted-foreground mt-2">Isso pode levar alguns segundos</p>
+            </div>
+          ) : (
+            <>
+              <ProgramFilters
+                genres={genres}
+                years={years}
+                onFilter={fetchPrograms}
+                isLoading={isLoading}
+              />
 
-          <div>
-            {programs.length === 0 && !isLoading ? (
-              <div className="mb-4">
-                <p className="text-sm text-muted-foreground text-center">
-                  Selecione os filtros e clique em "Buscar" para carregar os programas
-                </p>
+              <div>
+                {programs.length === 0 && !isLoading ? (
+                  <div className="mb-4">
+                    <p className="text-sm text-muted-foreground text-center">
+                      Selecione os filtros e clique em "Buscar" para carregar os programas
+                    </p>
+                  </div>
+                ) : (
+                  <div className="mb-4 flex items-center justify-between">
+                    <p className="text-sm text-muted-foreground">
+                      {isLoading ? 'Filtrando...' : `${programs.length} programas encontrados`}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Clique duas vezes em uma linha para ver detalhes
+                    </p>
+                  </div>
+                )}
+                
+                <ProgramTable
+                  programs={programs}
+                  onProgramClick={handleProgramClick}
+                  isLoading={isLoading}
+                />
               </div>
-            ) : (
-              <div className="mb-4 flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">
-                  {isLoading ? 'Carregando...' : `${programs.length} programas encontrados`}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Clique duas vezes em uma linha para ver detalhes
-                </p>
-              </div>
-            )}
-            
-            <ProgramTable
-              programs={programs}
-              onProgramClick={handleProgramClick}
-              isLoading={isLoading}
-            />
-          </div>
+            </>
+          )}
         </div>
       </main>
 
