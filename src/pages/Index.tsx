@@ -121,40 +121,86 @@ const Index = () => {
     
     let filtered = [...data];
     
+    // Debug: Check data types in first few records
+    if (data.length > 0) {
+      console.log('Sample data (first 3):');
+      data.slice(0, 3).forEach((p, i) => {
+        console.log(`  ${i + 1}. GENRE: "${p.GENRE}" (type: ${typeof p.GENRE}), YEAR: ${p.YEAR} (type: ${typeof p.YEAR})`);
+      });
+    }
+    
     if (filters.genre) {
-      filtered = filtered.filter(p => p.GENRE === filters.genre);
-      console.log(`After genre filter (${filters.genre}):`, filtered.length);
+      const beforeFilter = filtered.length;
+      filtered = filtered.filter(p => {
+        const matches = p.GENRE?.trim() === filters.genre.trim();
+        return matches;
+      });
+      console.log(`After genre filter "${filters.genre}": ${filtered.length} (removed ${beforeFilter - filtered.length})`);
+      
+      // If no results, show what genres exist
+      if (filtered.length === 0) {
+        const genresInData = [...new Set(data.map(p => p.GENRE).filter(Boolean))];
+        console.log('Available genres in dataset:', genresInData.slice(0, 10));
+        console.log(`Does "${filters.genre}" exist?`, genresInData.includes(filters.genre));
+      }
     }
     
     if (filters.year) {
+      const beforeFilter = filtered.length;
       const yearNum = parseInt(filters.year);
-      filtered = filtered.filter(p => p.YEAR === yearNum);
-      console.log(`After year filter (${filters.year}):`, filtered.length);
+      
+      filtered = filtered.filter(p => {
+        // Try multiple comparison methods
+        const yearMatches = p.YEAR === yearNum || 
+                           String(p.YEAR) === filters.year;
+        return yearMatches;
+      });
+      
+      console.log(`After year filter "${filters.year}": ${filtered.length} (removed ${beforeFilter - filtered.length})`);
+      
+      // Debug year comparison
+      if (filtered.length === 0 && beforeFilter > 0) {
+        console.log('Year comparison debug:');
+        const sampleWithGenre = data.filter(p => !filters.genre || p.GENRE === filters.genre).slice(0, 5);
+        sampleWithGenre.forEach(p => {
+          console.log(`  Program: ${p.TITLE}, YEAR value: ${p.YEAR}, type: ${typeof p.YEAR}, matches: ${p.YEAR === yearNum || String(p.YEAR) === filters.year}`);
+        });
+      }
     }
     
     if (filters.serie) {
-      filtered = filtered.filter(p => p.SERIE_TITLE === filters.serie);
-      console.log(`After serie filter (${filters.serie}):`, filtered.length);
+      const beforeFilter = filtered.length;
+      filtered = filtered.filter(p => p.SERIE_TITLE?.trim() === filters.serie.trim());
+      console.log(`After serie filter "${filters.serie}": ${filtered.length} (removed ${beforeFilter - filtered.length})`);
     }
     
-    // Log first 3 results for debugging
+    // Log results
     if (filtered.length > 0) {
-      console.log('First 3 results:', filtered.slice(0, 3).map(p => ({
-        title: p.TITLE,
-        genre: p.GENRE,
-        year: p.YEAR,
-        serie: p.SERIE_TITLE
-      })));
+      console.log('✓ Found results! First 3:');
+      filtered.slice(0, 3).forEach((p, i) => {
+        console.log(`  ${i + 1}. ${p.TITLE} | Genre: ${p.GENRE} | Year: ${p.YEAR} | Serie: ${p.SERIE_TITLE}`);
+      });
     } else {
-      console.log('No results found. Checking if data exists in original dataset...');
-      if (filters.genre) {
-        const genreMatches = data.filter(p => p.GENRE === filters.genre);
-        console.log(`Programs with genre ${filters.genre}:`, genreMatches.length);
-      }
-      if (filters.year) {
+      console.log('✗ NO RESULTS FOUND');
+      
+      // Deep debug - check if combination exists
+      if (filters.genre && filters.year) {
         const yearNum = parseInt(filters.year);
-        const yearMatches = data.filter(p => p.YEAR === yearNum);
-        console.log(`Programs with year ${filters.year}:`, yearMatches.length);
+        const genreCount = data.filter(p => p.GENRE === filters.genre).length;
+        const yearCount = data.filter(p => p.YEAR === yearNum).length;
+        console.log(`Programs with genre "${filters.genre}": ${genreCount}`);
+        console.log(`Programs with year "${filters.year}": ${yearCount}`);
+        
+        // Find one example with the genre
+        const exampleWithGenre = data.find(p => p.GENRE === filters.genre);
+        if (exampleWithGenre) {
+          console.log('Example program with this genre:', {
+            title: exampleWithGenre.TITLE,
+            genre: exampleWithGenre.GENRE,
+            year: exampleWithGenre.YEAR,
+            yearType: typeof exampleWithGenre.YEAR
+          });
+        }
       }
     }
     
