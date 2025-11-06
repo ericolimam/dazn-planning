@@ -32,6 +32,22 @@ const getGenreColor = (genre: string) => {
   return colors[genre] || 'bg-muted text-foreground border-border';
 };
 
+const getRowBackgroundColor = (stateEvent: string) => {
+  const normalizedState = stateEvent?.toUpperCase() || '';
+  
+  if (normalizedState === 'LIVE + EVENTO') {
+    return 'bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-950 dark:hover:bg-yellow-900';
+  }
+  if (normalizedState === 'EN FEED') {
+    return 'bg-red-100 hover:bg-red-200 dark:bg-red-950 dark:hover:bg-red-900';
+  }
+  if (normalizedState === 'FLY') {
+    return 'bg-blue-100 hover:bg-blue-200 dark:bg-blue-950 dark:hover:bg-blue-900';
+  }
+  
+  return 'hover:bg-muted/50';
+};
+
 export interface Program {
   ID: number;
   TITLE: string;
@@ -143,7 +159,7 @@ export function ProgramTable({ programs, onProgramClick, isLoading }: ProgramTab
               <TableRow
                 key={program.ID}
                 onDoubleClick={() => onProgramClick(program)}
-                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                className={`cursor-pointer transition-colors ${getRowBackgroundColor(program.STATE_EVENT)}`}
               >
                 <TableCell className="font-medium">{program.ID}</TableCell>
                 <TableCell className="font-semibold">{program.TITLE || '-'}</TableCell>
