@@ -78,14 +78,24 @@ const extractYearFromDate = (dateStr: string): number => {
   return parseInt(parts[2]);
 };
 
+// Get current week number
+const getCurrentWeek = () => {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 1);
+  const diff = now.getTime() - start.getTime();
+  const oneWeek = 1000 * 60 * 60 * 24 * 7;
+  return Math.ceil(diff / oneWeek);
+};
+
 export default function Schedule() {
-  const [selectedWeek, setSelectedWeek] = useState<number | null>(null);
-  const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [selectedWeek, setSelectedWeek] = useState<number | null>(getCurrentWeek());
+  const [selectedChannel, setSelectedChannel] = useState<string | null>("DAZN 1");
+  const [selectedYear, setSelectedYear] = useState<number | null>(new Date().getFullYear());
   const [view, setView] = useState<View>("month");
   const [date, setDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<ScheduleEvent | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [timeStep, setTimeStep] = useState<30 | 60>(30); // 30 or 60 minutes
 
   // First query: Load all data for filters
   const { data: allScheduleData } = useQuery({
@@ -274,6 +284,36 @@ export default function Schedule() {
           years={years}
         />
 
+        {view === "week" && (
+          <div className="mb-4 flex items-center gap-3">
+            <label className="text-sm font-medium text-foreground">
+              Intervalo de Tempo:
+            </label>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setTimeStep(30)}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  timeStep === 30
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                }`}
+              >
+                30 minutos
+              </button>
+              <button
+                onClick={() => setTimeStep(60)}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  timeStep === 60
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                }`}
+              >
+                1 hora
+              </button>
+            </div>
+          </div>
+        )}
+
         <Card className="p-6 bg-card border-border">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
@@ -293,6 +333,8 @@ export default function Schedule() {
                 eventPropGetter={eventStyleGetter}
                 onDoubleClickEvent={handleDoubleClickEvent}
                 views={['month', 'week', 'day']}
+                step={timeStep}
+                timeslots={1}
                 messages={{
                   next: "Próximo",
                   previous: "Anterior",
