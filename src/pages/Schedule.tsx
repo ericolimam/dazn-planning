@@ -222,7 +222,7 @@ export default function Schedule() {
         borderRadius: '4px',
         opacity: 0.9,
         color: 'white',
-        border: '0px',
+        border: '1px solid #374151',
         display: 'block',
         fontSize: '12px',
         padding: '2px 4px',
