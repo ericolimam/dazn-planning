@@ -172,7 +172,8 @@ export default function Schedule() {
     enabled: !!allScheduleData,
   });
 
-  const events = scheduleData?.ROWS?.map((event: ScheduleEvent) => {
+  const events = scheduleData?.ROWS?.filter((event: ScheduleEvent) => event.PROG_REQTYPE === 'PROGRAMA')
+    .map((event: ScheduleEvent) => {
     try {
       const start = parseDateTime(event.DATE, event.START_TIME);
       const duration = parseDuration(event.DURATION);
