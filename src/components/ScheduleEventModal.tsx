@@ -8,6 +8,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScheduleEvent } from "@/pages/Schedule";
+import { Star, Sparkles, TrendingUp } from "lucide-react";
 
 const getGenreColor = (genre: string) => {
   const colors: Record<string, string> = {
@@ -44,6 +45,40 @@ const formatDuration = (duration: string) => {
   // Duration format: HH:MM:SS with colons
   const [hours, minutes, seconds] = duration.split(':');
   return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
+};
+
+const getPremiereBadge = (premiere: string | undefined) => {
+  if (!premiere) return null;
+  
+  const premierConfig: Record<string, { icon: JSX.Element; label: string; className: string }> = {
+    'ESTREIA': { 
+      icon: <Star className="h-4 w-4 mr-1" fill="gold" color="gold" />, 
+      label: 'Estreia',
+      className: 'bg-yellow-600 text-white border-yellow-600'
+    },
+    'EXCLUSIVO': { 
+      icon: <Sparkles className="h-4 w-4 mr-1" fill="white" color="white" />, 
+      label: 'Exclusivo',
+      className: 'bg-purple-600 text-white border-purple-600'
+    },
+    'DESTAQUE': { 
+      icon: <TrendingUp className="h-4 w-4 mr-1" color="white" />, 
+      label: 'Destaque',
+      className: 'bg-blue-600 text-white border-blue-600'
+    },
+  };
+  
+  const config = premierConfig[premiere];
+  if (!config) return null;
+  
+  return (
+    <Badge variant="secondary" className={config.className}>
+      <span className="flex items-center">
+        {config.icon}
+        {config.label}
+      </span>
+    </Badge>
+  );
 };
 
 interface ScheduleEventModalProps {
@@ -110,6 +145,11 @@ export function ScheduleEventModal({ event, open, onOpenChange }: ScheduleEventM
               <InfoRow label="Categoria" value={event.PROGCATEGORY} />
               <InfoRow label="Tipo de Programa" value={event.PROG_REQTYPE} />
               <InfoRow label="Tipo de Série" value={event.SERIES_REQTYPE} />
+              {event.PREMIERE && (
+                <InfoRow label="Premiere">
+                  {getPremiereBadge(event.PREMIERE)}
+                </InfoRow>
+              )}
             </div>
           </div>
 
