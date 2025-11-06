@@ -243,16 +243,15 @@ export default function Schedule() {
     return {
       style: {
         backgroundColor,
-        borderRadius: '5px',
-        opacity: 0.95,
+        borderRadius: '4px',
+        opacity: 0.9,
         color: 'white',
-        border: '2px solid rgba(255, 255, 255, 0.3)',
+        border: '1px solid #374151',
         display: 'flex',
         alignItems: 'center',
         gap: '4px',
         fontSize: '12px',
         padding: '2px 4px',
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)',
       }
     };
   };
