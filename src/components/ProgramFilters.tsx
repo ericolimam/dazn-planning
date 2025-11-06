@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Search, X } from "lucide-react";
+import { toast } from "sonner";
 
 interface ProgramFiltersProps {
   genres: string[];
@@ -27,6 +28,12 @@ export function ProgramFilters({ genres, years, series, onFilter, onClear, isLoa
   const [selectedSerie, setSelectedSerie] = useState<string>("all");
 
   const handleFilter = () => {
+    // Validate that at least one filter is selected
+    if (selectedGenre === "all" && selectedYear === "all" && selectedSerie === "all") {
+      toast.error("Selecione pelo menos um critério de filtro para realizar a busca");
+      return;
+    }
+
     onFilter({
       genre: selectedGenre === "all" ? "" : selectedGenre,
       year: selectedYear === "all" ? "" : selectedYear,
