@@ -6,6 +6,7 @@ import { ProgramFilters } from "@/components/ProgramFilters";
 import { ProgramStatistics } from "@/components/ProgramStatistics";
 import { toast } from "sonner";
 import daznLogo from "@/assets/dazn-logo.png";
+import { NavLink } from "@/components/NavLink";
 
 const Index = () => {
   const [programs, setPrograms] = useState<Program[]>([]);
@@ -221,17 +222,15 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-card backdrop-blur-sm sticky top-0 z-40 shadow-sm">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg overflow-hidden bg-white flex items-center justify-center">
-              <img src={daznLogo} alt="DAZN Logo" className="h-full w-full object-contain" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">
-                Controle de Produção
-              </h1>
-              <p className="text-sm text-muted-foreground">Sistema de consulta Programas</p>
+      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-8">
+              <img src={daznLogo} alt="DAZN" className="h-10 w-10" />
+              <nav className="flex gap-6">
+                <NavLink to="/">Programas</NavLink>
+                <NavLink to="/schedule">Grade de Programação</NavLink>
+              </nav>
             </div>
           </div>
         </div>
@@ -239,6 +238,15 @@ const Index = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <h1 className="text-4xl font-bold text-foreground mb-2">
+            Catálogo de Programas
+          </h1>
+          <p className="text-muted-foreground">
+            Consulte e filtre o catálogo completo de programas
+          </p>
+        </div>
+        
         <div className="space-y-6">
           {isInitialLoading ? (
             <div className="flex flex-col items-center justify-center py-16">
