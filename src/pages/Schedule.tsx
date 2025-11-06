@@ -56,11 +56,13 @@ const getGenreColor = (genre: string) => {
   return colors[genre] || '#6b7280';
 };
 
-const getPremiereIcon = (premiere: string) => {
+const getPremiereIcon = (premiere: string | undefined) => {
+  if (!premiere) return null;
+  
   const icons: Record<string, JSX.Element> = {
-    'ESTREIA': <Star className="h-3 w-3" fill="gold" color="gold" />,
-    'EXCLUSIVO': <Sparkles className="h-3 w-3" fill="white" color="white" />,
-    'DESTAQUE': <TrendingUp className="h-3 w-3" color="yellow" />,
+    'ESTREIA': <Star className="h-3 w-3 flex-shrink-0" fill="gold" color="gold" />,
+    'EXCLUSIVO': <Sparkles className="h-3 w-3 flex-shrink-0" fill="white" color="white" />,
+    'DESTAQUE': <TrendingUp className="h-3 w-3 flex-shrink-0" color="yellow" />,
   };
   
   return icons[premiere] || null;
@@ -255,11 +257,15 @@ export default function Schedule() {
   };
 
   const EventComponent = ({ event }: any) => {
-    const premiereIcon = getPremiereIcon(event.resource.PREMIERE);
+    const premiereIcon = getPremiereIcon(event.resource?.PREMIERE);
     return (
-      <div className="flex items-center gap-1">
-        {premiereIcon}
-        <span>{event.title}</span>
+      <div className="flex items-center gap-1 w-full overflow-hidden">
+        {premiereIcon && (
+          <span className="flex-shrink-0">
+            {premiereIcon}
+          </span>
+        )}
+        <span className="truncate text-xs">{event.title}</span>
       </div>
     );
   };
