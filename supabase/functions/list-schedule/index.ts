@@ -91,15 +91,24 @@ Deno.serve(async (req) => {
     console.log('=== PROVYS SCHEDULE RESPONSE ===');
     console.log('Total rows received:', data?.ROWS?.length || 0);
     
+    // Count events with PREMIERE
+    const premiereCount = data?.ROWS?.filter((row: any) => row.PREMIERE).length || 0;
+    console.log('Events with PREMIERE:', premiereCount);
+    
     if (data?.ROWS && data.ROWS.length > 0) {
       console.log('First 3 events:');
       data.ROWS.slice(0, 3).forEach((row: any, i: number) => {
         console.log(`  ${i + 1}. ${row.PROGRAMME || row.SERIES} - Channel: ${row.CHANNEL}, Week: ${row.WEEK}, Date: ${row.DATE}, PREMIERE: ${row.PREMIERE || 'N/A'}`);
       });
       
-      // Log complete first event to see all fields
-      console.log('=== FIRST EVENT COMPLETE DATA ===');
-      console.log(JSON.stringify(data.ROWS[0], null, 2));
+      // Find and log first event with PREMIERE
+      const premiereEvent = data.ROWS.find((row: any) => row.PREMIERE);
+      if (premiereEvent) {
+        console.log('=== FIRST EVENT WITH PREMIERE ===');
+        console.log(JSON.stringify(premiereEvent, null, 2));
+      } else {
+        console.log('⚠️ NO EVENTS HAVE PREMIERE VALUE SET');
+      }
     }
 
     return new Response(JSON.stringify(data), {
