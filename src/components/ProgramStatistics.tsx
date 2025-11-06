@@ -96,15 +96,15 @@ export const ProgramStatistics = ({ programs }: ProgramStatisticsProps) => {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-semibold">Top 5 Gêneros</CardTitle>
           </CardHeader>
-          <CardContent className="h-[200px]">
+          <CardContent className="h-[160px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={genreData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={35}
-                  outerRadius={55}
+                  innerRadius={28}
+                  outerRadius={45}
                   paddingAngle={2}
                   dataKey="value"
                 >
@@ -118,7 +118,7 @@ export const ProgramStatistics = ({ programs }: ProgramStatisticsProps) => {
                   layout="vertical"
                   align="right"
                   verticalAlign="middle"
-                  wrapperStyle={{ fontSize: '9px', paddingLeft: '5px' }}
+                  wrapperStyle={{ fontSize: '8px', paddingLeft: '3px' }}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -130,15 +130,15 @@ export const ProgramStatistics = ({ programs }: ProgramStatisticsProps) => {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-semibold">Top 5 Anos</CardTitle>
           </CardHeader>
-          <CardContent className="h-[200px]">
+          <CardContent className="h-[160px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={yearData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={35}
-                  outerRadius={55}
+                  innerRadius={28}
+                  outerRadius={45}
                   paddingAngle={2}
                   dataKey="value"
                 >
@@ -152,7 +152,7 @@ export const ProgramStatistics = ({ programs }: ProgramStatisticsProps) => {
                   layout="vertical"
                   align="right"
                   verticalAlign="middle"
-                  wrapperStyle={{ fontSize: '9px', paddingLeft: '5px' }}
+                  wrapperStyle={{ fontSize: '8px', paddingLeft: '3px' }}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -164,15 +164,15 @@ export const ProgramStatistics = ({ programs }: ProgramStatisticsProps) => {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-semibold">Top 5 Tipos</CardTitle>
           </CardHeader>
-          <CardContent className="h-[200px]">
+          <CardContent className="h-[160px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={typeData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={35}
-                  outerRadius={55}
+                  innerRadius={28}
+                  outerRadius={45}
                   paddingAngle={2}
                   dataKey="value"
                 >
@@ -186,7 +186,7 @@ export const ProgramStatistics = ({ programs }: ProgramStatisticsProps) => {
                   layout="vertical"
                   align="right"
                   verticalAlign="middle"
-                  wrapperStyle={{ fontSize: '9px', paddingLeft: '5px' }}
+                  wrapperStyle={{ fontSize: '8px', paddingLeft: '3px' }}
                 />
               </PieChart>
             </ResponsiveContainer>
