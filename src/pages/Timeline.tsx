@@ -66,10 +66,19 @@ const formatTime = (date: Date) => {
   return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 };
 
+// Get current week number
+const getCurrentWeek = () => {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 1);
+  const diff = now.getTime() - start.getTime();
+  const oneWeek = 1000 * 60 * 60 * 24 * 7;
+  return Math.ceil(diff / oneWeek);
+};
+
 export default function Timeline() {
-  const [selectedWeek, setSelectedWeek] = useState<number | null>(null);
-  const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [selectedWeek, setSelectedWeek] = useState<number | null>(getCurrentWeek());
+  const [selectedChannel, setSelectedChannel] = useState<string | null>("DAZN 1");
+  const [selectedYear, setSelectedYear] = useState<number | null>(new Date().getFullYear());
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [selectedEvent, setSelectedEvent] = useState<ScheduleEvent | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
