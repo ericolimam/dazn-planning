@@ -96,8 +96,33 @@ export default function Schedule() {
         body: {},
       });
 
-      if (error) throw error;
-      console.log('All schedule data loaded:', data?.ROWS?.length || 0, 'events');
+      if (error) {
+        console.error('Error loading schedule:', error);
+        throw error;
+      }
+      
+      console.log('=== SCHEDULE DATA LOADED ===');
+      console.log('Success:', data?.success !== false);
+      console.log('Total rows received:', data?.ROWS?.length || 0);
+      
+      if (data?.ROWS && data.ROWS.length > 0) {
+        console.log('First 3 raw events from API:');
+        data.ROWS.slice(0, 3).forEach((row: any, i: number) => {
+          console.log(`  ${i + 1}.`, {
+            ID: row.ID,
+            PROGRAMME: row.PROGRAMME,
+            SERIES: row.SERIES,
+            DATE: row.DATE,
+            START_TIME: row.START_TIME,
+            DURATION: row.DURATION,
+            CHANNEL: row.CHANNEL,
+            WEEK: row.WEEK
+          });
+        });
+      } else {
+        console.log('NO ROWS in response!');
+      }
+      
       return data;
     },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
@@ -148,18 +173,43 @@ export default function Schedule() {
   });
 
   const events = scheduleData?.ROWS?.map((event: ScheduleEvent) => {
-    const start = parseDateTime(event.DATE, event.START_TIME);
-    const duration = parseDuration(event.DURATION);
-    const end = new Date(start.getTime() + duration);
+    try {
+      const start = parseDateTime(event.DATE, event.START_TIME);
+      const duration = parseDuration(event.DURATION);
+      const end = new Date(start.getTime() + duration);
 
-    return {
-      id: event.ID,
-      title: event.PROGRAMME || event.SERIES || event.TXSLOT_NAME,
-      start,
-      end,
-      resource: event,
-    };
-  }) || [];
+      const calendarEvent = {
+        id: event.ID,
+        title: event.PROGRAMME || event.SERIES || event.TXSLOT_NAME || 'Sem título',
+        start,
+        end,
+        resource: event,
+      };
+
+      return calendarEvent;
+    } catch (error) {
+      console.error('Error parsing event:', event, error);
+      return null;
+    }
+  }).filter(e => e !== null) || [];
+
+  console.log('=== CALENDAR EVENTS DEBUG ===');
+  console.log('Total events after mapping:', events.length);
+  if (events.length > 0) {
+    console.log('First event:', events[0]);
+    console.log('Sample event dates:', {
+      start: events[0].start,
+      end: events[0].end,
+      title: events[0].title
+    });
+  } else {
+    console.log('NO EVENTS MAPPED!');
+    console.log('scheduleData:', scheduleData);
+    console.log('scheduleData?.ROWS?.length:', scheduleData?.ROWS?.length);
+    if (scheduleData?.ROWS && scheduleData.ROWS.length > 0) {
+      console.log('Sample raw event:', scheduleData.ROWS[0]);
+    }
+  }
 
   const eventStyleGetter = (event: any) => {
     const genre = event.resource.GENRE;
