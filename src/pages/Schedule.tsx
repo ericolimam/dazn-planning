@@ -34,21 +34,21 @@ export interface ScheduleEvent {
 
 const getGenreColor = (genre: string) => {
   const colors: Record<string, string> = {
-    'FUTEBOL': '#475569',
-    'BASQUETEBOL': '#52525b',
-    'ATLETISMO': '#4b5563',
-    'BOXE': '#525252',
-    'PROGRAMAS': '#57534e',
-    'MMA': '#64748b',
-    'TÉNIS': '#71717a',
-    'DARDOS': '#6b7280',
-    'HÓQUEI': '#737373',
-    'RÂGUEBI': '#78716c',
-    'ANDEBOL': '#334155',
-    'TÉNIS DE MESA': '#3f3f46',
-    'VOLEIBOL': '#374151',
-    'CICLISMO': '#404040',
-    'AUTOMOBILISMO': '#44403c',
+    'FUTEBOL': '#10b981',        // Green
+    'BASQUETEBOL': '#f59e0b',    // Orange
+    'ATLETISMO': '#3b82f6',      // Blue
+    'BOXE': '#ef4444',           // Red
+    'PROGRAMAS': '#8b5cf6',      // Purple
+    'MMA': '#dc2626',            // Dark Red
+    'TÉNIS': '#06b6d4',          // Cyan
+    'DARDOS': '#f97316',         // Orange-Red
+    'HÓQUEI': '#0ea5e9',         // Sky Blue
+    'RÂGUEBI': '#059669',        // Emerald
+    'ANDEBOL': '#6366f1',        // Indigo
+    'TÉNIS DE MESA': '#14b8a6',  // Teal
+    'VOLEIBOL': '#ec4899',       // Pink
+    'CICLISMO': '#eab308',       // Yellow
+    'AUTOMOBILISMO': '#64748b',  // Slate
   };
   
   return colors[genre] || '#6b7280';
