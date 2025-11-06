@@ -38,12 +38,9 @@ const formatTime = (timeStr: string) => {
 };
 
 const formatDuration = (duration: string) => {
-  const hours = parseInt(duration.substring(0, 2));
-  const minutes = parseInt(duration.substring(2, 4));
-  if (hours > 0) {
-    return `${hours}h ${minutes}min`;
-  }
-  return `${minutes}min`;
+  // Duration format: HH:MM:SS with colons
+  const [hours, minutes, seconds] = duration.split(':');
+  return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
 };
 
 interface ScheduleEventModalProps {
