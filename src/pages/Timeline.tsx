@@ -306,7 +306,7 @@ export default function Timeline() {
                               return (
                                 <div
                                   key={event.ID}
-                                  className="absolute top-1 h-14 rounded border-2 border-white/30 cursor-pointer hover:border-white/60 hover:shadow-lg transition-all overflow-hidden"
+                                  className="absolute top-1 h-14 rounded border-2 border-gray-700 cursor-pointer hover:border-gray-600 hover:shadow-lg transition-all overflow-hidden"
                                   style={{
                                     left: `${left}px`,
                                     width: `${width}px`,
