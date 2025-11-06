@@ -240,10 +240,15 @@ const Index = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-4xl font-bold text-foreground mb-2">
-            Catálogo de Programas
-          </h1>
-          <p className="text-muted-foreground">
+          <div className="flex items-baseline gap-3">
+            <h1 className="text-4xl font-bold text-foreground">
+              Catálogo de Programas
+            </h1>
+            <span className="text-2xl font-semibold text-primary">
+              ({allPrograms.length.toLocaleString()})
+            </span>
+          </div>
+          <p className="text-muted-foreground mt-2">
             Consulte e filtre o catálogo completo de programas
           </p>
         </div>
