@@ -230,6 +230,7 @@ const Index = () => {
               <nav className="flex gap-6">
                 <NavLink to="/">Programas</NavLink>
                 <NavLink to="/schedule">Grade de Programação</NavLink>
+                <NavLink to="/timeline">Timeline</NavLink>
               </nav>
             </div>
           </div>
