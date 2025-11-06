@@ -113,7 +113,7 @@ export default function Timeline() {
     if (!scheduleData?.ROWS) return { days: [], minTime: 0, maxTime: 24 };
 
     const events = scheduleData.ROWS
-      .filter((event: ScheduleEvent) => event.PROG_REQTYPE === 'PROGRAMA')
+      .filter((event: ScheduleEvent) => event.PROG_REQTYPE === 'PROGRAMA' || event.TXSLOT_NAME === 'SEM EMISSÃO')
       .map((event: ScheduleEvent) => {
         try {
           const start = parseDateTime(event.DATE, event.START_TIME);
@@ -319,7 +319,7 @@ export default function Timeline() {
                                 >
                                   <div className="px-2 py-1 text-white text-xs h-full flex flex-col justify-center">
                                     <div className="font-semibold truncate">
-                                      {event.PROGRAMME || event.SERIES}
+                                      {event.PROGRAMME || event.SERIES || event.TXSLOT_NAME || 'Sem programação'}
                                     </div>
                                     <div className="text-[10px] opacity-90">
                                       {formatTime(event.startDate)} - {formatTime(event.endDate)}
