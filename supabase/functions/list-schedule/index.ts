@@ -94,8 +94,12 @@ Deno.serve(async (req) => {
     if (data?.ROWS && data.ROWS.length > 0) {
       console.log('First 3 events:');
       data.ROWS.slice(0, 3).forEach((row: any, i: number) => {
-        console.log(`  ${i + 1}. ${row.PROGRAMME || row.SERIES} - Channel: ${row.CHANNEL}, Week: ${row.WEEK}, Date: ${row.DATE}`);
+        console.log(`  ${i + 1}. ${row.PROGRAMME || row.SERIES} - Channel: ${row.CHANNEL}, Week: ${row.WEEK}, Date: ${row.DATE}, PREMIERE: ${row.PREMIERE || 'N/A'}`);
       });
+      
+      // Log complete first event to see all fields
+      console.log('=== FIRST EVENT COMPLETE DATA ===');
+      console.log(JSON.stringify(data.ROWS[0], null, 2));
     }
 
     return new Response(JSON.stringify(data), {
