@@ -57,19 +57,19 @@ const getGenreColor = (genre: string) => {
 const parseDateTime = (dateStr: string, timeStr: string) => {
   // Parse date MM/DD/YYYY
   const [month, day, year] = dateStr.split('/');
-  // Parse time HHMMSS
-  const hours = timeStr.substring(0, 2);
-  const minutes = timeStr.substring(2, 4);
-  const seconds = timeStr.substring(4, 6);
+  // Parse time HH:MM:SS (with colons)
+  const [hours, minutes, seconds] = timeStr.split(':').map(s => parseInt(s));
   
-  return new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes), parseInt(seconds));
+  return new Date(parseInt(year), parseInt(month) - 1, parseInt(day), hours, minutes, seconds || 0);
 };
 
 const parseDuration = (duration: string) => {
-  // Duration format HHMM
-  const hours = parseInt(duration.substring(0, 2));
-  const minutes = parseInt(duration.substring(2, 4));
-  return (hours * 60 + minutes) * 60 * 1000; // Convert to milliseconds
+  // Duration format HH:MM:SS.ms (with colons)
+  const parts = duration.split(':').map(s => parseFloat(s));
+  const hours = parts[0] || 0;
+  const minutes = parts[1] || 0;
+  const seconds = parts[2] || 0;
+  return (hours * 60 * 60 + minutes * 60 + seconds) * 1000; // Convert to milliseconds
 };
 
 const extractYearFromDate = (dateStr: string): number => {
