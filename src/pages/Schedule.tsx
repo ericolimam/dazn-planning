@@ -31,7 +31,7 @@ export interface ScheduleEvent {
   SERIES_REQTYPE: string;
   GENRE: string;
   PROGCATEGORY: string;
-  PREMIERE?: string; // Optional - may not be available in API
+  PREMIERE?: string;
 }
 
 const getGenreColor = (genre: string) => {
