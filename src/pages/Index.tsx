@@ -19,6 +19,7 @@ const Index = () => {
   const [genres, setGenres] = useState<string[]>([]);
   const [years, setYears] = useState<number[]>([]);
   const [series, setSeries] = useState<string[]>([]);
+  const [narrators, setNarrators] = useState<string[]>([]);
 
   // Load filter options on mount, but don't show programs in table
   useEffect(() => {
@@ -55,7 +56,11 @@ const Index = () => {
         const uniqueSeries = [...new Set(programsData.map(p => p.SERIE_TITLE).filter(Boolean))].sort();
         setSeries(uniqueSeries);
         
-        console.log(`Genres: ${uniqueGenres.length}, Years: ${uniqueYears.length}, Series: ${uniqueSeries.length}`);
+        // Extract unique narrators
+        const uniqueNarrators = [...new Set(programsData.map(p => p.NARRATOR).filter(Boolean))].sort();
+        setNarrators(uniqueNarrators);
+        
+        console.log(`Genres: ${uniqueGenres.length}, Years: ${uniqueYears.length}, Series: ${uniqueSeries.length}, Narrators: ${uniqueNarrators.length}`);
         
         toast.success(`${programsData.length} programas carregados. Use os filtros para buscar.`);
       }
@@ -67,7 +72,7 @@ const Index = () => {
     }
   };
 
-  const fetchPrograms = async (filters: { genre: string; year: string; serie: string }) => {
+  const fetchPrograms = async (filters: { genre: string; year: string; serie: string; narrator: string }) => {
     setIsLoading(true);
     
     try {
@@ -96,6 +101,9 @@ const Index = () => {
           const uniqueSeries = [...new Set(programsData.map(p => p.SERIE_TITLE).filter(Boolean))].sort();
           setSeries(uniqueSeries);
           
+          const uniqueNarrators = [...new Set(programsData.map(p => p.NARRATOR).filter(Boolean))].sort();
+          setNarrators(uniqueNarrators);
+          
           // Apply filters locally
           const filtered = filterProgramsLocally(programsData, filters);
           setPrograms(filtered);
@@ -118,7 +126,7 @@ const Index = () => {
     }
   };
 
-  const filterProgramsLocally = (data: Program[], filters: { genre: string; year: string; serie: string }): Program[] => {
+  const filterProgramsLocally = (data: Program[], filters: { genre: string; year: string; serie: string; narrator: string }): Program[] => {
     console.log('=== FILTERING LOCALLY ===');
     console.log('Total programs:', data.length);
     console.log('Filters:', filters);
@@ -176,6 +184,12 @@ const Index = () => {
       const beforeFilter = filtered.length;
       filtered = filtered.filter(p => p.SERIE_TITLE?.trim() === filters.serie.trim());
       console.log(`After serie filter "${filters.serie}": ${filtered.length} (removed ${beforeFilter - filtered.length})`);
+    }
+    
+    if (filters.narrator) {
+      const beforeFilter = filtered.length;
+      filtered = filtered.filter(p => p.NARRATOR?.trim() === filters.narrator.trim());
+      console.log(`After narrator filter "${filters.narrator}": ${filtered.length} (removed ${beforeFilter - filtered.length})`);
     }
     
     // Log results
@@ -272,6 +286,7 @@ const Index = () => {
                 genres={genres}
                 years={years}
                 series={series}
+                narrators={narrators}
                 onFilter={fetchPrograms}
                 onClear={handleClearFilters}
                 isLoading={isLoading}

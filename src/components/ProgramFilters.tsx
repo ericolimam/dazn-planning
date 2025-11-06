@@ -17,19 +17,21 @@ interface ProgramFiltersProps {
   genres: string[];
   years: number[];
   series: string[];
-  onFilter: (filters: { genre: string; year: string; serie: string }) => void;
+  narrators: string[];
+  onFilter: (filters: { genre: string; year: string; serie: string; narrator: string }) => void;
   onClear: () => void;
   isLoading?: boolean;
 }
 
-export function ProgramFilters({ genres, years, series, onFilter, onClear, isLoading }: ProgramFiltersProps) {
+export function ProgramFilters({ genres, years, series, narrators, onFilter, onClear, isLoading }: ProgramFiltersProps) {
   const [selectedGenre, setSelectedGenre] = useState<string>("all");
   const [selectedYear, setSelectedYear] = useState<string>("all");
   const [selectedSerie, setSelectedSerie] = useState<string>("all");
+  const [selectedNarrator, setSelectedNarrator] = useState<string>("all");
 
   const handleFilter = () => {
     // Validate that at least one filter is selected
-    if (selectedGenre === "all" && selectedYear === "all" && selectedSerie === "all") {
+    if (selectedGenre === "all" && selectedYear === "all" && selectedSerie === "all" && selectedNarrator === "all") {
       toast.error("Selecione pelo menos um critério de filtro para realizar a busca");
       return;
     }
@@ -38,6 +40,7 @@ export function ProgramFilters({ genres, years, series, onFilter, onClear, isLoa
       genre: selectedGenre === "all" ? "" : selectedGenre,
       year: selectedYear === "all" ? "" : selectedYear,
       serie: selectedSerie === "all" ? "" : selectedSerie,
+      narrator: selectedNarrator === "all" ? "" : selectedNarrator,
     });
   };
 
@@ -45,6 +48,7 @@ export function ProgramFilters({ genres, years, series, onFilter, onClear, isLoa
     setSelectedGenre("all");
     setSelectedYear("all");
     setSelectedSerie("all");
+    setSelectedNarrator("all");
     onClear();
   };
 
@@ -56,7 +60,7 @@ export function ProgramFilters({ genres, years, series, onFilter, onClear, isLoa
           <h2 className="text-lg font-semibold">Filtros</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
           <div className="space-y-2">
             <Label htmlFor="genre">Gênero</Label>
             <Select value={selectedGenre} onValueChange={setSelectedGenre} disabled={isLoading}>
@@ -108,7 +112,24 @@ export function ProgramFilters({ genres, years, series, onFilter, onClear, isLoa
             </Select>
           </div>
 
-          <div className="flex items-end gap-2 md:col-span-2 lg:col-span-2">
+          <div className="space-y-2">
+            <Label htmlFor="narrator">Narrador</Label>
+            <Select value={selectedNarrator} onValueChange={setSelectedNarrator} disabled={isLoading}>
+              <SelectTrigger id="narrator" className="bg-background">
+                <SelectValue placeholder="Todos os narradores" />
+              </SelectTrigger>
+              <SelectContent className="bg-background z-50 max-h-[300px]">
+                <SelectItem value="all">Todos os narradores</SelectItem>
+                {narrators.map((narrator) => (
+                  <SelectItem key={narrator} value={narrator}>
+                    {narrator}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-end gap-2 md:col-span-2">
             <Button
               onClick={handleFilter}
               disabled={isLoading}
