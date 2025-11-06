@@ -110,7 +110,7 @@ export default function Timeline() {
   });
 
   const timelineData = useMemo(() => {
-    if (!scheduleData?.ROWS) return { channels: [], events: [], minTime: 0, maxTime: 24 };
+    if (!scheduleData?.ROWS) return { days: [], minTime: 0, maxTime: 24 };
 
     const events = scheduleData.ROWS
       .filter((event: ScheduleEvent) => event.PROG_REQTYPE === 'PROGRAMA')
@@ -133,25 +133,58 @@ export default function Timeline() {
       })
       .filter(e => e !== null);
 
-    // Filter by selected date
-    const dateFiltered = events.filter(e => {
-      const eventDate = e.startDate.toISOString().split('T')[0];
-      return eventDate === selectedDate;
+    // If week is selected, show all days of that week
+    let filteredEvents = events;
+    if (selectedWeek) {
+      filteredEvents = events.filter(e => e.WEEK === selectedWeek);
+    } else {
+      // Filter by selected date only if no week is selected
+      filteredEvents = events.filter(e => {
+        const eventDate = e.startDate.toISOString().split('T')[0];
+        return eventDate === selectedDate;
+      });
+    }
+
+    // Group by date and channel
+    const dateGroups = new Map<string, typeof filteredEvents>();
+    filteredEvents.forEach(event => {
+      const dateKey = event.startDate.toISOString().split('T')[0];
+      if (!dateGroups.has(dateKey)) {
+        dateGroups.set(dateKey, []);
+      }
+      dateGroups.get(dateKey)!.push(event);
     });
 
-    // Group by channel
-    const channelGroups = channels.map(channel => ({
-      channel,
-      events: dateFiltered.filter(e => e.CHANNEL === channel).sort((a, b) => a.startHour - b.startHour),
-    })).filter(g => g.events.length > 0);
+    // Sort dates
+    const sortedDates = Array.from(dateGroups.keys()).sort();
 
-    // Find time range
-    const allHours = dateFiltered.flatMap(e => [e.startHour, e.endHour]);
+    // Create structure: days -> channels -> events
+    const days = sortedDates.map(date => {
+      const dayEvents = dateGroups.get(date)!;
+      const channelGroups = channels.map(channel => ({
+        channel,
+        events: dayEvents.filter(e => e.CHANNEL === channel).sort((a, b) => a.startHour - b.startHour),
+      })).filter(g => g.events.length > 0);
+
+      return {
+        date,
+        dateFormatted: new Date(date + 'T12:00:00').toLocaleDateString('pt-BR', { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        }),
+        channels: channelGroups,
+      };
+    });
+
+    // Find time range across all events
+    const allHours = filteredEvents.flatMap(e => [e.startHour, e.endHour]);
     const minTime = allHours.length > 0 ? Math.floor(Math.min(...allHours)) : 0;
     const maxTime = allHours.length > 0 ? Math.ceil(Math.max(...allHours)) : 24;
 
-    return { channels: channelGroups, minTime, maxTime };
-  }, [scheduleData, channels, selectedDate]);
+    return { days, minTime, maxTime };
+  }, [scheduleData, channels, selectedDate, selectedWeek]);
 
   const hourRange = timelineData.maxTime - timelineData.minTime;
   const hourWidth = 120; // pixels per hour
@@ -183,15 +216,17 @@ export default function Timeline() {
           </p>
         </div>
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-2">Data</label>
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="px-4 py-2 border border-border rounded-md bg-background text-foreground"
-          />
-        </div>
+        {!selectedWeek && (
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2">Data</label>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="px-4 py-2 border border-border rounded-md bg-background text-foreground"
+            />
+          </div>
+        )}
 
         <ScheduleFilters
           selectedWeek={selectedWeek}
@@ -210,84 +245,96 @@ export default function Timeline() {
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
-          ) : timelineData.channels.length === 0 ? (
+          ) : timelineData.days.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              Nenhum evento encontrado para a data selecionada
+              Nenhum evento encontrado {selectedWeek ? 'para a semana selecionada' : 'para a data selecionada'}
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <div style={{ minWidth: `${hourRange * hourWidth + 200}px` }}>
-                {/* Time header */}
-                <div className="flex items-center mb-4 border-b border-border pb-2">
-                  <div className="w-32 flex-shrink-0 font-semibold">Canal</div>
-                  <div className="flex-1 flex relative">
-                    {Array.from({ length: hourRange + 1 }, (_, i) => {
-                      const hour = timelineData.minTime + i;
-                      return (
-                        <div
-                          key={hour}
-                          className="text-xs text-muted-foreground"
-                          style={{ width: `${hourWidth}px` }}
-                        >
-                          {hour.toString().padStart(2, '0')}:00
+            <div className="space-y-8">
+              {timelineData.days.map(({ date, dateFormatted, channels: dayChannels }) => (
+                <div key={date}>
+                  {selectedWeek && (
+                    <h2 className="text-xl font-bold mb-4 text-foreground">
+                      {dateFormatted}
+                    </h2>
+                  )}
+                  
+                  <div className="overflow-x-auto">
+                    <div style={{ minWidth: `${hourRange * hourWidth + 200}px` }}>
+                      {/* Time header */}
+                      <div className="flex items-center mb-4 border-b border-border pb-2">
+                        <div className="w-32 flex-shrink-0 font-semibold">Canal</div>
+                        <div className="flex-1 flex relative">
+                          {Array.from({ length: hourRange + 1 }, (_, i) => {
+                            const hour = timelineData.minTime + i;
+                            return (
+                              <div
+                                key={hour}
+                                className="text-xs text-muted-foreground"
+                                style={{ width: `${hourWidth}px` }}
+                              >
+                                {hour.toString().padStart(2, '0')}:00
+                              </div>
+                            );
+                          })}
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Channel rows */}
-                {timelineData.channels.map(({ channel, events }) => (
-                  <div key={channel} className="flex items-start mb-6">
-                    <div className="w-32 flex-shrink-0 font-medium pt-2">
-                      {channel}
-                    </div>
-                    <div className="flex-1 relative" style={{ height: '60px' }}>
-                      {/* Grid lines */}
-                      <div className="absolute inset-0 flex">
-                        {Array.from({ length: hourRange + 1 }, (_, i) => (
-                          <div
-                            key={i}
-                            className="border-l border-border/30"
-                            style={{ width: `${hourWidth}px` }}
-                          />
-                        ))}
                       </div>
 
-                      {/* Events */}
-                      {events.map((event) => {
-                        const left = (event.startHour - timelineData.minTime) * hourWidth;
-                        const width = (event.endHour - event.startHour) * hourWidth;
-                        
-                        return (
-                          <div
-                            key={event.ID}
-                            className="absolute top-1 h-14 rounded cursor-pointer hover:opacity-80 transition-opacity overflow-hidden"
-                            style={{
-                              left: `${left}px`,
-                              width: `${width}px`,
-                              backgroundColor: getGenreColor(event.GENRE),
-                            }}
-                            onClick={() => {
-                              setSelectedEvent(event);
-                              setModalOpen(true);
-                            }}
-                          >
-                            <div className="px-2 py-1 text-white text-xs h-full flex flex-col justify-center">
-                              <div className="font-semibold truncate">
-                                {event.PROGRAMME || event.SERIES}
-                              </div>
-                              <div className="text-[10px] opacity-90">
-                                {formatTime(event.startDate)} - {formatTime(event.endDate)}
-                              </div>
-                            </div>
+                      {/* Channel rows */}
+                      {dayChannels.map(({ channel, events }) => (
+                        <div key={`${date}-${channel}`} className="flex items-start mb-6">
+                          <div className="w-32 flex-shrink-0 font-medium pt-2">
+                            {channel}
                           </div>
-                        );
-                      })}
+                          <div className="flex-1 relative" style={{ height: '60px' }}>
+                            {/* Grid lines */}
+                            <div className="absolute inset-0 flex">
+                              {Array.from({ length: hourRange + 1 }, (_, i) => (
+                                <div
+                                  key={i}
+                                  className="border-l border-border/30"
+                                  style={{ width: `${hourWidth}px` }}
+                                />
+                              ))}
+                            </div>
+
+                            {/* Events */}
+                            {events.map((event) => {
+                              const left = (event.startHour - timelineData.minTime) * hourWidth;
+                              const width = (event.endHour - event.startHour) * hourWidth;
+                              
+                              return (
+                                <div
+                                  key={event.ID}
+                                  className="absolute top-1 h-14 rounded border-2 border-white/30 cursor-pointer hover:border-white/60 hover:shadow-lg transition-all overflow-hidden"
+                                  style={{
+                                    left: `${left}px`,
+                                    width: `${width}px`,
+                                    backgroundColor: getGenreColor(event.GENRE),
+                                  }}
+                                  onClick={() => {
+                                    setSelectedEvent(event);
+                                    setModalOpen(true);
+                                  }}
+                                >
+                                  <div className="px-2 py-1 text-white text-xs h-full flex flex-col justify-center">
+                                    <div className="font-semibold truncate">
+                                      {event.PROGRAMME || event.SERIES}
+                                    </div>
+                                    <div className="text-[10px] opacity-90">
+                                      {formatTime(event.startDate)} - {formatTime(event.endDate)}
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           )}
         </Card>
