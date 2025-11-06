@@ -1,24 +1,34 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      },
-    });
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { week, channel } = await req.json();
+    console.log('=== LIST-SCHEDULE REQUEST ===');
+    
+    let requestBody: any = {};
+    try {
+      requestBody = await req.json();
+    } catch (e) {
+      console.log('No body provided, using empty filters');
+    }
+    
+    const { week, channel } = requestBody;
+    console.log('Filters requested:', { week, channel });
     
     const apiUsername = Deno.env.get('PROVYS_API_USERNAME');
     const apiPassword = Deno.env.get('PROVYS_API_PASSWORD');
 
     if (!apiUsername || !apiPassword) {
+      console.error('API credentials not configured');
       throw new Error('API credentials not configured');
     }
 
@@ -37,7 +47,7 @@ Deno.serve(async (req) => {
       filters.push({ "OPERATOR": "=", "VALUE": channel, "ATTR_NM": "TXSCHED_ID.TXWEEK_ID.CHANNEL_RF" });
     }
 
-    const requestBody = {
+    const provysRequestBody = {
       "ENTITY_NM": "TXSLOT",
       "ACTION_NM": "LIST",
       "COLUMNS": [
@@ -59,6 +69,7 @@ Deno.serve(async (req) => {
       "FILTERS": filters
     };
 
+    console.log('Calling Provys API for schedule data...');
     const credentials = btoa(`${apiUsername}:${apiPassword}`);
     
     const response = await fetch('https://i00597.myprovys.com/api/objects/list', {
@@ -68,32 +79,44 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
         'Authorization': `Basic ${credentials}`,
       },
-      body: JSON.stringify(requestBody),
+      body: JSON.stringify(provysRequestBody),
     });
 
     if (!response.ok) {
-      console.error('Provys API error:', response.status, response.statusText);
-      throw new Error(`Provys API returned ${response.status}`);
+      const errorText = await response.text();
+      console.error('Provys API error:', response.status, response.statusText, errorText);
+      throw new Error(`Provys API returned ${response.status}: ${errorText}`);
     }
 
     const data = await response.json();
-    console.log('Provys API response received, rows:', data?.ROWS?.length || 0);
+    console.log('=== PROVYS SCHEDULE RESPONSE ===');
+    console.log('Total rows received:', data?.ROWS?.length || 0);
+    
+    if (data?.ROWS && data.ROWS.length > 0) {
+      console.log('First 3 events:');
+      data.ROWS.slice(0, 3).forEach((row: any, i: number) => {
+        console.log(`  ${i + 1}. ${row.PROGRAMME || row.SERIES} - Channel: ${row.CHANNEL}, Week: ${row.WEEK}, Date: ${row.DATE}`);
+      });
+    }
 
     return new Response(JSON.stringify(data), {
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
+        ...corsHeaders,
       },
     });
   } catch (error) {
     console.error('Error in list-schedule function:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        success: false 
+      }),
       {
         status: 500,
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
+          ...corsHeaders,
         },
       }
     );
