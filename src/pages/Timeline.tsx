@@ -9,6 +9,7 @@ import daznLogo from "@/assets/dazn-logo.png";
 import { NavLink } from "@/components/NavLink";
 import { ScheduleEvent } from "./Schedule";
 import { Star, Sparkles, TrendingUp } from "lucide-react";
+import { UserMenu } from "@/components/UserMenu";
 
 const getGenreColor = (genre: string) => {
   const colors: Record<string, string> = {
@@ -224,6 +225,7 @@ export default function Timeline() {
                 <NavLink to="/timeline">Timeline</NavLink>
               </nav>
             </div>
+            <UserMenu />
           </div>
         </div>
       </header>

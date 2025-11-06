@@ -11,6 +11,7 @@ import { ScheduleEventModal } from "@/components/ScheduleEventModal";
 import { Loader2 } from "lucide-react";
 import daznLogo from "@/assets/dazn-logo.png";
 import { NavLink } from "@/components/NavLink";
+import { UserMenu } from "@/components/UserMenu";
 import { Star, Sparkles, TrendingUp } from "lucide-react";
 
 moment.locale("pt-br");
@@ -288,6 +289,7 @@ export default function Schedule() {
                 <NavLink to="/timeline">Timeline</NavLink>
               </nav>
             </div>
+            <UserMenu />
           </div>
         </div>
       </header>

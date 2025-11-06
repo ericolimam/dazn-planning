@@ -7,6 +7,7 @@ import { ProgramStatistics } from "@/components/ProgramStatistics";
 import { toast } from "sonner";
 import daznLogo from "@/assets/dazn-logo.png";
 import { NavLink } from "@/components/NavLink";
+import { UserMenu } from "@/components/UserMenu";
 
 const Index = () => {
   const [programs, setPrograms] = useState<Program[]>([]);
@@ -233,6 +234,7 @@ const Index = () => {
                 <NavLink to="/timeline">Timeline</NavLink>
               </nav>
             </div>
+            <UserMenu />
           </div>
         </div>
       </header>
