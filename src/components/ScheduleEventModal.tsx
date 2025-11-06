@@ -145,11 +145,9 @@ export function ScheduleEventModal({ event, open, onOpenChange }: ScheduleEventM
               <InfoRow label="Categoria" value={event.PROGCATEGORY} />
               <InfoRow label="Tipo de Programa" value={event.PROG_REQTYPE} />
               <InfoRow label="Tipo de Série" value={event.SERIES_REQTYPE} />
-              {event.PREMIERE && (
-                <InfoRow label="Premiere">
-                  {getPremiereBadge(event.PREMIERE)}
-                </InfoRow>
-              )}
+              <InfoRow label="Premiere">
+                {event.PREMIERE ? getPremiereBadge(event.PREMIERE) : <span className="text-sm font-semibold">-</span>}
+              </InfoRow>
             </div>
           </div>
 
