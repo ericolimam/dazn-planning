@@ -95,7 +95,7 @@ export default function Schedule() {
   const [date, setDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<ScheduleEvent | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [timeStep, setTimeStep] = useState<30 | 60>(30); // 30 or 60 minutes
+  const [timeStep, setTimeStep] = useState<15 | 30 | 60>(30); // 15, 30 or 60 minutes
 
   // First query: Load all data for filters
   const { data: allScheduleData } = useQuery({
@@ -290,6 +290,16 @@ export default function Schedule() {
               Intervalo de Tempo:
             </label>
             <div className="flex gap-2">
+              <button
+                onClick={() => setTimeStep(15)}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  timeStep === 15
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                }`}
+              >
+                15 minutos
+              </button>
               <button
                 onClick={() => setTimeStep(30)}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
