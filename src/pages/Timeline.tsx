@@ -8,6 +8,7 @@ import { Loader2 } from "lucide-react";
 import daznLogo from "@/assets/dazn-logo.png";
 import { NavLink } from "@/components/NavLink";
 import { ScheduleEvent } from "./Schedule";
+import { Star, Sparkles, TrendingUp } from "lucide-react";
 
 const getGenreColor = (genre: string) => {
   const colors: Record<string, string> = {
@@ -28,6 +29,18 @@ const getGenreColor = (genre: string) => {
     'AUTOMOBILISMO': '#64748b',
   };
   return colors[genre] || '#6b7280';
+};
+
+const getPremiereIcon = (premiere: string) => {
+  if (!premiere) return null;
+  
+  const icons: Record<string, JSX.Element> = {
+    'ESTREIA': <Star className="h-3 w-3 inline-block mr-1" fill="gold" color="gold" />,
+    'EXCLUSIVO': <Sparkles className="h-3 w-3 inline-block mr-1" fill="white" color="white" />,
+    'DESTAQUE': <TrendingUp className="h-3 w-3 inline-block mr-1" color="yellow" />,
+  };
+  
+  return icons[premiere] || null;
 };
 
 const parseDateTime = (dateStr: string, timeStr: string) => {
@@ -304,28 +317,29 @@ export default function Timeline() {
                               const width = (event.endHour - event.startHour) * hourWidth;
                               
                               return (
-                                <div
-                                  key={event.ID}
-                                  className="absolute top-1 h-14 rounded border border-gray-700 cursor-pointer hover:border-gray-600 hover:shadow-lg transition-all overflow-hidden"
-                                  style={{
-                                    left: `${left}px`,
-                                    width: `${width}px`,
-                                    backgroundColor: getGenreColor(event.GENRE),
-                                  }}
-                                  onClick={() => {
-                                    setSelectedEvent(event);
-                                    setModalOpen(true);
-                                  }}
-                                >
-                                  <div className="px-2 py-1 text-white text-xs h-full flex flex-col justify-center">
-                                    <div className="font-semibold truncate">
-                                      {event.PROGRAMME || event.SERIES || event.TXSLOT_NAME || 'Sem programação'}
-                                    </div>
-                                    <div className="text-[10px] opacity-90">
-                                      {formatTime(event.startDate)} - {formatTime(event.endDate)}
-                                    </div>
-                                  </div>
-                                </div>
+                                 <div
+                                   key={event.ID}
+                                   className="absolute top-1 h-14 rounded border border-gray-700 cursor-pointer hover:border-gray-600 hover:shadow-lg transition-all overflow-hidden"
+                                   style={{
+                                     left: `${left}px`,
+                                     width: `${width}px`,
+                                     backgroundColor: getGenreColor(event.GENRE),
+                                   }}
+                                   onClick={() => {
+                                     setSelectedEvent(event);
+                                     setModalOpen(true);
+                                   }}
+                                 >
+                                   <div className="px-2 py-1 text-white text-xs h-full flex flex-col justify-center">
+                                     <div className="font-semibold truncate flex items-center">
+                                       {getPremiereIcon(event.PREMIERE)}
+                                       {event.PROGRAMME || event.SERIES || event.TXSLOT_NAME || 'Sem programação'}
+                                     </div>
+                                     <div className="text-[10px] opacity-90">
+                                       {formatTime(event.startDate)} - {formatTime(event.endDate)}
+                                     </div>
+                                   </div>
+                                 </div>
                               );
                             })}
                           </div>

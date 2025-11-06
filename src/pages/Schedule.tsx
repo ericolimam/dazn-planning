@@ -11,6 +11,7 @@ import { ScheduleEventModal } from "@/components/ScheduleEventModal";
 import { Loader2 } from "lucide-react";
 import daznLogo from "@/assets/dazn-logo.png";
 import { NavLink } from "@/components/NavLink";
+import { Star, Sparkles, TrendingUp } from "lucide-react";
 
 moment.locale("pt-br");
 const localizer = momentLocalizer(moment);
@@ -30,6 +31,7 @@ export interface ScheduleEvent {
   SERIES_REQTYPE: string;
   GENRE: string;
   PROGCATEGORY: string;
+  PREMIERE: string;
 }
 
 const getGenreColor = (genre: string) => {
@@ -52,6 +54,16 @@ const getGenreColor = (genre: string) => {
   };
   
   return colors[genre] || '#6b7280';
+};
+
+const getPremiereIcon = (premiere: string) => {
+  const icons: Record<string, JSX.Element> = {
+    'ESTREIA': <Star className="h-3 w-3" fill="gold" color="gold" />,
+    'EXCLUSIVO': <Sparkles className="h-3 w-3" fill="white" color="white" />,
+    'DESTAQUE': <TrendingUp className="h-3 w-3" color="yellow" />,
+  };
+  
+  return icons[premiere] || null;
 };
 
 const parseDateTime = (dateStr: string, timeStr: string) => {
@@ -233,11 +245,23 @@ export default function Schedule() {
         opacity: 0.9,
         color: 'white',
         border: '1px solid #374151',
-        display: 'block',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '4px',
         fontSize: '12px',
         padding: '2px 4px',
       }
     };
+  };
+
+  const EventComponent = ({ event }: any) => {
+    const premiereIcon = getPremiereIcon(event.resource.PREMIERE);
+    return (
+      <div className="flex items-center gap-1">
+        {premiereIcon}
+        <span>{event.title}</span>
+      </div>
+    );
   };
 
   const handleDoubleClickEvent = (event: any) => {
@@ -345,6 +369,9 @@ export default function Schedule() {
                 views={['month', 'week', 'day']}
                 step={timeStep}
                 timeslots={1}
+                components={{
+                  event: EventComponent,
+                }}
                 messages={{
                   next: "Próximo",
                   previous: "Anterior",
