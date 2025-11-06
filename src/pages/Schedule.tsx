@@ -72,24 +72,79 @@ const parseDuration = (duration: string) => {
   return (hours * 60 + minutes) * 60 * 1000; // Convert to milliseconds
 };
 
+const extractYearFromDate = (dateStr: string): number => {
+  // Date format: MM/DD/YYYY
+  const parts = dateStr.split('/');
+  return parseInt(parts[2]);
+};
+
 export default function Schedule() {
   const [selectedWeek, setSelectedWeek] = useState<number | null>(null);
   const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [view, setView] = useState<View>("month");
   const [date, setDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<ScheduleEvent | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  const { data: scheduleData, isLoading } = useQuery({
-    queryKey: ["schedule", selectedWeek, selectedChannel],
+  // First query: Load all data for filters
+  const { data: allScheduleData } = useQuery({
+    queryKey: ["schedule-all"],
     queryFn: async () => {
+      console.log('Loading all schedule data for filters...');
       const { data, error } = await supabase.functions.invoke("list-schedule", {
-        body: { week: selectedWeek, channel: selectedChannel },
+        body: {},
       });
 
       if (error) throw error;
+      console.log('All schedule data loaded:', data?.ROWS?.length || 0, 'events');
       return data;
     },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+
+  // Extract unique weeks, channels, and years
+  const weeks = allScheduleData?.ROWS 
+    ? [...new Set<number>(allScheduleData.ROWS.map((r: ScheduleEvent) => r.WEEK).filter((w: number) => w))].sort((a: number, b: number) => a - b)
+    : [];
+  
+  const channels = allScheduleData?.ROWS 
+    ? [...new Set<string>(allScheduleData.ROWS.map((r: ScheduleEvent) => r.CHANNEL).filter((c: string) => c))].sort()
+    : [];
+
+  const years = allScheduleData?.ROWS 
+    ? [...new Set<number>(allScheduleData.ROWS.map((r: ScheduleEvent) => extractYearFromDate(r.DATE)).filter((y: number) => y))].sort((a: number, b: number) => b - a)
+    : [];
+
+  console.log('Filters available:', { weeks: weeks.length, channels: channels.length, years: years.length });
+
+  // Second query: Filter data based on selections
+  const { data: scheduleData, isLoading } = useQuery({
+    queryKey: ["schedule-filtered", selectedWeek, selectedChannel, selectedYear],
+    queryFn: async () => {
+      console.log('Filtering schedule data:', { selectedWeek, selectedChannel, selectedYear });
+      
+      // Apply filters locally on cached data
+      if (!allScheduleData?.ROWS) return { ROWS: [] };
+      
+      let filtered = [...allScheduleData.ROWS];
+      
+      if (selectedWeek !== null) {
+        filtered = filtered.filter((r: ScheduleEvent) => r.WEEK === selectedWeek);
+      }
+      
+      if (selectedChannel !== null) {
+        filtered = filtered.filter((r: ScheduleEvent) => r.CHANNEL === selectedChannel);
+      }
+      
+      if (selectedYear !== null) {
+        filtered = filtered.filter((r: ScheduleEvent) => extractYearFromDate(r.DATE) === selectedYear);
+      }
+      
+      console.log('Filtered results:', filtered.length, 'events');
+      return { ROWS: filtered };
+    },
+    enabled: !!allScheduleData,
   });
 
   const events = scheduleData?.ROWS?.map((event: ScheduleEvent) => {
@@ -158,10 +213,13 @@ export default function Schedule() {
         <ScheduleFilters
           selectedWeek={selectedWeek}
           selectedChannel={selectedChannel}
+          selectedYear={selectedYear}
           onWeekChange={setSelectedWeek}
           onChannelChange={setSelectedChannel}
-          weeks={scheduleData?.ROWS ? [...new Set<number>(scheduleData.ROWS.map((r: ScheduleEvent) => r.WEEK))].sort((a: number, b: number) => a - b) : []}
-          channels={scheduleData?.ROWS ? [...new Set<string>(scheduleData.ROWS.map((r: ScheduleEvent) => r.CHANNEL))].sort() : []}
+          onYearChange={setSelectedYear}
+          weeks={weeks}
+          channels={channels}
+          years={years}
         />
 
         <Card className="p-6 bg-card border-border">
