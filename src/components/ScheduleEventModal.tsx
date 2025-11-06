@@ -32,9 +32,12 @@ const getGenreColor = (genre: string) => {
 };
 
 const formatTime = (timeStr: string) => {
-  const hours = timeStr.substring(0, 2);
-  const minutes = timeStr.substring(2, 4);
-  return `${hours}:${minutes}`;
+  // Format: HH:MM:SS or HH:MM
+  const parts = timeStr.split(':');
+  const hours = parts[0]?.padStart(2, '0') || '00';
+  const minutes = parts[1]?.padStart(2, '0') || '00';
+  const seconds = parts[2]?.padStart(2, '0') || '00';
+  return `${hours}:${minutes}:${seconds}`;
 };
 
 const formatDuration = (duration: string) => {
