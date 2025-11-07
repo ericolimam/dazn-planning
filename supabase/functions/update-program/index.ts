@@ -28,17 +28,17 @@ serve(async (req) => {
     // Build the change request body - correct Provys format
     const attrs: any = {};
 
-    // Map the updates to the correct attribute names
+    // Map the updates to the correct attribute names (remove PROG_ID. prefix)
     if (updates.STATE_EVENT !== undefined) {
-      attrs["PROG_ID.STATE_EVENT_RF"] = updates.STATE_EVENT;
+      attrs["STATE_EVENT_RF"] = updates.STATE_EVENT;
     }
 
     if (updates.CABINE !== undefined) {
-      attrs["PROG_ID.CABINE_RF"] = updates.CABINE;
+      attrs["CABINE_RF"] = updates.CABINE;
     }
 
     if (updates.NARRATOR !== undefined) {
-      attrs["PROG_ID.NARRATOR_RF"] = updates.NARRATOR;
+      attrs["NARRATOR_RF"] = updates.NARRATOR;
     }
 
     if (updates.RESUMO !== undefined) {
