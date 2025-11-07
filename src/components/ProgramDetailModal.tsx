@@ -49,9 +49,9 @@ interface ProgramDetailModalProps {
   program: Program | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  stateEvents?: string[];
-  cabines?: string[];
-  narrators?: string[];
+  stateEvents?: Array<{id: string; name: string}>;
+  cabines?: Array<{id: string; name: string}>;
+  narrators?: Array<{id: string; name: string}>;
 }
 
 export function ProgramDetailModal({ 
@@ -65,9 +65,9 @@ export function ProgramDetailModal({
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [editedData, setEditedData] = useState({
-    STATE_EVENT: program?.STATE_EVENT || '',
-    CABINE: program?.CABINE || '',
-    NARRATOR: program?.NARRATOR || '',
+    STATE_EVENT_ID: program?.STATE_EVENT_ID || '',
+    CABINE_ID: program?.CABINE_ID || '',
+    NARRATOR_ID: program?.NARRATOR_ID || '',
     RESUMO: program?.RESUMO || false,
     DESTAQUE_SEMANA: program?.DESTAQUE_SEMANA || false,
     PROMO_DAZN: program?.PROMO_DAZN || false,
@@ -77,9 +77,9 @@ export function ProgramDetailModal({
 
   const handleEdit = () => {
     setEditedData({
-      STATE_EVENT: program.STATE_EVENT || '',
-      CABINE: program.CABINE || '',
-      NARRATOR: program.NARRATOR || '',
+      STATE_EVENT_ID: program.STATE_EVENT_ID || '',
+      CABINE_ID: program.CABINE_ID || '',
+      NARRATOR_ID: program.NARRATOR_ID || '',
       RESUMO: program.RESUMO || false,
       DESTAQUE_SEMANA: program.DESTAQUE_SEMANA || false,
       PROMO_DAZN: program.PROMO_DAZN || false,
@@ -90,9 +90,9 @@ export function ProgramDetailModal({
   const handleCancel = () => {
     setIsEditing(false);
     setEditedData({
-      STATE_EVENT: program.STATE_EVENT || '',
-      CABINE: program.CABINE || '',
-      NARRATOR: program.NARRATOR || '',
+      STATE_EVENT_ID: program.STATE_EVENT_ID || '',
+      CABINE_ID: program.CABINE_ID || '',
+      NARRATOR_ID: program.NARRATOR_ID || '',
       RESUMO: program.RESUMO || false,
       DESTAQUE_SEMANA: program.DESTAQUE_SEMANA || false,
       PROMO_DAZN: program.PROMO_DAZN || false,
@@ -105,7 +105,14 @@ export function ProgramDetailModal({
       const { data, error } = await supabase.functions.invoke('update-program', {
         body: {
           programId: program.ID,
-          updates: editedData
+          updates: {
+            STATE_EVENT: editedData.STATE_EVENT_ID,
+            CABINE: editedData.CABINE_ID,
+            NARRATOR: editedData.NARRATOR_ID,
+            RESUMO: editedData.RESUMO,
+            DESTAQUE_SEMANA: editedData.DESTAQUE_SEMANA,
+            PROMO_DAZN: editedData.PROMO_DAZN
+          }
         }
       });
 
@@ -159,16 +166,16 @@ export function ProgramDetailModal({
                   <div className="space-y-2">
                     <Label htmlFor="state_event">Estado/Evento</Label>
                     <Select
-                      value={editedData.STATE_EVENT}
-                      onValueChange={(value) => setEditedData({ ...editedData, STATE_EVENT: value })}
+                      value={editedData.STATE_EVENT_ID}
+                      onValueChange={(value) => setEditedData({ ...editedData, STATE_EVENT_ID: value })}
                     >
                       <SelectTrigger className="bg-background">
                         <SelectValue placeholder="Selecione o estado/evento" />
                       </SelectTrigger>
                       <SelectContent className="bg-background z-50">
                         {stateEvents.map((event) => (
-                          <SelectItem key={event} value={event}>
-                            {event}
+                          <SelectItem key={event.id} value={event.id}>
+                            {event.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -209,16 +216,16 @@ export function ProgramDetailModal({
                 <div className="space-y-2">
                   <Label htmlFor="cabine">Cabine</Label>
                   <Select
-                    value={editedData.CABINE}
-                    onValueChange={(value) => setEditedData({ ...editedData, CABINE: value })}
+                    value={editedData.CABINE_ID}
+                    onValueChange={(value) => setEditedData({ ...editedData, CABINE_ID: value })}
                   >
                     <SelectTrigger className="bg-background">
                       <SelectValue placeholder="Selecione a cabine" />
                     </SelectTrigger>
                     <SelectContent className="bg-background z-50">
                       {cabines.map((cabine) => (
-                        <SelectItem key={cabine} value={cabine}>
-                          {cabine}
+                        <SelectItem key={cabine.id} value={cabine.id}>
+                          {cabine.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -227,16 +234,16 @@ export function ProgramDetailModal({
                 <div className="space-y-2">
                   <Label htmlFor="narrator">Narrador</Label>
                   <Select
-                    value={editedData.NARRATOR}
-                    onValueChange={(value) => setEditedData({ ...editedData, NARRATOR: value })}
+                    value={editedData.NARRATOR_ID}
+                    onValueChange={(value) => setEditedData({ ...editedData, NARRATOR_ID: value })}
                   >
                     <SelectTrigger className="bg-background">
                       <SelectValue placeholder="Selecione o narrador" />
                     </SelectTrigger>
                     <SelectContent className="bg-background z-50">
                       {narrators.map((narrator) => (
-                        <SelectItem key={narrator} value={narrator}>
-                          {narrator}
+                        <SelectItem key={narrator.id} value={narrator.id}>
+                          {narrator.name}
                         </SelectItem>
                       ))}
                     </SelectContent>

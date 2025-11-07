@@ -58,12 +58,15 @@ export interface Program {
   PROG_CATEGORY: string;
   ACQ_TYPE: string;
   CABINE: string;
+  CABINE_ID: string;
   NARRATOR: string;
+  NARRATOR_ID: string;
   RESUMO: boolean;
   DESTAQUE_SEMANA: boolean;
   PROMO_DAZN: boolean;
   YEAR: number;
   STATE_EVENT: string;
+  STATE_EVENT_ID: string;
 }
 
 interface ProgramTableProps {

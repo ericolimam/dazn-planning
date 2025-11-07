@@ -17,7 +17,7 @@ interface ProgramFiltersProps {
   genres: string[];
   years: number[];
   series: string[];
-  narrators: string[];
+  narrators: Array<{id: string; name: string}>;
   onFilter: (filters: { genre: string; year: string; serie: string; narrator: string }) => void;
   onClear: () => void;
   isLoading?: boolean;
@@ -121,8 +121,8 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
               <SelectContent className="bg-background z-50 max-h-[300px]">
                 <SelectItem value="all">Todos os narradores</SelectItem>
                 {narrators.map((narrator) => (
-                  <SelectItem key={narrator} value={narrator}>
-                    {narrator}
+                  <SelectItem key={narrator.id} value={narrator.name}>
+                    {narrator.name}
                   </SelectItem>
                 ))}
               </SelectContent>
