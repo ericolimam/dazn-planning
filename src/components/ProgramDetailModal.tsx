@@ -76,14 +76,20 @@ export function ProgramDetailModal({
   if (!program) return null;
 
   const handleEdit = () => {
-    setEditedData({
-      STATE_EVENT_ID: program.STATE_EVENT_ID || '',
-      CABINE_ID: program.CABINE_ID || '',
-      NARRATOR_ID: program.NARRATOR_ID || '',
+    const newData = {
+      STATE_EVENT_ID: String(program.STATE_EVENT_ID || ''),
+      CABINE_ID: String(program.CABINE_ID || ''),
+      NARRATOR_ID: String(program.NARRATOR_ID || ''),
       RESUMO: program.RESUMO || false,
       DESTAQUE_SEMANA: program.DESTAQUE_SEMANA || false,
       PROMO_DAZN: program.PROMO_DAZN || false,
-    });
+    };
+    console.log('Editing program:', program.TITLE);
+    console.log('Edited data:', newData);
+    console.log('Available narrators:', narrators.length);
+    console.log('Available cabines:', cabines.length);
+    console.log('Available state events:', stateEvents.length);
+    setEditedData(newData);
     setIsEditing(true);
   };
 
@@ -173,8 +179,9 @@ export function ProgramDetailModal({
                         <SelectValue placeholder="Selecione o estado/evento" />
                       </SelectTrigger>
                       <SelectContent className="bg-background z-50">
+                        <SelectItem value="">Nenhum</SelectItem>
                         {stateEvents.map((event) => (
-                          <SelectItem key={event.id} value={event.id}>
+                          <SelectItem key={event.id} value={String(event.id)}>
                             {event.name}
                           </SelectItem>
                         ))}
@@ -223,8 +230,9 @@ export function ProgramDetailModal({
                       <SelectValue placeholder="Selecione a cabine" />
                     </SelectTrigger>
                     <SelectContent className="bg-background z-50">
+                      <SelectItem value="">Nenhuma</SelectItem>
                       {cabines.map((cabine) => (
-                        <SelectItem key={cabine.id} value={cabine.id}>
+                        <SelectItem key={cabine.id} value={String(cabine.id)}>
                           {cabine.name}
                         </SelectItem>
                       ))}
@@ -241,8 +249,9 @@ export function ProgramDetailModal({
                       <SelectValue placeholder="Selecione o narrador" />
                     </SelectTrigger>
                     <SelectContent className="bg-background z-50">
+                      <SelectItem value="">Nenhum</SelectItem>
                       {narrators.map((narrator) => (
-                        <SelectItem key={narrator.id} value={narrator.id}>
+                        <SelectItem key={narrator.id} value={String(narrator.id)}>
                           {narrator.name}
                         </SelectItem>
                       ))}
