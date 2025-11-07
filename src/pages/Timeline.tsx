@@ -58,7 +58,8 @@ const parseDuration = (duration: string) => {
   return (hours * 60 * 60 + minutes * 60 + seconds) * 1000;
 };
 
-const extractYearFromDate = (dateStr: string): number => {
+const extractYearFromDate = (dateStr: string | null | undefined): number | null => {
+  if (!dateStr) return null;
   const parts = dateStr.split('/');
   return parseInt(parts[2]);
 };
@@ -105,7 +106,7 @@ export default function Timeline() {
     : [];
 
   const years = allScheduleData?.ROWS 
-    ? [...new Set<number>(allScheduleData.ROWS.map((r: ScheduleEvent) => extractYearFromDate(r.DATE)).filter((y: number) => y))].sort((a: number, b: number) => b - a)
+    ? [...new Set<number>(allScheduleData.ROWS.map((r: ScheduleEvent) => extractYearFromDate(r.DATE)).filter((y): y is number => y !== null))].sort((a: number, b: number) => b - a)
     : [];
 
   const { data: scheduleData, isLoading } = useQuery({
@@ -124,7 +125,10 @@ export default function Timeline() {
       }
       
       if (selectedYear !== null) {
-        filtered = filtered.filter((r: ScheduleEvent) => extractYearFromDate(r.DATE) === selectedYear);
+        filtered = filtered.filter((r: ScheduleEvent) => {
+          const year = extractYearFromDate(r.DATE);
+          return year !== null && year === selectedYear;
+        });
       }
       
       return { ROWS: filtered };
