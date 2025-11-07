@@ -19,7 +19,12 @@ serve(async (req) => {
     const apiUsername = Deno.env.get('PROVYS_API_USERNAME');
     const apiPassword = Deno.env.get('PROVYS_API_PASSWORD');
 
+    console.log('Checking credentials...');
+    console.log('Username exists:', !!apiUsername);
+    console.log('Password exists:', !!apiPassword);
+    
     if (!apiUsername || !apiPassword) {
+      console.error('Missing credentials!');
       throw new Error('API credentials not configured');
     }
 
@@ -62,19 +67,34 @@ serve(async (req) => {
     };
 
     console.log('API REQUEST BODY:', JSON.stringify(requestBody, null, 2));
+    
+    const authHeader = 'Basic ' + btoa(`${apiUsername}:${apiPassword}`);
+    console.log('Authorization header length:', authHeader.length);
 
     const response = await fetch('https://i00598.myprovys.com/api/objects/list', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Basic ' + btoa(`${apiUsername}:${apiPassword}`),
+        'Authorization': authHeader,
       },
       body: JSON.stringify(requestBody),
     });
 
+    console.log('Response status:', response.status);
+    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('PROVYS API error:', errorText);
+      console.error('PROVYS API error response:', errorText);
+      console.error('Request was:', JSON.stringify({
+        url: 'https://i00598.myprovys.com/api/objects/list',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Basic [REDACTED]'
+        },
+        body: requestBody
+      }, null, 2));
       throw new Error(`API request failed: ${response.status} - ${errorText}`);
     }
 
