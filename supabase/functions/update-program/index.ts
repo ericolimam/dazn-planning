@@ -111,14 +111,27 @@ serve(async (req) => {
       }
     }
 
-    const data = await response.json();
+    // Check if response has content
+    const responseText = await response.text();
     console.log('=== PROVYS API SUCCESS ===');
     console.log('Update successful!');
-    console.log('Response:', JSON.stringify(data, null, 2));
+    console.log('Response text length:', responseText.length);
+    console.log('Response text:', responseText || '(empty)');
+    
+    // Parse response if not empty
+    let data = {};
+    if (responseText && responseText.trim().length > 0) {
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        console.log('Could not parse response as JSON, using empty object');
+      }
+    }
 
     return new Response(
       JSON.stringify({ 
         success: true, 
+        message: 'Programa atualizado com sucesso',
         data 
       }), 
       {
