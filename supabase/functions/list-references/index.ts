@@ -40,6 +40,10 @@ serve(async (req) => {
       ACTION_NM: 'LIST',
       COLUMNS: [
         {
+          ALIAS: 'REFERENCE_ID',
+          ATTR_NM: 'REFERENCE_ID',
+        },
+        {
           ALIAS: 'DETAIL',
           ATTR_NM: 'NAME',
         },
