@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar, momentLocalizer, View } from "react-big-calendar";
 import moment from "moment";
 import "moment/locale/pt-br";
@@ -103,6 +103,14 @@ const getCurrentWeek = () => {
   return Math.ceil(diff / oneWeek);
 };
 
+// Calculate date from week number
+const getDateFromWeek = (week: number, year: number) => {
+  const start = new Date(year, 0, 1);
+  const daysToAdd = (week - 1) * 7;
+  const result = new Date(start.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
+  return result;
+};
+
 export default function Schedule() {
   const [selectedWeek, setSelectedWeek] = useState<number | null>(getCurrentWeek());
   const [selectedChannels, setSelectedChannels] = useState<string[]>(["DAZN 1"]);
@@ -113,6 +121,14 @@ export default function Schedule() {
   const [modalOpen, setModalOpen] = useState(false);
   const [timeStep, setTimeStep] = useState<15 | 30 | 60>(30); // 15, 30 or 60 minutes
   const [showOverlaps, setShowOverlaps] = useState(false); // Default: Sem Overlaps
+
+  // Update calendar date when week selection changes (for week/day views)
+  useEffect(() => {
+    if (selectedWeek !== null && selectedYear !== null && (view === "week" || view === "day")) {
+      const weekDate = getDateFromWeek(selectedWeek, selectedYear);
+      setDate(weekDate);
+    }
+  }, [selectedWeek, selectedYear, view]);
 
   // First query: Load all data for filters
   const { data: allScheduleData } = useQuery({
@@ -405,6 +421,8 @@ export default function Schedule() {
                 views={['month', 'week', 'day']}
                 step={timeStep}
                 timeslots={1}
+                min={new Date(1970, 0, 1, 5, 0, 0)}
+                max={new Date(1970, 0, 2, 5, 0, 0)}
                 dayLayoutAlgorithm={showOverlaps ? 'overlap' : 'no-overlap'}
                 components={{
                   event: EventComponent,

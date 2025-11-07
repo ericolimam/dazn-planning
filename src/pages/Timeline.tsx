@@ -137,7 +137,7 @@ export default function Timeline() {
   });
 
   const timelineData = useMemo(() => {
-    if (!scheduleData?.ROWS) return { days: [], minTime: 0, maxTime: 24 };
+    if (!scheduleData?.ROWS) return { days: [], minTime: 5, maxTime: 29 };
 
     const events = scheduleData.ROWS
       .filter((event: ScheduleEvent) => event.PROG_REQTYPE === 'PROGRAMA' || event.TXSLOT_NAME === 'SEM EMISSÃO')
@@ -147,12 +147,22 @@ export default function Timeline() {
           const duration = parseDuration(event.DURATION);
           const end = new Date(start.getTime() + duration);
           
+          // Calculate hours in 24h+ format for events after midnight
+          let startHour = start.getHours() + start.getMinutes() / 60;
+          let endHour = end.getHours() + end.getMinutes() / 60;
+          
+          // If event starts before 5am, treat it as next day (24+ hours)
+          if (startHour < 5) startHour += 24;
+          if (endHour < 5) endHour += 24;
+          // If event ends before it starts, it crossed midnight
+          if (endHour < startHour) endHour += 24;
+          
           return {
             ...event,
             startDate: start,
             endDate: end,
-            startHour: start.getHours() + start.getMinutes() / 60,
-            endHour: end.getHours() + end.getMinutes() / 60,
+            startHour,
+            endHour,
           };
         } catch (error) {
           return null;
@@ -205,10 +215,9 @@ export default function Timeline() {
       };
     });
 
-    // Find time range across all events
-    const allHours = filteredEvents.flatMap(e => [e.startHour, e.endHour]);
-    const minTime = allHours.length > 0 ? Math.floor(Math.min(...allHours)) : 0;
-    const maxTime = allHours.length > 0 ? Math.ceil(Math.max(...allHours)) : 24;
+    // Fixed time range: 5am to 5am next day (5 to 29 in 24h+ format)
+    const minTime = 5;
+    const maxTime = 29;
 
     return { days, minTime, maxTime };
   }, [scheduleData, channels, selectedDate, selectedWeek]);
@@ -292,16 +301,17 @@ export default function Timeline() {
                       {/* Time header */}
                       <div className="flex items-center mb-4 border-b border-border pb-2">
                         <div className="w-32 flex-shrink-0 font-semibold">Canal</div>
-                        <div className="flex-1 flex relative">
+                          <div className="flex-1 flex relative">
                           {Array.from({ length: hourRange + 1 }, (_, i) => {
                             const hour = timelineData.minTime + i;
+                            const displayHour = hour >= 24 ? hour - 24 : hour;
                             return (
                               <div
                                 key={hour}
                                 className="text-xs text-muted-foreground"
                                 style={{ width: `${hourWidth}px` }}
                               >
-                                {hour.toString().padStart(2, '0')}:00
+                                {displayHour.toString().padStart(2, '0')}:00
                               </div>
                             );
                           })}
