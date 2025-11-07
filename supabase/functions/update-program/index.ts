@@ -31,7 +31,7 @@ serve(async (req) => {
       ACTION_NM: "CHANGE",
       RECORDS: [
         {
-          KEY_VALUE: programId.toString(),
+          ID: programId.toString(),
           ATTRIBUTES: []
         }
       ]
