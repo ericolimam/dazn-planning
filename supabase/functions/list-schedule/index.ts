@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
     console.log('Calling Provys API for schedule data...');
     const credentials = btoa(`${apiUsername}:${apiPassword}`);
     
-    const response = await fetch('https://i00597.myprovys.com/api/objects/list', {
+    const response = await fetch('https://i00598.myprovys.com/api/objects/list', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
