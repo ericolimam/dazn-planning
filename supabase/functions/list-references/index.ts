@@ -23,29 +23,36 @@ serve(async (req) => {
       throw new Error('API credentials not configured');
     }
 
-    // Map reference types to their entity names
-    const entityMap: Record<string, string> = {
+    // Map reference types to their filter values
+    const filterMap: Record<string, string> = {
       'narrator': 'NARRATOR',
       'cabine': 'CABINE',
       'state_event': 'STATE_EVENT',
     };
 
-    const entityName = entityMap[referenceType];
-    if (!entityName) {
+    const filterValue = filterMap[referenceType];
+    if (!filterValue) {
       throw new Error(`Unknown reference type: ${referenceType}`);
     }
 
     const requestBody = {
-      ENTITY_NM: entityName,
+      ENTITY_NM: 'REFERENCE',
       ACTION_NM: 'LIST',
       COLUMNS: [
         {
-          ALIAS: 'ID',
-          ATTR_NM: `${entityName}_ID`,
+          ALIAS: 'DETAIL',
+          ATTR_NM: 'NAME',
         },
         {
-          ALIAS: 'NAME',
-          ATTR_NM: 'NAME',
+          ALIAS: 'REFERENCE_TABLE',
+          ATTR_NM: 'REFTAB_ID.NAME_NM',
+        },
+      ],
+      FILTERS: [
+        {
+          OPERATOR: '=',
+          VALUE: filterValue,
+          ATTR_NM: 'REFTAB_ID.NAME_NM',
         },
       ],
     };
@@ -72,8 +79,8 @@ serve(async (req) => {
 
     // Transform the response
     const items = data.ROWS?.map((row: any) => ({
-      id: String(row.ID),
-      name: row.NAME,
+      id: String(row.REFERENCE_ID),
+      name: row.DETAIL,
     })) || [];
 
     console.log(`First 3 ${referenceType}:`, items.slice(0, 3));
