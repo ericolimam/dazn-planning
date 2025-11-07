@@ -10,9 +10,15 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Program } from "./ProgramTable";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -43,9 +49,19 @@ interface ProgramDetailModalProps {
   program: Program | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  stateEvents?: string[];
+  cabines?: string[];
+  narrators?: string[];
 }
 
-export function ProgramDetailModal({ program, open, onOpenChange }: ProgramDetailModalProps) {
+export function ProgramDetailModal({ 
+  program, 
+  open, 
+  onOpenChange,
+  stateEvents = [],
+  cabines = [],
+  narrators = []
+}: ProgramDetailModalProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [editedData, setEditedData] = useState({
@@ -142,12 +158,21 @@ export function ProgramDetailModal({ program, open, onOpenChange }: ProgramDetai
                 {isEditing ? (
                   <div className="space-y-2">
                     <Label htmlFor="state_event">Estado/Evento</Label>
-                    <Input
-                      id="state_event"
+                    <Select
                       value={editedData.STATE_EVENT}
-                      onChange={(e) => setEditedData({ ...editedData, STATE_EVENT: e.target.value })}
-                      placeholder="Estado/Evento"
-                    />
+                      onValueChange={(value) => setEditedData({ ...editedData, STATE_EVENT: value })}
+                    >
+                      <SelectTrigger className="bg-background">
+                        <SelectValue placeholder="Selecione o estado/evento" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-background z-50">
+                        {stateEvents.map((event) => (
+                          <SelectItem key={event} value={event}>
+                            {event}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 ) : (
                   <InfoRow label="Estado/Evento">
@@ -183,21 +208,39 @@ export function ProgramDetailModal({ program, open, onOpenChange }: ProgramDetai
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="cabine">Cabine</Label>
-                  <Input
-                    id="cabine"
+                  <Select
                     value={editedData.CABINE}
-                    onChange={(e) => setEditedData({ ...editedData, CABINE: e.target.value })}
-                    placeholder="Cabine"
-                  />
+                    onValueChange={(value) => setEditedData({ ...editedData, CABINE: value })}
+                  >
+                    <SelectTrigger className="bg-background">
+                      <SelectValue placeholder="Selecione a cabine" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background z-50">
+                      {cabines.map((cabine) => (
+                        <SelectItem key={cabine} value={cabine}>
+                          {cabine}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="narrator">Narrador</Label>
-                  <Input
-                    id="narrator"
+                  <Select
                     value={editedData.NARRATOR}
-                    onChange={(e) => setEditedData({ ...editedData, NARRATOR: e.target.value })}
-                    placeholder="Narrador"
-                  />
+                    onValueChange={(value) => setEditedData({ ...editedData, NARRATOR: value })}
+                  >
+                    <SelectTrigger className="bg-background">
+                      <SelectValue placeholder="Selecione o narrador" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background z-50">
+                      {narrators.map((narrator) => (
+                        <SelectItem key={narrator} value={narrator}>
+                          {narrator}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             ) : (

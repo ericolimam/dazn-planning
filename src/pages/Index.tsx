@@ -20,6 +20,8 @@ const Index = () => {
   const [years, setYears] = useState<number[]>([]);
   const [series, setSeries] = useState<string[]>([]);
   const [narrators, setNarrators] = useState<string[]>([]);
+  const [stateEvents, setStateEvents] = useState<string[]>([]);
+  const [cabines, setCabines] = useState<string[]>([]);
 
   // Load filter options on mount, but don't show programs in table
   useEffect(() => {
@@ -60,7 +62,15 @@ const Index = () => {
         const uniqueNarrators = [...new Set(programsData.map(p => p.NARRATOR).filter(Boolean))].sort();
         setNarrators(uniqueNarrators);
         
-        console.log(`Genres: ${uniqueGenres.length}, Years: ${uniqueYears.length}, Series: ${uniqueSeries.length}, Narrators: ${uniqueNarrators.length}`);
+        // Extract unique state events
+        const uniqueStateEvents = [...new Set(programsData.map(p => p.STATE_EVENT).filter(Boolean))].sort();
+        setStateEvents(uniqueStateEvents);
+        
+        // Extract unique cabines
+        const uniqueCabines = [...new Set(programsData.map(p => p.CABINE).filter(Boolean))].sort();
+        setCabines(uniqueCabines);
+        
+        console.log(`Genres: ${uniqueGenres.length}, Years: ${uniqueYears.length}, Series: ${uniqueSeries.length}, Narrators: ${uniqueNarrators.length}, State Events: ${uniqueStateEvents.length}, Cabines: ${uniqueCabines.length}`);
         
         toast.success(`${programsData.length} programas carregados. Use os filtros para buscar.`);
       }
@@ -103,6 +113,12 @@ const Index = () => {
           
           const uniqueNarrators = [...new Set(programsData.map(p => p.NARRATOR).filter(Boolean))].sort();
           setNarrators(uniqueNarrators);
+          
+          const uniqueStateEvents = [...new Set(programsData.map(p => p.STATE_EVENT).filter(Boolean))].sort();
+          setStateEvents(uniqueStateEvents);
+          
+          const uniqueCabines = [...new Set(programsData.map(p => p.CABINE).filter(Boolean))].sort();
+          setCabines(uniqueCabines);
           
           // Apply filters locally
           const filtered = filterProgramsLocally(programsData, filters);
@@ -326,6 +342,9 @@ const Index = () => {
         program={selectedProgram}
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
+        stateEvents={stateEvents}
+        cabines={cabines}
+        narrators={narrators}
       />
     </div>
   );
