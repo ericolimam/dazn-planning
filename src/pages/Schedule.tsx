@@ -202,7 +202,7 @@ export default function Schedule() {
     enabled: !!allScheduleData,
   });
 
-  const events = scheduleData?.ROWS?.filter((event: ScheduleEvent) => event.PROG_REQTYPE === 'PROGRAMA')
+  let events = scheduleData?.ROWS?.filter((event: ScheduleEvent) => event.PROG_REQTYPE === 'PROGRAMA')
     .map((event: ScheduleEvent) => {
     try {
       const start = parseDateTime(event.DATE, event.START_TIME);
@@ -223,6 +223,27 @@ export default function Schedule() {
       return null;
     }
   }).filter(e => e !== null) || [];
+
+  // Remove overlaps if needed
+  if (!showOverlaps && events.length > 0) {
+    const sortedEvents = [...events].sort((a, b) => a.start.getTime() - b.start.getTime());
+    const filteredEvents = [];
+    const channelLastEnd: Record<string, number> = {};
+
+    for (const event of sortedEvents) {
+      const channel = event.resource.CHANNEL;
+      const eventStart = event.start.getTime();
+      const lastEnd = channelLastEnd[channel] || 0;
+
+      // Only include event if it doesn't overlap with previous event on same channel
+      if (eventStart >= lastEnd) {
+        filteredEvents.push(event);
+        channelLastEnd[channel] = event.end.getTime();
+      }
+    }
+
+    events = filteredEvents;
+  }
 
   console.log('=== CALENDAR EVENTS DEBUG ===');
   console.log('Total events after mapping:', events.length);
