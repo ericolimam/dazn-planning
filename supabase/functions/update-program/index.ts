@@ -88,10 +88,14 @@ serve(async (req) => {
         const errorData = JSON.parse(errorText);
         if (errorData.ERROR_NM === 'KER_RIGHTS_INSUFFICIENTPRIVILEGES') {
           const displayName = errorData.PARAMS?.C_NLSDISPLAYNAME || 'campo desconhecido';
-          throw new Error(`Sem permissão para alterar: ${displayName}. Contate o administrador do sistema.`);
+          const errorMsg = `⚠️ ERRO DE PERMISSÃO\n\nO usuário da API (${username}) não tem permissão para editar: ${displayName}\n\nSolução: Verifique as permissões do usuário no sistema Provys ou use credenciais com permissões adequadas.`;
+          throw new Error(errorMsg);
         }
         throw new Error(`API request failed: ${response.status} - ${errorData.ERRORMESSAGE || errorText}`);
       } catch (parseError) {
+        if (parseError instanceof Error && parseError.message.includes('ERRO DE PERMISSÃO')) {
+          throw parseError;
+        }
         throw new Error(`API request failed: ${response.status} - ${errorText}`);
       }
     }
