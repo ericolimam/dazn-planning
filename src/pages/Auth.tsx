@@ -130,7 +130,7 @@ export default function Auth() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <img src={daznLogo} alt="DAZN" className="h-16 w-16" />
+            <img src={daznLogo} alt="DAZN" className="h-16 w-16 dark:invert" />
           </div>
           <CardTitle className="text-2xl">
             {isLogin ? "Login" : "Criar Conta"}
