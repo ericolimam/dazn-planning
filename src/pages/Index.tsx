@@ -58,6 +58,14 @@ const Index = () => {
         setSeries(uniqueSeries);
         
         // Extract unique narrators with IDs from programs
+        console.log('=== EXTRACTING NARRATORS ===');
+        console.log('Sample program data (first 5):');
+        programsData.slice(0, 5).forEach((p: any, i: number) => {
+          console.log(`  ${i + 1}. ${p.TITLE}`);
+          console.log(`     NARRATOR: "${p.NARRATOR}" (type: ${typeof p.NARRATOR})`);
+          console.log(`     NARRATOR_ID: "${p.NARRATOR_ID}" (type: ${typeof p.NARRATOR_ID})`);
+        });
+        
         const narratorMap = new Map<string, {id: string; name: string}>();
         programsData.forEach((program: any) => {
           if (program.NARRATOR && program.NARRATOR_ID) {
@@ -70,6 +78,16 @@ const Index = () => {
         const narratorsList = Array.from(narratorMap.values()).sort((a, b) => a.name.localeCompare(b.name));
         setNarrators(narratorsList);
         console.log(`Extracted ${narratorsList.length} unique narrators from programs`);
+        if (narratorsList.length > 0) {
+          console.log('First 3 narrators:', narratorsList.slice(0, 3));
+        } else {
+          console.log('⚠️ NO NARRATORS FOUND IN DATA');
+          // Count how many programs have narrator data
+          const withNarrator = programsData.filter((p: any) => p.NARRATOR).length;
+          const withNarratorId = programsData.filter((p: any) => p.NARRATOR_ID).length;
+          console.log(`Programs with NARRATOR field: ${withNarrator}`);
+          console.log(`Programs with NARRATOR_ID field: ${withNarratorId}`);
+        }
         
         // Extract unique cabines with IDs from programs
         const cabineMap = new Map<string, {id: string; name: string}>();
