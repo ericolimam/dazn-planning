@@ -25,6 +25,12 @@ Deno.serve(async (req) => {
     const apiUsername = Deno.env.get('PROVYS_API_USERNAME');
     const apiPassword = Deno.env.get('PROVYS_API_PASSWORD');
 
+    console.log('Checking credentials...');
+    console.log('Username exists:', !!apiUsername);
+    console.log('Username length:', apiUsername?.length || 0);
+    console.log('Password exists:', !!apiPassword);
+    console.log('Password length:', apiPassword?.length || 0);
+
     if (!apiUsername || !apiPassword) {
       console.error('API credentials not configured');
       throw new Error('API credentials not configured');
