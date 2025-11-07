@@ -35,19 +35,15 @@ const getGenreColor = (genre: string) => {
 const getRowBackgroundColor = (stateEvent: string) => {
   const normalizedState = stateEvent?.toUpperCase().trim() || '';
   
-  console.log('STATE_EVENT:', stateEvent, '-> Normalized:', normalizedState);
-  
-  if (normalizedState === 'LIVE + EVENTO') {
-    console.log('Applying yellow pastel');
-    return 'bg-state-yellow-pastel hover:bg-state-yellow-pastel-hover transition-colors';
+  // Accept both "LIVE+EVENTO" and "LIVE + EVENTO"
+  if (normalizedState === 'LIVE+EVENTO' || normalizedState === 'LIVE + EVENTO') {
+    return 'bg-[hsl(var(--state-yellow-pastel))] hover:bg-[hsl(var(--state-yellow-pastel-hover))] transition-colors';
   }
   if (normalizedState === 'EN FEED') {
-    console.log('Applying red pastel');
-    return 'bg-state-red-pastel hover:bg-state-red-pastel-hover transition-colors';
+    return 'bg-[hsl(var(--state-red-pastel))] hover:bg-[hsl(var(--state-red-pastel-hover))] transition-colors';
   }
   if (normalizedState === 'FLY') {
-    console.log('Applying blue pastel');
-    return 'bg-state-blue-pastel hover:bg-state-blue-pastel-hover transition-colors';
+    return 'bg-[hsl(var(--state-blue-pastel))] hover:bg-[hsl(var(--state-blue-pastel-hover))] transition-colors';
   }
   
   return 'hover:bg-muted/50 transition-colors';
