@@ -38,9 +38,7 @@ Deno.serve(async (req) => {
 
     const filters = [
       { "OPERATOR": "=", "VALUE": "N", "ATTR_NM": "ENVELOPE" },
-      { "OPERATOR": "NL", "VALUE": null, "ATTR_NM": "TECHSLOT" },
-      { "OPERATOR": ">=", "VALUE": "01.01.2025", "ATTR_NM": "TXSCHED_ID.TXDAY_DATE" },
-      { "OPERATOR": "<=", "VALUE": "31.12.2026", "ATTR_NM": "TXSCHED_ID.TXDAY_DATE" }
+      { "OPERATOR": "NL", "VALUE": null, "ATTR_NM": "TECHSLOT" }
     ];
 
     // Add optional filters
@@ -50,6 +48,8 @@ Deno.serve(async (req) => {
     if (channel) {
       filters.push({ "OPERATOR": "=", "VALUE": channel, "ATTR_NM": "TXSCHED_ID.TXWEEK_ID.CHANNEL_RF" });
     }
+    
+    console.log('Applied filters:', JSON.stringify(filters, null, 2));
 
     const provysRequestBody = {
       "ENTITY_NM": "TXSLOT",
