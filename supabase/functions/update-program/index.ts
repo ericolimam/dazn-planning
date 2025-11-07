@@ -21,6 +21,12 @@ serve(async (req) => {
     const username = Deno.env.get('PROVYS_API_USERNAME');
     const password = Deno.env.get('PROVYS_API_PASSWORD');
     
+    console.log('Checking credentials...');
+    console.log('Username exists:', !!username);
+    console.log('Username length:', username?.length || 0);
+    console.log('Password exists:', !!password);
+    console.log('Password length:', password?.length || 0);
+    
     if (!username || !password) {
       throw new Error('API credentials not configured');
     }
@@ -81,19 +87,24 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('PROVYS API error:', errorText);
+      console.error('=== API ERROR RESPONSE ===');
+      console.error('Status:', response.status);
+      console.error('Status Text:', response.statusText);
+      console.error('Headers:', Object.fromEntries(response.headers.entries()));
+      console.error('Body:', errorText);
       
       // Parse error to provide more details
       try {
         const errorData = JSON.parse(errorText);
         if (errorData.ERROR_NM === 'KER_RIGHTS_INSUFFICIENTPRIVILEGES') {
           const displayName = errorData.PARAMS?.C_NLSDISPLAYNAME || 'campo desconhecido';
-          const errorMsg = `⚠️ ERRO DE PERMISSÃO\n\nO usuário da API (${username}) não tem permissão para editar: ${displayName}\n\nSolução: Verifique as permissões do usuário no sistema Provys ou use credenciais com permissões adequadas.`;
+          console.error('⚠️ Permission denied for field:', displayName);
+          const errorMsg = `Sem permissão para editar: ${displayName}`;
           throw new Error(errorMsg);
         }
         throw new Error(`API request failed: ${response.status} - ${errorData.ERRORMESSAGE || errorText}`);
       } catch (parseError) {
-        if (parseError instanceof Error && parseError.message.includes('ERRO DE PERMISSÃO')) {
+        if (parseError instanceof Error && parseError.message.includes('Sem permissão')) {
           throw parseError;
         }
         throw new Error(`API request failed: ${response.status} - ${errorText}`);
@@ -101,8 +112,9 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log('=== PROVYS API RESPONSE ===');
-    console.log(JSON.stringify(data, null, 2));
+    console.log('=== PROVYS API SUCCESS ===');
+    console.log('Update successful!');
+    console.log('Response:', JSON.stringify(data, null, 2));
 
     return new Response(
       JSON.stringify({ 
