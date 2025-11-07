@@ -33,21 +33,10 @@ const Index = () => {
     try {
       console.log('Loading all programs for filtering...');
       
-      // Load programs and reference data in parallel
-      const [programsResult, narratorsResult, cabinesResult, stateEventsResult] = await Promise.all([
-        supabase.functions.invoke('list-programs', {
-          body: { genre: undefined, year: undefined },
-        }),
-        supabase.functions.invoke('list-references', {
-          body: { referenceType: 'narrator' },
-        }),
-        supabase.functions.invoke('list-references', {
-          body: { referenceType: 'cabine' },
-        }),
-        supabase.functions.invoke('list-references', {
-          body: { referenceType: 'state_event' },
-        }),
-      ]);
+      // Load programs only
+      const programsResult = await supabase.functions.invoke('list-programs', {
+        body: { genre: undefined, year: undefined },
+      });
 
       if (programsResult.error) throw programsResult.error;
 
@@ -68,26 +57,47 @@ const Index = () => {
         const uniqueSeries = [...new Set(programsData.map(p => p.SERIE_TITLE).filter(Boolean))].sort();
         setSeries(uniqueSeries);
         
-        // Set narrators from API
-        if (narratorsResult.data?.success && narratorsResult.data?.data) {
-          const narratorsList = narratorsResult.data.data as Array<{id: string; name: string}>;
-          setNarrators(narratorsList.sort((a, b) => a.name.localeCompare(b.name)));
-          console.log(`Loaded ${narratorsList.length} narrators`);
-        }
+        // Extract unique narrators with IDs from programs
+        const narratorMap = new Map<string, {id: string; name: string}>();
+        programsData.forEach((program: any) => {
+          if (program.NARRATOR && program.NARRATOR_ID) {
+            narratorMap.set(String(program.NARRATOR_ID), {
+              id: String(program.NARRATOR_ID),
+              name: program.NARRATOR
+            });
+          }
+        });
+        const narratorsList = Array.from(narratorMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+        setNarrators(narratorsList);
+        console.log(`Extracted ${narratorsList.length} unique narrators from programs`);
         
-        // Set cabines from API
-        if (cabinesResult.data?.success && cabinesResult.data?.data) {
-          const cabinesList = cabinesResult.data.data as Array<{id: string; name: string}>;
-          setCabines(cabinesList.sort((a, b) => a.name.localeCompare(b.name)));
-          console.log(`Loaded ${cabinesList.length} cabines`);
-        }
+        // Extract unique cabines with IDs from programs
+        const cabineMap = new Map<string, {id: string; name: string}>();
+        programsData.forEach((program: any) => {
+          if (program.CABINE && program.CABINE_ID) {
+            cabineMap.set(String(program.CABINE_ID), {
+              id: String(program.CABINE_ID),
+              name: program.CABINE
+            });
+          }
+        });
+        const cabinesList = Array.from(cabineMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+        setCabines(cabinesList);
+        console.log(`Extracted ${cabinesList.length} unique cabines from programs`);
         
-        // Set state events from API
-        if (stateEventsResult.data?.success && stateEventsResult.data?.data) {
-          const stateEventsList = stateEventsResult.data.data as Array<{id: string; name: string}>;
-          setStateEvents(stateEventsList.sort((a, b) => a.name.localeCompare(b.name)));
-          console.log(`Loaded ${stateEventsList.length} state events`);
-        }
+        // Extract unique state events with IDs from programs
+        const stateEventMap = new Map<string, {id: string; name: string}>();
+        programsData.forEach((program: any) => {
+          if (program.STATE_EVENT && program.STATE_EVENT_ID) {
+            stateEventMap.set(String(program.STATE_EVENT_ID), {
+              id: String(program.STATE_EVENT_ID),
+              name: program.STATE_EVENT
+            });
+          }
+        });
+        const stateEventsList = Array.from(stateEventMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+        setStateEvents(stateEventsList);
+        console.log(`Extracted ${stateEventsList.length} unique state events from programs`);
         
         console.log(`Genres: ${uniqueGenres.length}, Years: ${uniqueYears.length}, Series: ${uniqueSeries.length}`);
         
