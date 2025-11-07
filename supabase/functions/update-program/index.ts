@@ -25,60 +25,40 @@ serve(async (req) => {
       throw new Error('API credentials not configured');
     }
 
-    // Build the change request body
-    const requestBody: any = {
-      ENTITY_NM: "PROG",
-      ACTION_NM: "CHANGE",
-      RECORDS: [
-        {
-          PROG_ID: programId.toString(),
-          ATTRIBUTES: []
-        }
-      ]
-    };
+    // Build the change request body - correct Provys format
+    const attrs: any = {};
 
     // Map the updates to the correct attribute names
     if (updates.STATE_EVENT !== undefined) {
-      requestBody.RECORDS[0].ATTRIBUTES.push({
-        ATTR_NM: "PROG_ID.STATE_EVENT_RF",
-        VALUE: updates.STATE_EVENT
-      });
+      attrs["PROG_ID.STATE_EVENT_RF"] = updates.STATE_EVENT;
     }
 
     if (updates.CABINE !== undefined) {
-      requestBody.RECORDS[0].ATTRIBUTES.push({
-        ATTR_NM: "PROG_ID.CABINE_RF",
-        VALUE: updates.CABINE
-      });
+      attrs["PROG_ID.CABINE_RF"] = updates.CABINE;
     }
 
     if (updates.NARRATOR !== undefined) {
-      requestBody.RECORDS[0].ATTRIBUTES.push({
-        ATTR_NM: "PROG_ID.NARRATOR_RF",
-        VALUE: updates.NARRATOR
-      });
+      attrs["PROG_ID.NARRATOR_RF"] = updates.NARRATOR;
     }
 
     if (updates.RESUMO !== undefined) {
-      requestBody.RECORDS[0].ATTRIBUTES.push({
-        ATTR_NM: "RESUMO",
-        VALUE: updates.RESUMO ? "S" : "N"
-      });
+      attrs["RESUMO"] = updates.RESUMO ? "S" : "N";
     }
 
     if (updates.DESTAQUE_SEMANA !== undefined) {
-      requestBody.RECORDS[0].ATTRIBUTES.push({
-        ATTR_NM: "DESTAQUE",
-        VALUE: updates.DESTAQUE_SEMANA ? "S" : "N"
-      });
+      attrs["DESTAQUE"] = updates.DESTAQUE_SEMANA ? "S" : "N";
     }
 
     if (updates.PROMO_DAZN !== undefined) {
-      requestBody.RECORDS[0].ATTRIBUTES.push({
-        ATTR_NM: "PROMODAZN",
-        VALUE: updates.PROMO_DAZN ? "S" : "N"
-      });
+      attrs["PROMODAZN"] = updates.PROMO_DAZN ? "S" : "N";
     }
+
+    const requestBody: any = {
+      ID: programId.toString(),
+      ENTITY_NM: "PROG",
+      ACTION_NM: "CHANGE",
+      ATTRS: [attrs]
+    };
 
     console.log('=== API REQUEST BODY ===');
     console.log(JSON.stringify(requestBody, null, 2));
