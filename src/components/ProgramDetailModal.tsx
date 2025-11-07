@@ -170,16 +170,28 @@ export function ProgramDetailModal({
                 <InfoRow label="Ano" value={program.YEAR} />
                 {isEditing ? (
                   <div className="space-y-2">
-                    <Label htmlFor="state_event">Estado/Evento</Label>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="state_event">Estado/Evento</Label>
+                      {editedData.STATE_EVENT_ID && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2 text-xs"
+                          onClick={() => setEditedData({ ...editedData, STATE_EVENT_ID: '' })}
+                        >
+                          Limpar
+                        </Button>
+                      )}
+                    </div>
                     <Select
-                      value={editedData.STATE_EVENT_ID}
+                      value={editedData.STATE_EVENT_ID || undefined}
                       onValueChange={(value) => setEditedData({ ...editedData, STATE_EVENT_ID: value })}
                     >
                       <SelectTrigger className="bg-background">
                         <SelectValue placeholder="Selecione o estado/evento" />
                       </SelectTrigger>
                       <SelectContent className="bg-background z-50">
-                        <SelectItem value="">Nenhum</SelectItem>
                         {stateEvents.map((event) => (
                           <SelectItem key={event.id} value={String(event.id)}>
                             {event.name}
@@ -221,16 +233,28 @@ export function ProgramDetailModal({
             {isEditing ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="cabine">Cabine</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="cabine">Cabine</Label>
+                    {editedData.CABINE_ID && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2 text-xs"
+                        onClick={() => setEditedData({ ...editedData, CABINE_ID: '' })}
+                      >
+                        Limpar
+                      </Button>
+                    )}
+                  </div>
                   <Select
-                    value={editedData.CABINE_ID}
+                    value={editedData.CABINE_ID || undefined}
                     onValueChange={(value) => setEditedData({ ...editedData, CABINE_ID: value })}
                   >
                     <SelectTrigger className="bg-background">
                       <SelectValue placeholder="Selecione a cabine" />
                     </SelectTrigger>
                     <SelectContent className="bg-background z-50">
-                      <SelectItem value="">Nenhuma</SelectItem>
                       {cabines.map((cabine) => (
                         <SelectItem key={cabine.id} value={String(cabine.id)}>
                           {cabine.name}
@@ -240,16 +264,28 @@ export function ProgramDetailModal({
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="narrator">Narrador</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="narrator">Narrador</Label>
+                    {editedData.NARRATOR_ID && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2 text-xs"
+                        onClick={() => setEditedData({ ...editedData, NARRATOR_ID: '' })}
+                      >
+                        Limpar
+                      </Button>
+                    )}
+                  </div>
                   <Select
-                    value={editedData.NARRATOR_ID}
+                    value={editedData.NARRATOR_ID || undefined}
                     onValueChange={(value) => setEditedData({ ...editedData, NARRATOR_ID: value })}
                   >
                     <SelectTrigger className="bg-background">
                       <SelectValue placeholder="Selecione o narrador" />
                     </SelectTrigger>
                     <SelectContent className="bg-background z-50">
-                      <SelectItem value="">Nenhum</SelectItem>
                       {narrators.map((narrator) => (
                         <SelectItem key={narrator.id} value={String(narrator.id)}>
                           {narrator.name}
