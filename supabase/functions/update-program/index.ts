@@ -28,19 +28,21 @@ serve(async (req) => {
     // Build the change request body - correct Provys format
     const attrs: any = {};
 
-    // Map the updates to the correct attribute names (remove PROG_ID. prefix)
-    if (updates.STATE_EVENT !== undefined) {
+    // Map the updates to the correct attribute names
+    // Only include fields with non-empty values to avoid permission errors
+    if (updates.STATE_EVENT !== undefined && updates.STATE_EVENT !== '') {
       attrs["STATE_EVENT_RF"] = updates.STATE_EVENT;
     }
 
-    if (updates.CABINE !== undefined) {
+    if (updates.CABINE !== undefined && updates.CABINE !== '') {
       attrs["CABINE_RF"] = updates.CABINE;
     }
 
-    if (updates.NARRATOR !== undefined) {
+    if (updates.NARRATOR !== undefined && updates.NARRATOR !== '') {
       attrs["NARRATOR_RF"] = updates.NARRATOR;
     }
 
+    // Boolean fields are always included since they're mandatory
     if (updates.RESUMO !== undefined) {
       attrs["RESUMO"] = updates.RESUMO;
     }
@@ -52,6 +54,8 @@ serve(async (req) => {
     if (updates.PROMO_DAZN !== undefined) {
       attrs["PROMODAZN"] = updates.PROMO_DAZN;
     }
+    
+    console.log('Filtered attributes to update:', Object.keys(attrs));
 
     const requestBody: any = {
       ID: programId.toString(),
