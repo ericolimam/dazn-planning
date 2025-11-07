@@ -42,15 +42,15 @@ serve(async (req) => {
     }
 
     if (updates.RESUMO !== undefined) {
-      attrs["RESUMO"] = updates.RESUMO ? "S" : "N";
+      attrs["RESUMO"] = updates.RESUMO;
     }
 
     if (updates.DESTAQUE_SEMANA !== undefined) {
-      attrs["DESTAQUE"] = updates.DESTAQUE_SEMANA ? "S" : "N";
+      attrs["DESTAQUE"] = updates.DESTAQUE_SEMANA;
     }
 
     if (updates.PROMO_DAZN !== undefined) {
-      attrs["PROMODAZN"] = updates.PROMO_DAZN ? "S" : "N";
+      attrs["PROMODAZN"] = updates.PROMO_DAZN;
     }
 
     const requestBody: any = {
