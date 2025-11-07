@@ -57,7 +57,7 @@ serve(async (req) => {
       ID: programId.toString(),
       ENTITY_NM: "PROG",
       ACTION_NM: "CHANGE",
-      ATTRS: [attrs]
+      ATTRS: attrs
     };
 
     console.log('=== API REQUEST BODY ===');
