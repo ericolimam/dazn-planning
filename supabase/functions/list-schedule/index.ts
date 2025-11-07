@@ -39,8 +39,8 @@ Deno.serve(async (req) => {
     const filters = [
       { "OPERATOR": "=", "VALUE": "N", "ATTR_NM": "ENVELOPE" },
       { "OPERATOR": "NL", "VALUE": null, "ATTR_NM": "TECHSLOT" },
-      { "OPERATOR": ">", "VALUE": "01.01.2015", "ATTR_NM": "TXSCHED_ID.TXDAY_DATE" },
-      { "OPERATOR": "<", "VALUE": "01.01.2040", "ATTR_NM": "TXSCHED_ID.TXDAY_DATE" }
+      { "OPERATOR": ">=", "VALUE": "01.01.2025", "ATTR_NM": "TXSCHED_ID.TXDAY_DATE" },
+      { "OPERATOR": "<=", "VALUE": "31.12.2026", "ATTR_NM": "TXSCHED_ID.TXDAY_DATE" }
     ];
 
     // Add optional filters
