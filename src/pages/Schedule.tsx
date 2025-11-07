@@ -105,13 +105,14 @@ const getCurrentWeek = () => {
 
 export default function Schedule() {
   const [selectedWeek, setSelectedWeek] = useState<number | null>(getCurrentWeek());
-  const [selectedChannel, setSelectedChannel] = useState<string | null>("DAZN 1");
+  const [selectedChannels, setSelectedChannels] = useState<string[]>(["DAZN 1"]);
   const [selectedYear, setSelectedYear] = useState<number | null>(new Date().getFullYear());
   const [view, setView] = useState<View>("month");
   const [date, setDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<ScheduleEvent | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [timeStep, setTimeStep] = useState<15 | 30 | 60>(30); // 15, 30 or 60 minutes
+  const [showOverlaps, setShowOverlaps] = useState(false); // Default: Sem Overlaps
 
   // First query: Load all data for filters
   const { data: allScheduleData } = useQuery({
@@ -171,9 +172,9 @@ export default function Schedule() {
 
   // Second query: Filter data based on selections
   const { data: scheduleData, isLoading } = useQuery({
-    queryKey: ["schedule-filtered", selectedWeek, selectedChannel, selectedYear],
+    queryKey: ["schedule-filtered", selectedWeek, selectedChannels, selectedYear],
     queryFn: async () => {
-      console.log('Filtering schedule data:', { selectedWeek, selectedChannel, selectedYear });
+      console.log('Filtering schedule data:', { selectedWeek, selectedChannels, selectedYear });
       
       // Apply filters locally on cached data
       if (!allScheduleData?.ROWS) return { ROWS: [] };
@@ -184,8 +185,8 @@ export default function Schedule() {
         filtered = filtered.filter((r: ScheduleEvent) => r.WEEK === selectedWeek);
       }
       
-      if (selectedChannel !== null) {
-        filtered = filtered.filter((r: ScheduleEvent) => r.CHANNEL === selectedChannel);
+      if (selectedChannels.length > 0) {
+        filtered = filtered.filter((r: ScheduleEvent) => selectedChannels.includes(r.CHANNEL));
       }
       
       if (selectedYear !== null) {
@@ -310,11 +311,13 @@ export default function Schedule() {
 
         <ScheduleFilters
           selectedWeek={selectedWeek}
-          selectedChannel={selectedChannel}
+          selectedChannels={selectedChannels}
           selectedYear={selectedYear}
+          showOverlaps={showOverlaps}
           onWeekChange={setSelectedWeek}
-          onChannelChange={setSelectedChannel}
+          onChannelsChange={setSelectedChannels}
           onYearChange={setSelectedYear}
+          onShowOverlapsChange={setShowOverlaps}
           weeks={weeks}
           channels={channels}
           years={years}
@@ -381,6 +384,7 @@ export default function Schedule() {
                 views={['month', 'week', 'day']}
                 step={timeStep}
                 timeslots={1}
+                dayLayoutAlgorithm={showOverlaps ? 'overlap' : 'no-overlap'}
                 components={{
                   event: EventComponent,
                 }}

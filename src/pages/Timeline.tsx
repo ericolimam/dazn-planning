@@ -79,7 +79,7 @@ const getCurrentWeek = () => {
 
 export default function Timeline() {
   const [selectedWeek, setSelectedWeek] = useState<number | null>(getCurrentWeek());
-  const [selectedChannel, setSelectedChannel] = useState<string | null>("DAZN 1");
+  const [selectedChannels, setSelectedChannels] = useState<string[]>(["DAZN 1"]);
   const [selectedYear, setSelectedYear] = useState<number | null>(new Date().getFullYear());
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [selectedEvent, setSelectedEvent] = useState<ScheduleEvent | null>(null);
@@ -110,7 +110,7 @@ export default function Timeline() {
     : [];
 
   const { data: scheduleData, isLoading } = useQuery({
-    queryKey: ["schedule-filtered", selectedWeek, selectedChannel, selectedYear],
+    queryKey: ["schedule-filtered", selectedWeek, selectedChannels, selectedYear],
     queryFn: async () => {
       if (!allScheduleData?.ROWS) return { ROWS: [] };
       
@@ -120,8 +120,8 @@ export default function Timeline() {
         filtered = filtered.filter((r: ScheduleEvent) => r.WEEK === selectedWeek);
       }
       
-      if (selectedChannel !== null) {
-        filtered = filtered.filter((r: ScheduleEvent) => r.CHANNEL === selectedChannel);
+      if (selectedChannels.length > 0) {
+        filtered = filtered.filter((r: ScheduleEvent) => selectedChannels.includes(r.CHANNEL));
       }
       
       if (selectedYear !== null) {
@@ -258,10 +258,10 @@ export default function Timeline() {
 
         <ScheduleFilters
           selectedWeek={selectedWeek}
-          selectedChannel={selectedChannel}
+          selectedChannels={selectedChannels}
           selectedYear={selectedYear}
           onWeekChange={setSelectedWeek}
-          onChannelChange={setSelectedChannel}
+          onChannelsChange={setSelectedChannels}
           onYearChange={setSelectedYear}
           weeks={weeks}
           channels={channels}

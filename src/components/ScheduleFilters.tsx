@@ -8,15 +8,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { X } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface ScheduleFiltersProps {
   selectedWeek: number | null;
-  selectedChannel: string | null;
+  selectedChannels: string[];
   selectedYear: number | null;
+  showOverlaps?: boolean;
   onWeekChange: (week: number | null) => void;
-  onChannelChange: (channel: string | null) => void;
+  onChannelsChange: (channels: string[]) => void;
   onYearChange: (year: number | null) => void;
+  onShowOverlapsChange?: (show: boolean) => void;
   weeks: number[];
   channels: string[];
   years: number[];
@@ -24,18 +29,28 @@ interface ScheduleFiltersProps {
 
 export function ScheduleFilters({
   selectedWeek,
-  selectedChannel,
+  selectedChannels,
   selectedYear,
+  showOverlaps,
   onWeekChange,
-  onChannelChange,
+  onChannelsChange,
   onYearChange,
+  onShowOverlapsChange,
   weeks,
   channels,
   years,
 }: ScheduleFiltersProps) {
+  const handleChannelToggle = (channel: string) => {
+    if (selectedChannels.includes(channel)) {
+      onChannelsChange(selectedChannels.filter(c => c !== channel));
+    } else {
+      onChannelsChange([...selectedChannels, channel]);
+    }
+  };
+
   return (
     <Card className="p-4 mb-6 bg-card border-border">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div className="space-y-2">
           <Label htmlFor="year-filter" className="text-sm font-medium">
             Ano
@@ -105,31 +120,41 @@ export function ScheduleFilters({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="channel-filter" className="text-sm font-medium">
-            Canal
+          <Label className="text-sm font-medium">
+            Canais
           </Label>
           <div className="flex gap-2">
-            <Select
-              value={selectedChannel || "all"}
-              onValueChange={(value) => onChannelChange(value === "all" ? null : value)}
-            >
-              <SelectTrigger id="channel-filter" className="bg-background border-input">
-                <SelectValue placeholder="Todos os canais" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos os canais</SelectItem>
-                {channels.map((channel) => (
-                  <SelectItem key={channel} value={channel}>
-                    {channel}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {selectedChannel && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="w-full justify-start bg-background border-input">
+                  {selectedChannels.length === 0 ? "Selecione canais..." : `${selectedChannels.length} canal(is) selecionado(s)`}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-64 bg-background border-border z-50" align="start">
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {channels.map((channel) => (
+                    <div key={channel} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`channel-${channel}`}
+                        checked={selectedChannels.includes(channel)}
+                        onCheckedChange={() => handleChannelToggle(channel)}
+                      />
+                      <label
+                        htmlFor={`channel-${channel}`}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        {channel}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+            {selectedChannels.length > 0 && (
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => onChannelChange(null)}
+                onClick={() => onChannelsChange([])}
                 className="shrink-0"
               >
                 <X className="h-4 w-4" />
@@ -138,10 +163,26 @@ export function ScheduleFilters({
           </div>
         </div>
 
+        {onShowOverlapsChange && (
+          <div className="space-y-2">
+            <Label htmlFor="overlap-toggle" className="text-sm font-medium">
+              Visualização
+            </Label>
+            <div className="flex items-center gap-2 h-10">
+              <Switch
+                id="overlap-toggle"
+                checked={!showOverlaps}
+                onCheckedChange={(checked) => onShowOverlapsChange(!checked)}
+              />
+              <span className="text-sm">Sem Overlaps</span>
+            </div>
+          </div>
+        )}
+
         <div className="space-y-2">
           <Label className="text-sm font-medium">Filtros Ativos</Label>
           <div className="flex flex-wrap gap-2 items-center min-h-10">
-            {!selectedYear && !selectedWeek && !selectedChannel && (
+            {!selectedYear && !selectedWeek && selectedChannels.length === 0 && (
               <span className="text-sm text-muted-foreground">Nenhum filtro aplicado</span>
             )}
             {selectedYear && (
@@ -154,11 +195,11 @@ export function ScheduleFilters({
                 Semana {selectedWeek}
               </span>
             )}
-            {selectedChannel && (
-              <span className="text-sm bg-muted px-2 py-1 rounded">
-                {selectedChannel}
+            {selectedChannels.map(channel => (
+              <span key={channel} className="text-sm bg-muted px-2 py-1 rounded">
+                {channel}
               </span>
-            )}
+            ))}
           </div>
         </div>
       </div>
