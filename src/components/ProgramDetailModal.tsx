@@ -84,11 +84,27 @@ export function ProgramDetailModal({
       DESTAQUE_SEMANA: program.DESTAQUE_SEMANA || false,
       PROMO_DAZN: program.PROMO_DAZN || false,
     };
-    console.log('Editing program:', program.TITLE);
-    console.log('Edited data:', newData);
-    console.log('Available narrators:', narrators.length);
-    console.log('Available cabines:', cabines.length);
-    console.log('Available state events:', stateEvents.length);
+    
+    console.log('=== OPENING EDIT MODE ===');
+    console.log('Program:', program.TITLE);
+    console.log('Current values from program:', {
+      STATE_EVENT: program.STATE_EVENT,
+      STATE_EVENT_ID: program.STATE_EVENT_ID,
+      CABINE: program.CABINE,
+      CABINE_ID: program.CABINE_ID,
+      NARRATOR: program.NARRATOR,
+      NARRATOR_ID: program.NARRATOR_ID,
+    });
+    console.log('Setting editedData to:', newData);
+    console.log('Available options:', {
+      narrators: narrators.length,
+      narratorIds: narrators.map(n => n.id),
+      cabines: cabines.length,
+      cabineIds: cabines.map(c => c.id),
+      stateEvents: stateEvents.length,
+      stateEventIds: stateEvents.map(s => s.id),
+    });
+    
     setEditedData(newData);
     setIsEditing(true);
   };
@@ -184,9 +200,18 @@ export function ProgramDetailModal({
                         </Button>
                       )}
                     </div>
+                    {program.STATE_EVENT && (
+                      <p className="text-xs text-muted-foreground">
+                        Valor atual: {program.STATE_EVENT}
+                      </p>
+                    )}
                     <Select
                       value={editedData.STATE_EVENT_ID || undefined}
-                      onValueChange={(value) => setEditedData({ ...editedData, STATE_EVENT_ID: value })}
+                      onValueChange={(value) => {
+                        console.log('State Event changed to:', value);
+                        console.log('Available state events:', stateEvents);
+                        setEditedData({ ...editedData, STATE_EVENT_ID: value });
+                      }}
                     >
                       <SelectTrigger className="bg-background">
                         <SelectValue placeholder="Selecione o estado/evento" />
@@ -247,9 +272,18 @@ export function ProgramDetailModal({
                       </Button>
                     )}
                   </div>
+                  {program.CABINE && (
+                    <p className="text-xs text-muted-foreground">
+                      Valor atual: {program.CABINE}
+                    </p>
+                  )}
                   <Select
                     value={editedData.CABINE_ID || undefined}
-                    onValueChange={(value) => setEditedData({ ...editedData, CABINE_ID: value })}
+                    onValueChange={(value) => {
+                      console.log('Cabine changed to:', value);
+                      console.log('Available cabines:', cabines);
+                      setEditedData({ ...editedData, CABINE_ID: value });
+                    }}
                   >
                     <SelectTrigger className="bg-background">
                       <SelectValue placeholder="Selecione a cabine" />
@@ -278,9 +312,18 @@ export function ProgramDetailModal({
                       </Button>
                     )}
                   </div>
+                  {program.NARRATOR && (
+                    <p className="text-xs text-muted-foreground">
+                      Valor atual: {program.NARRATOR}
+                    </p>
+                  )}
                   <Select
                     value={editedData.NARRATOR_ID || undefined}
-                    onValueChange={(value) => setEditedData({ ...editedData, NARRATOR_ID: value })}
+                    onValueChange={(value) => {
+                      console.log('Narrator changed to:', value);
+                      console.log('Available narrators:', narrators);
+                      setEditedData({ ...editedData, NARRATOR_ID: value });
+                    }}
                   >
                     <SelectTrigger className="bg-background">
                       <SelectValue placeholder="Selecione o narrador" />
