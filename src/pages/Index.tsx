@@ -77,19 +77,15 @@ const Index = () => {
           console.log(`Loaded ${cabinesResult.data.data.length} cabines from API`);
         }
         
-        // Extract unique state events with IDs from programs
-        const stateEventMap = new Map<string, {id: string; name: string}>();
-        programsData.forEach((program: any) => {
-          if (program.STATE_EVENT && program.STATE_EVENT_ID) {
-            stateEventMap.set(String(program.STATE_EVENT_ID), {
-              id: String(program.STATE_EVENT_ID),
-              name: program.STATE_EVENT
-            });
-          }
+        // Load state events from API
+        const stateEventsResult = await supabase.functions.invoke('list-references', {
+          body: { referenceType: 'state_event' },
         });
-        const stateEventsList = Array.from(stateEventMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-        setStateEvents(stateEventsList);
-        console.log(`Extracted ${stateEventsList.length} unique state events from programs`);
+        
+        if (stateEventsResult.data?.success && stateEventsResult.data?.data) {
+          setStateEvents(stateEventsResult.data.data);
+          console.log(`Loaded ${stateEventsResult.data.data.length} state events from API`);
+        }
         
         console.log(`Genres: ${uniqueGenres.length}, Years: ${uniqueYears.length}, Series: ${uniqueSeries.length}`);
         
