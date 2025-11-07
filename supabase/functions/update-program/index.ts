@@ -78,7 +78,18 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('PROVYS API error:', errorText);
-      throw new Error(`API request failed: ${response.status} - ${errorText}`);
+      
+      // Parse error to provide more details
+      try {
+        const errorData = JSON.parse(errorText);
+        if (errorData.ERROR_NM === 'KER_RIGHTS_INSUFFICIENTPRIVILEGES') {
+          const displayName = errorData.PARAMS?.C_NLSDISPLAYNAME || 'campo desconhecido';
+          throw new Error(`Sem permissão para alterar: ${displayName}. Contate o administrador do sistema.`);
+        }
+        throw new Error(`API request failed: ${response.status} - ${errorData.ERRORMESSAGE || errorText}`);
+      } catch (parseError) {
+        throw new Error(`API request failed: ${response.status} - ${errorText}`);
+      }
     }
 
     const data = await response.json();
