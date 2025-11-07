@@ -76,10 +76,21 @@ export function ProgramDetailModal({
   if (!program) return null;
 
   const handleEdit = () => {
+    // Find matching IDs by name as fallback
+    const findIdByName = (name: string, list: Array<{id: string; name: string}>) => {
+      const match = list.find(item => item.name === name);
+      return match ? String(match.id) : '';
+    };
+    
+    // Try to use existing IDs, or find by name
+    const stateEventId = program.STATE_EVENT_ID ? String(program.STATE_EVENT_ID) : findIdByName(program.STATE_EVENT || '', stateEvents);
+    const cabineId = program.CABINE_ID ? String(program.CABINE_ID) : findIdByName(program.CABINE || '', cabines);
+    const narratorId = program.NARRATOR_ID ? String(program.NARRATOR_ID) : findIdByName(program.NARRATOR || '', narrators);
+    
     const newData = {
-      STATE_EVENT_ID: String(program.STATE_EVENT_ID || ''),
-      CABINE_ID: String(program.CABINE_ID || ''),
-      NARRATOR_ID: String(program.NARRATOR_ID || ''),
+      STATE_EVENT_ID: stateEventId,
+      CABINE_ID: cabineId,
+      NARRATOR_ID: narratorId,
       RESUMO: program.RESUMO || false,
       DESTAQUE_SEMANA: program.DESTAQUE_SEMANA || false,
       PROMO_DAZN: program.PROMO_DAZN || false,
@@ -95,14 +106,16 @@ export function ProgramDetailModal({
       NARRATOR: program.NARRATOR,
       NARRATOR_ID: program.NARRATOR_ID,
     });
+    console.log('Matched IDs:', {
+      stateEventId,
+      cabineId,
+      narratorId
+    });
     console.log('Setting editedData to:', newData);
     console.log('Available options:', {
-      narrators: narrators.length,
-      narratorIds: narrators.map(n => n.id),
-      cabines: cabines.length,
-      cabineIds: cabines.map(c => c.id),
-      stateEvents: stateEvents.length,
-      stateEventIds: stateEvents.map(s => s.id),
+      narrators: narrators.map(n => ({ id: n.id, name: n.name })),
+      cabines: cabines.map(c => ({ id: c.id, name: c.name })),
+      stateEvents: stateEvents.map(s => ({ id: s.id, name: s.name })),
     });
     
     setEditedData(newData);
