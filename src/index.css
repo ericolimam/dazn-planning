@@ -57,6 +57,14 @@ All colors MUST be HSL.
 
     /* Transition */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* State Event Colors - Pastel tones */
+    --state-yellow-pastel: 48 96% 90%;
+    --state-yellow-pastel-hover: 48 96% 85%;
+    --state-red-pastel: 0 85% 93%;
+    --state-red-pastel-hover: 0 85% 88%;
+    --state-blue-pastel: 210 95% 92%;
+    --state-blue-pastel-hover: 210 95% 87%;
   }
 
   .dark {
@@ -104,6 +112,14 @@ All colors MUST be HSL.
     /* Shadow tokens */
     --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.3);
     --shadow-hover: 0 4px 16px hsl(0 0% 0% / 0.5);
+    
+    /* State Event Colors - Dark mode pastel tones */
+    --state-yellow-pastel: 48 40% 25%;
+    --state-yellow-pastel-hover: 48 45% 30%;
+    --state-red-pastel: 0 40% 25%;
+    --state-red-pastel-hover: 0 45% 30%;
+    --state-blue-pastel: 210 40% 25%;
+    --state-blue-pastel-hover: 210 45% 30%;
   }
 }
 

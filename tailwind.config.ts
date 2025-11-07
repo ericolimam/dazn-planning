@@ -57,6 +57,12 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        "state-yellow-pastel": "hsl(var(--state-yellow-pastel))",
+        "state-yellow-pastel-hover": "hsl(var(--state-yellow-pastel-hover))",
+        "state-red-pastel": "hsl(var(--state-red-pastel))",
+        "state-red-pastel-hover": "hsl(var(--state-red-pastel-hover))",
+        "state-blue-pastel": "hsl(var(--state-blue-pastel))",
+        "state-blue-pastel-hover": "hsl(var(--state-blue-pastel-hover))",
       },
       borderRadius: {
         lg: "var(--radius)",

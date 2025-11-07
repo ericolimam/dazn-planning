@@ -36,16 +36,16 @@ const getRowBackgroundColor = (stateEvent: string) => {
   const normalizedState = stateEvent?.toUpperCase() || '';
   
   if (normalizedState === 'LIVE + EVENTO') {
-    return 'bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-950 dark:hover:bg-yellow-900';
+    return 'bg-state-yellow-pastel hover:bg-state-yellow-pastel-hover transition-colors';
   }
   if (normalizedState === 'EN FEED') {
-    return 'bg-red-100 hover:bg-red-200 dark:bg-red-950 dark:hover:bg-red-900';
+    return 'bg-state-red-pastel hover:bg-state-red-pastel-hover transition-colors';
   }
   if (normalizedState === 'FLY') {
-    return 'bg-blue-100 hover:bg-blue-200 dark:bg-blue-950 dark:hover:bg-blue-900';
+    return 'bg-state-blue-pastel hover:bg-state-blue-pastel-hover transition-colors';
   }
   
-  return 'hover:bg-muted/50';
+  return 'hover:bg-muted/50 transition-colors';
 };
 
 export interface Program {
