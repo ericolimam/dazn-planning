@@ -69,7 +69,7 @@ serve(async (req) => {
 
     // Make API call
     const encodedCredentials = btoa(`${username}:${password}`);
-    const response = await fetch('https://i00597.myprovys.com/api/objects/change', {
+    const response = await fetch('https://i00598.myprovys.com/api/objects/change', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
