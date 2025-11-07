@@ -37,13 +37,13 @@ const getRowBackgroundColor = (stateEvent: string) => {
   
   // Accept both "LIVE+EVENTO" and "LIVE + EVENTO"
   if (normalizedState === 'LIVE+EVENTO' || normalizedState === 'LIVE + EVENTO') {
-    return 'bg-[hsl(var(--state-yellow-pastel))] hover:bg-[hsl(var(--state-yellow-pastel-hover))] transition-colors';
+    return 'bg-state-yellow-pastel hover:bg-state-yellow-pastel-hover transition-colors';
   }
   if (normalizedState === 'EN FEED') {
-    return 'bg-[hsl(var(--state-red-pastel))] hover:bg-[hsl(var(--state-red-pastel-hover))] transition-colors';
+    return 'bg-state-red-pastel hover:bg-state-red-pastel-hover transition-colors';
   }
   if (normalizedState === 'FLY') {
-    return 'bg-[hsl(var(--state-blue-pastel))] hover:bg-[hsl(var(--state-blue-pastel-hover))] transition-colors';
+    return 'bg-state-blue-pastel hover:bg-state-blue-pastel-hover transition-colors';
   }
   
   return 'hover:bg-muted/50 transition-colors';

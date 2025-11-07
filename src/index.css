@@ -59,8 +59,8 @@ All colors MUST be HSL.
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     
     /* State Event Colors - Pastel tones */
-    --state-yellow-pastel: 48 96% 90%;
-    --state-yellow-pastel-hover: 48 96% 85%;
+    --state-yellow-pastel: 45 100% 88%;
+    --state-yellow-pastel-hover: 45 100% 82%;
     --state-red-pastel: 0 85% 93%;
     --state-red-pastel-hover: 0 85% 88%;
     --state-blue-pastel: 210 95% 92%;
@@ -114,12 +114,12 @@ All colors MUST be HSL.
     --shadow-hover: 0 4px 16px hsl(0 0% 0% / 0.5);
     
     /* State Event Colors - Dark mode pastel tones */
-    --state-yellow-pastel: 48 40% 25%;
-    --state-yellow-pastel-hover: 48 45% 30%;
-    --state-red-pastel: 0 40% 25%;
-    --state-red-pastel-hover: 0 45% 30%;
-    --state-blue-pastel: 210 40% 25%;
-    --state-blue-pastel-hover: 210 45% 30%;
+    --state-yellow-pastel: 45 85% 45%;
+    --state-yellow-pastel-hover: 45 90% 50%;
+    --state-red-pastel: 0 60% 35%;
+    --state-red-pastel-hover: 0 65% 40%;
+    --state-blue-pastel: 210 60% 40%;
+    --state-blue-pastel-hover: 210 65% 45%;
   }
 }
 
