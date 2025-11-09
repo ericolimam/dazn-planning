@@ -51,6 +51,7 @@ const getRowBackgroundColor = (stateEvent: string) => {
 
 export interface Program {
   ID: number;
+  EPISODE: number;
   TITLE: string;
   SERIE_TITLE: string;
   GENRE: string;
@@ -141,8 +142,8 @@ export function ProgramTable({ programs, onProgramClick, isLoading }: ProgramTab
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead onClick={() => handleSort('ID')} className="cursor-pointer hover:bg-muted transition-colors">
-                ID {sortColumn === 'ID' && (sortDirection === 'asc' ? '↑' : '↓')}
+              <TableHead onClick={() => handleSort('EPISODE')} className="cursor-pointer hover:bg-muted transition-colors">
+                Episódio {sortColumn === 'EPISODE' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
               <TableHead onClick={() => handleSort('TITLE')} className="cursor-pointer hover:bg-muted transition-colors">
                 Título {sortColumn === 'TITLE' && (sortDirection === 'asc' ? '↑' : '↓')}
@@ -168,7 +169,7 @@ export function ProgramTable({ programs, onProgramClick, isLoading }: ProgramTab
                 onDoubleClick={() => onProgramClick(program)}
                 className={`cursor-pointer transition-colors ${getRowBackgroundColor(program.STATE_EVENT)}`}
               >
-                <TableCell className="font-medium">{program.ID}</TableCell>
+                <TableCell className="font-medium">{program.EPISODE || '-'}</TableCell>
                 <TableCell className="font-semibold">{program.TITLE || '-'}</TableCell>
                 <TableCell>{program.SERIE_TITLE || '-'}</TableCell>
                 <TableCell>

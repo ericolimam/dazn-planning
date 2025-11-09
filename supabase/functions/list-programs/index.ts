@@ -37,6 +37,7 @@ serve(async (req) => {
       ACTION_NM: "LIST",
       COLUMNS: [
         { ALIAS: "ID", ATTR_NM: "PROG_ID" },
+        { ALIAS: "EPISODE", ATTR_NM: "EPISODENR" },
         { ALIAS: "TITLE", ATTR_NM: "TITLE" },
         { ALIAS: "SERIE_TITLE", ATTR_NM: "PROG_ID.SERIES_ID.TITLE" },
         { ALIAS: "GENRE", FORMAT: "NAME", ATTR_NM: "PROG_ID.SERIES_ID.GENRE_RF" },

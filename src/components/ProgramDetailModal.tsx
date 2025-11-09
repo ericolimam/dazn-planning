@@ -203,6 +203,7 @@ export function ProgramDetailModal({
               </h3>
                <div className="space-y-2">
                 <InfoRow label="ID" value={program.ID} />
+                <InfoRow label="Episódio" value={program.EPISODE} />
                 <InfoRow label="Gênero">
                   <Badge variant="secondary" className={getGenreColor(program.GENRE)}>
                     {program.GENRE || '-'}
