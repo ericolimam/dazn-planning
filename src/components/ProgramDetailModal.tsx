@@ -171,8 +171,6 @@ export function ProgramDetailModal({
         toast.success('Programa atualizado com sucesso!');
         setIsEditing(false);
         onOpenChange(false);
-        // Reload the page to fetch updated data
-        window.location.reload();
       } else {
         throw new Error(data?.error || 'Erro ao atualizar programa');
       }
