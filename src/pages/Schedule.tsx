@@ -421,8 +421,9 @@ export default function Schedule() {
                 views={['month', 'week', 'day']}
                 step={timeStep}
                 timeslots={1}
-                min={new Date(2024, 0, 1, 5, 0, 0)}
-                max={new Date(2024, 0, 2, 5, 0, 0)}
+                min={new Date(1972, 0, 1, 5, 0, 0)}
+                max={new Date(1972, 0, 2, 5, 0, 0)}
+                dayLayoutAlgorithm="no-overlap"
                 components={{
                   event: EventComponent,
                 }}
