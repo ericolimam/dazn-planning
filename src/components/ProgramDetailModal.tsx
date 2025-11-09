@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Program } from "./ProgramTable";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -263,53 +264,107 @@ export function ProgramDetailModal({
 
           <Separator />
 
-          {/* Production Information */}
-          <div className="space-y-2">
-            <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-              Produção
-            </h3>
-            {isEditing ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="cabine">Cabine</Label>
-                    {editedData.CABINE_ID && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 px-2 text-xs"
-                        onClick={() => setEditedData({ ...editedData, CABINE_ID: '' })}
-                      >
-                        Limpar
-                      </Button>
+          {/* Tabs for Production, Planning, and Promotion */}
+          <Tabs defaultValue="producao" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="producao">Produção</TabsTrigger>
+              <TabsTrigger value="planning">Planning</TabsTrigger>
+              <TabsTrigger value="promocao">Promoção</TabsTrigger>
+            </TabsList>
+
+            {/* Produção Tab */}
+            <TabsContent value="producao" className="space-y-4 mt-4">
+              {isEditing ? (
+                <div className="space-y-4">
+                  {/* Cabine */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="cabine">Cabine</Label>
+                      {editedData.CABINE_ID && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2 text-xs"
+                          onClick={() => setEditedData({ ...editedData, CABINE_ID: '' })}
+                        >
+                          Limpar
+                        </Button>
+                      )}
+                    </div>
+                    {program.CABINE && (
+                      <p className="text-xs text-muted-foreground">
+                        Valor atual: {program.CABINE}
+                      </p>
                     )}
+                    <Select
+                      value={editedData.CABINE_ID || undefined}
+                      onValueChange={(value) => {
+                        console.log('Cabine changed to:', value);
+                        console.log('Available cabines:', cabines);
+                        setEditedData({ ...editedData, CABINE_ID: value });
+                      }}
+                    >
+                      <SelectTrigger className="bg-background">
+                        <SelectValue placeholder="Selecione a cabine" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-background z-50">
+                        {cabines.map((cabine) => (
+                          <SelectItem key={cabine.id} value={String(cabine.id)}>
+                            {cabine.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                  {program.CABINE && (
-                    <p className="text-xs text-muted-foreground">
-                      Valor atual: {program.CABINE}
-                    </p>
-                  )}
-                  <Select
-                    value={editedData.CABINE_ID || undefined}
-                    onValueChange={(value) => {
-                      console.log('Cabine changed to:', value);
-                      console.log('Available cabines:', cabines);
-                      setEditedData({ ...editedData, CABINE_ID: value });
-                    }}
-                  >
-                    <SelectTrigger className="bg-background">
-                      <SelectValue placeholder="Selecione a cabine" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-background z-50">
-                      {cabines.map((cabine) => (
-                        <SelectItem key={cabine.id} value={String(cabine.id)}>
-                          {cabine.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+
+                  {/* Switches */}
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="resumo" className="cursor-pointer">Resumo</Label>
+                    <Switch
+                      id="resumo"
+                      checked={editedData.RESUMO}
+                      onCheckedChange={(checked) => setEditedData({ ...editedData, RESUMO: checked })}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="destaque" className="cursor-pointer">Destaque da Semana</Label>
+                    <Switch
+                      id="destaque"
+                      checked={editedData.DESTAQUE_SEMANA}
+                      onCheckedChange={(checked) => setEditedData({ ...editedData, DESTAQUE_SEMANA: checked })}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="promo" className="cursor-pointer">Promo DAZN</Label>
+                    <Switch
+                      id="promo"
+                      checked={editedData.PROMO_DAZN}
+                      onCheckedChange={(checked) => setEditedData({ ...editedData, PROMO_DAZN: checked })}
+                    />
+                  </div>
                 </div>
+              ) : (
+                <div className="space-y-4">
+                  <InfoRow label="Cabine" value={program.CABINE} />
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant={program.RESUMO ? "default" : "outline"}>
+                      {program.RESUMO ? '✓' : '✗'} Resumo
+                    </Badge>
+                    <Badge variant={program.DESTAQUE_SEMANA ? "default" : "outline"}>
+                      {program.DESTAQUE_SEMANA ? '✓' : '✗'} Destaque da Semana
+                    </Badge>
+                    <Badge variant={program.PROMO_DAZN ? "default" : "outline"}>
+                      {program.PROMO_DAZN ? '✓' : '✗'} Promo DAZN
+                    </Badge>
+                  </div>
+                </div>
+              )}
+            </TabsContent>
+
+            {/* Planning Tab */}
+            <TabsContent value="planning" className="space-y-4 mt-4">
+              {isEditing ? (
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="narrator">Narrador</Label>
@@ -350,63 +405,18 @@ export function ProgramDetailModal({
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <InfoRow label="Cabine" value={program.CABINE} />
+              ) : (
                 <InfoRow label="Narrador" value={program.NARRATOR} />
-              </div>
-            )}
-          </div>
+              )}
+            </TabsContent>
 
-          <Separator />
-
-          {/* Features & Highlights */}
-          <div className="space-y-2">
-            <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-              Características
-            </h3>
-            {isEditing ? (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="resumo" className="cursor-pointer">Resumo</Label>
-                  <Switch
-                    id="resumo"
-                    checked={editedData.RESUMO}
-                    onCheckedChange={(checked) => setEditedData({ ...editedData, RESUMO: checked })}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="destaque" className="cursor-pointer">Destaque da Semana</Label>
-                  <Switch
-                    id="destaque"
-                    checked={editedData.DESTAQUE_SEMANA}
-                    onCheckedChange={(checked) => setEditedData({ ...editedData, DESTAQUE_SEMANA: checked })}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="promo" className="cursor-pointer">Promo DAZN</Label>
-                  <Switch
-                    id="promo"
-                    checked={editedData.PROMO_DAZN}
-                    onCheckedChange={(checked) => setEditedData({ ...editedData, PROMO_DAZN: checked })}
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                <Badge variant={program.RESUMO ? "default" : "outline"}>
-                  {program.RESUMO ? '✓' : '✗'} Resumo
-                </Badge>
-                <Badge variant={program.DESTAQUE_SEMANA ? "default" : "outline"}>
-                  {program.DESTAQUE_SEMANA ? '✓' : '✗'} Destaque da Semana
-                </Badge>
-                <Badge variant={program.PROMO_DAZN ? "default" : "outline"}>
-                  {program.PROMO_DAZN ? '✓' : '✗'} Promo DAZN
-                </Badge>
-              </div>
-            )}
-          </div>
+            {/* Promoção Tab */}
+            <TabsContent value="promocao" className="space-y-4 mt-4">
+              <p className="text-sm text-muted-foreground text-center py-8">
+                Em breve...
+              </p>
+            </TabsContent>
+          </Tabs>
         </div>
 
         <DialogFooter className="gap-2">
