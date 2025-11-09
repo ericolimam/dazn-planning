@@ -49,7 +49,7 @@ serve(async (req) => {
     }
 
     if (updates.COMMENTATOR !== undefined && updates.COMMENTATOR !== '') {
-      attrs["COMMENTATOR_RF"] = updates.COMMENTATOR;
+      attrs["COMMENTATOR"] = updates.COMMENTATOR;
     }
 
     // Boolean fields are always included since they're mandatory
