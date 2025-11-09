@@ -203,7 +203,7 @@ export function ProgramDetailModal({
               <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                 Informações Básicas
               </h3>
-              <div className="space-y-2">
+               <div className="space-y-2">
                 <InfoRow label="ID" value={program.ID} />
                 <InfoRow label="Gênero">
                   <Badge variant="secondary" className={getGenreColor(program.GENRE)}>
@@ -211,54 +211,6 @@ export function ProgramDetailModal({
                   </Badge>
                 </InfoRow>
                 <InfoRow label="Ano" value={program.YEAR} />
-                {isEditing ? (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="state_event">Estado/Evento</Label>
-                      {editedData.STATE_EVENT_ID && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 px-2 text-xs"
-                          onClick={() => setEditedData({ ...editedData, STATE_EVENT_ID: '' })}
-                        >
-                          Limpar
-                        </Button>
-                      )}
-                    </div>
-                    {program.STATE_EVENT && (
-                      <p className="text-xs text-muted-foreground">
-                        Valor atual: {program.STATE_EVENT}
-                      </p>
-                    )}
-                    <Select
-                      value={editedData.STATE_EVENT_ID || undefined}
-                      onValueChange={(value) => {
-                        console.log('State Event changed to:', value);
-                        console.log('Available state events:', stateEvents);
-                        setEditedData({ ...editedData, STATE_EVENT_ID: value });
-                      }}
-                    >
-                      <SelectTrigger className="bg-background">
-                        <SelectValue placeholder="Selecione o estado/evento" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-background z-50">
-                        {stateEvents.map((event) => (
-                          <SelectItem key={event.id} value={String(event.id)}>
-                            {event.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                ) : (
-                  <InfoRow label="Estado/Evento">
-                    <Badge variant="outline" className="bg-muted border-border">
-                      {program.STATE_EVENT || '-'}
-                    </Badge>
-                  </InfoRow>
-                )}
               </div>
             </div>
 
@@ -403,6 +355,48 @@ export function ProgramDetailModal({
                     </div>
                   </div>
 
+                  {/* Broadcast Type */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="state_event">Broadcast Type</Label>
+                      {editedData.STATE_EVENT_ID && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2 text-xs"
+                          onClick={() => setEditedData({ ...editedData, STATE_EVENT_ID: '' })}
+                        >
+                          Limpar
+                        </Button>
+                      )}
+                    </div>
+                    {program.STATE_EVENT && (
+                      <p className="text-xs text-muted-foreground">
+                        Valor atual: {program.STATE_EVENT}
+                      </p>
+                    )}
+                    <Select
+                      value={editedData.STATE_EVENT_ID || undefined}
+                      onValueChange={(value) => {
+                        console.log('State Event changed to:', value);
+                        console.log('Available state events:', stateEvents);
+                        setEditedData({ ...editedData, STATE_EVENT_ID: value });
+                      }}
+                    >
+                      <SelectTrigger className="bg-background">
+                        <SelectValue placeholder="Selecione o broadcast type" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-background z-50">
+                        {stateEvents.map((event) => (
+                          <SelectItem key={event.id} value={String(event.id)}>
+                            {event.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   {/* Narrador */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -463,6 +457,11 @@ export function ProgramDetailModal({
                     <InfoRow label="Time Before" value={program.TIME_BEFORE} />
                     <InfoRow label="Time Ending" value={program.TIME_ENDING} />
                   </div>
+                  <InfoRow label="Broadcast Type">
+                    <Badge variant="outline" className="bg-muted border-border">
+                      {program.STATE_EVENT || '-'}
+                    </Badge>
+                  </InfoRow>
                   <InfoRow label="Narrador" value={program.NARRATOR} />
                   <InfoRow label="Comentador(es)" value={program.COMMENTATOR} />
                 </div>
