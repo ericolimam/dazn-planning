@@ -69,6 +69,7 @@ export function ProgramDetailModal({
     STATE_EVENT_ID: program?.STATE_EVENT_ID || '',
     CABINE_ID: program?.CABINE_ID || '',
     NARRATOR_ID: program?.NARRATOR_ID || '',
+    COMMENTATOR_ID: program?.COMMENTATOR_ID || '',
     RESUMO: program?.RESUMO || false,
     DESTAQUE_SEMANA: program?.DESTAQUE_SEMANA || false,
     PROMO_DAZN: program?.PROMO_DAZN || false,
@@ -87,11 +88,13 @@ export function ProgramDetailModal({
     const stateEventId = program.STATE_EVENT_ID ? String(program.STATE_EVENT_ID) : findIdByName(program.STATE_EVENT || '', stateEvents);
     const cabineId = program.CABINE_ID ? String(program.CABINE_ID) : findIdByName(program.CABINE || '', cabines);
     const narratorId = program.NARRATOR_ID ? String(program.NARRATOR_ID) : findIdByName(program.NARRATOR || '', narrators);
+    const commentatorId = program.COMMENTATOR_ID ? String(program.COMMENTATOR_ID) : findIdByName(program.COMMENTATOR || '', narrators);
     
     const newData = {
       STATE_EVENT_ID: stateEventId,
       CABINE_ID: cabineId,
       NARRATOR_ID: narratorId,
+      COMMENTATOR_ID: commentatorId,
       RESUMO: program.RESUMO || false,
       DESTAQUE_SEMANA: program.DESTAQUE_SEMANA || false,
       PROMO_DAZN: program.PROMO_DAZN || false,
@@ -129,6 +132,7 @@ export function ProgramDetailModal({
       STATE_EVENT_ID: program.STATE_EVENT_ID || '',
       CABINE_ID: program.CABINE_ID || '',
       NARRATOR_ID: program.NARRATOR_ID || '',
+      COMMENTATOR_ID: program.COMMENTATOR_ID || '',
       RESUMO: program.RESUMO || false,
       DESTAQUE_SEMANA: program.DESTAQUE_SEMANA || false,
       PROMO_DAZN: program.PROMO_DAZN || false,
@@ -145,6 +149,7 @@ export function ProgramDetailModal({
             STATE_EVENT: editedData.STATE_EVENT_ID,
             CABINE: editedData.CABINE_ID,
             NARRATOR: editedData.NARRATOR_ID,
+            COMMENTATOR: editedData.COMMENTATOR_ID,
             RESUMO: editedData.RESUMO,
             DESTAQUE_SEMANA: editedData.DESTAQUE_SEMANA,
             PROMO_DAZN: editedData.PROMO_DAZN
@@ -365,48 +370,96 @@ export function ProgramDetailModal({
             {/* Planning Tab */}
             <TabsContent value="planning" className="space-y-4 mt-4">
               {isEditing ? (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="narrator">Narrador</Label>
-                    {editedData.NARRATOR_ID && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 px-2 text-xs"
-                        onClick={() => setEditedData({ ...editedData, NARRATOR_ID: '' })}
-                      >
-                        Limpar
-                      </Button>
+                <div className="space-y-4">
+                  {/* Narrador */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="narrator">Narrador</Label>
+                      {editedData.NARRATOR_ID && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2 text-xs"
+                          onClick={() => setEditedData({ ...editedData, NARRATOR_ID: '' })}
+                        >
+                          Limpar
+                        </Button>
+                      )}
+                    </div>
+                    {program.NARRATOR && (
+                      <p className="text-xs text-muted-foreground">
+                        Valor atual: {program.NARRATOR}
+                      </p>
                     )}
+                    <Select
+                      value={editedData.NARRATOR_ID || undefined}
+                      onValueChange={(value) => {
+                        console.log('Narrator changed to:', value);
+                        console.log('Available narrators:', narrators);
+                        setEditedData({ ...editedData, NARRATOR_ID: value });
+                      }}
+                    >
+                      <SelectTrigger className="bg-background">
+                        <SelectValue placeholder="Selecione o narrador" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-background z-50">
+                        {narrators.map((narrator) => (
+                          <SelectItem key={narrator.id} value={String(narrator.id)}>
+                            {narrator.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                  {program.NARRATOR && (
-                    <p className="text-xs text-muted-foreground">
-                      Valor atual: {program.NARRATOR}
-                    </p>
-                  )}
-                  <Select
-                    value={editedData.NARRATOR_ID || undefined}
-                    onValueChange={(value) => {
-                      console.log('Narrator changed to:', value);
-                      console.log('Available narrators:', narrators);
-                      setEditedData({ ...editedData, NARRATOR_ID: value });
-                    }}
-                  >
-                    <SelectTrigger className="bg-background">
-                      <SelectValue placeholder="Selecione o narrador" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-background z-50">
-                      {narrators.map((narrator) => (
-                        <SelectItem key={narrator.id} value={String(narrator.id)}>
-                          {narrator.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+
+                  {/* Comentador(es) */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="commentator">Comentador(es)</Label>
+                      {editedData.COMMENTATOR_ID && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2 text-xs"
+                          onClick={() => setEditedData({ ...editedData, COMMENTATOR_ID: '' })}
+                        >
+                          Limpar
+                        </Button>
+                      )}
+                    </div>
+                    {program.COMMENTATOR && (
+                      <p className="text-xs text-muted-foreground">
+                        Valor atual: {program.COMMENTATOR}
+                      </p>
+                    )}
+                    <Select
+                      value={editedData.COMMENTATOR_ID || undefined}
+                      onValueChange={(value) => {
+                        console.log('Commentator changed to:', value);
+                        console.log('Available narrators:', narrators);
+                        setEditedData({ ...editedData, COMMENTATOR_ID: value });
+                      }}
+                    >
+                      <SelectTrigger className="bg-background">
+                        <SelectValue placeholder="Selecione o comentador" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-background z-50">
+                        {narrators.map((narrator) => (
+                          <SelectItem key={narrator.id} value={String(narrator.id)}>
+                            {narrator.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               ) : (
-                <InfoRow label="Narrador" value={program.NARRATOR} />
+                <div className="space-y-4">
+                  <InfoRow label="Narrador" value={program.NARRATOR} />
+                  <InfoRow label="Comentador(es)" value={program.COMMENTATOR} />
+                </div>
               )}
             </TabsContent>
 

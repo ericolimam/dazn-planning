@@ -62,6 +62,8 @@ export interface Program {
   CABINE_ID: string;
   NARRATOR: string;
   NARRATOR_ID: string;
+  COMMENTATOR: string;
+  COMMENTATOR_ID: string;
   RESUMO: boolean;
   DESTAQUE_SEMANA: boolean;
   PROMO_DAZN: boolean;

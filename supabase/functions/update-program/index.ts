@@ -48,6 +48,10 @@ serve(async (req) => {
       attrs["NARRATOR_RF"] = updates.NARRATOR;
     }
 
+    if (updates.COMMENTATOR !== undefined && updates.COMMENTATOR !== '') {
+      attrs["COMMENTATOR_RF"] = updates.COMMENTATOR;
+    }
+
     // Boolean fields are always included since they're mandatory
     if (updates.RESUMO !== undefined) {
       attrs["RESUMO"] = updates.RESUMO;
