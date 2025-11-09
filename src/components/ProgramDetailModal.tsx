@@ -71,6 +71,8 @@ export function ProgramDetailModal({
     CABINE_ID: program?.CABINE_ID || '',
     NARRATOR_ID: program?.NARRATOR_ID || '',
     COMMENTATOR: program?.COMMENTATOR || '',
+    TIME_BEFORE: program?.TIME_BEFORE || '',
+    TIME_ENDING: program?.TIME_ENDING || '',
     RESUMO: program?.RESUMO || false,
     DESTAQUE_SEMANA: program?.DESTAQUE_SEMANA || false,
     PROMO_DAZN: program?.PROMO_DAZN || false,
@@ -95,6 +97,8 @@ export function ProgramDetailModal({
       CABINE_ID: cabineId,
       NARRATOR_ID: narratorId,
       COMMENTATOR: program.COMMENTATOR || '',
+      TIME_BEFORE: program.TIME_BEFORE || '',
+      TIME_ENDING: program.TIME_ENDING || '',
       RESUMO: program.RESUMO || false,
       DESTAQUE_SEMANA: program.DESTAQUE_SEMANA || false,
       PROMO_DAZN: program.PROMO_DAZN || false,
@@ -133,6 +137,8 @@ export function ProgramDetailModal({
       CABINE_ID: program.CABINE_ID || '',
       NARRATOR_ID: program.NARRATOR_ID || '',
       COMMENTATOR: program.COMMENTATOR || '',
+      TIME_BEFORE: program.TIME_BEFORE || '',
+      TIME_ENDING: program.TIME_ENDING || '',
       RESUMO: program.RESUMO || false,
       DESTAQUE_SEMANA: program.DESTAQUE_SEMANA || false,
       PROMO_DAZN: program.PROMO_DAZN || false,
@@ -150,6 +156,8 @@ export function ProgramDetailModal({
             CABINE: editedData.CABINE_ID,
             NARRATOR: editedData.NARRATOR_ID,
             COMMENTATOR: editedData.COMMENTATOR,
+            TIME_BEFORE: editedData.TIME_BEFORE,
+            TIME_ENDING: editedData.TIME_ENDING,
             RESUMO: editedData.RESUMO,
             DESTAQUE_SEMANA: editedData.DESTAQUE_SEMANA,
             PROMO_DAZN: editedData.PROMO_DAZN
@@ -371,6 +379,30 @@ export function ProgramDetailModal({
             <TabsContent value="planning" className="space-y-4 mt-4">
               {isEditing ? (
                 <div className="space-y-4">
+                  {/* Time Before e Time Ending - lado a lado */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="time_before">Time Before</Label>
+                      <Input
+                        id="time_before"
+                        value={editedData.TIME_BEFORE}
+                        onChange={(e) => setEditedData({ ...editedData, TIME_BEFORE: e.target.value })}
+                        placeholder="HH:MM"
+                        className="bg-background"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="time_ending">Time Ending</Label>
+                      <Input
+                        id="time_ending"
+                        value={editedData.TIME_ENDING}
+                        onChange={(e) => setEditedData({ ...editedData, TIME_ENDING: e.target.value })}
+                        placeholder="HH:MM"
+                        className="bg-background"
+                      />
+                    </div>
+                  </div>
+
                   {/* Narrador */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -427,6 +459,10 @@ export function ProgramDetailModal({
                 </div>
               ) : (
                 <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <InfoRow label="Time Before" value={program.TIME_BEFORE} />
+                    <InfoRow label="Time Ending" value={program.TIME_ENDING} />
+                  </div>
                   <InfoRow label="Narrador" value={program.NARRATOR} />
                   <InfoRow label="Comentador(es)" value={program.COMMENTATOR} />
                 </div>

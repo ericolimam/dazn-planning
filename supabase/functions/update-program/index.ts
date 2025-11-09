@@ -52,6 +52,14 @@ serve(async (req) => {
       attrs["COMMENTATOR"] = updates.COMMENTATOR;
     }
 
+    if (updates.TIME_BEFORE !== undefined && updates.TIME_BEFORE !== '') {
+      attrs["SATELITESTART"] = updates.TIME_BEFORE;
+    }
+
+    if (updates.TIME_ENDING !== undefined && updates.TIME_ENDING !== '') {
+      attrs["SATELITEEND"] = updates.TIME_ENDING;
+    }
+
     // Boolean fields are always included since they're mandatory
     if (updates.RESUMO !== undefined) {
       attrs["RESUMO"] = updates.RESUMO;

@@ -63,6 +63,8 @@ export interface Program {
   NARRATOR: string;
   NARRATOR_ID: string;
   COMMENTATOR: string;
+  TIME_BEFORE?: string;
+  TIME_ENDING?: string;
   RESUMO: boolean;
   DESTAQUE_SEMANA: boolean;
   PROMO_DAZN: boolean;
