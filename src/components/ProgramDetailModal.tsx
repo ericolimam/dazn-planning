@@ -108,6 +108,10 @@ export function ProgramDetailModal({
 
   useEffect(() => {
     if (program && open) {
+      // CRITICAL: Reset fullProgram immediately to prevent showing old data
+      setFullProgram(null);
+      setIsEditing(false);
+      
       setEditedData({
         STATE_EVENT_ID: program.STATE_EVENT_ID || '',
         CABINE_ID: program.CABINE_ID || '',
@@ -135,8 +139,7 @@ export function ProgramDetailModal({
         CRM: program.CRM || false,
         SOCIAL: program.SOCIAL || false,
       });
-      setIsEditing(false);
-      setFullProgram(null);
+      
       loadProgramDetails();
     }
   }, [program?.ID, open]);
@@ -147,7 +150,8 @@ export function ProgramDetailModal({
     console.log('=== LOADING PROGRAM DETAILS ===');
     console.log('Program ID received in modal:', program.ID);
     console.log('Program Title:', program.TITLE);
-    console.log('Program object in modal:', program);
+    console.log('Program Episode:', program.EPISODE);
+    console.log('Full program object:', program);
     
     setIsLoadingDetails(true);
     try {
@@ -158,6 +162,9 @@ export function ProgramDetailModal({
       if (error) throw error;
 
       if (data?.success && data?.data) {
+        console.log('Received full program details for ID:', data.data.ID);
+        console.log('Details Title:', data.data.TITLE);
+        console.log('Details Episode:', data.data.EPISODE);
         setFullProgram(data.data);
       }
     } catch (error: any) {
@@ -170,7 +177,9 @@ export function ProgramDetailModal({
 
   if (!program) return null;
   
-  const displayProgram = fullProgram || program;
+  // CRITICAL: Always use program data while loading to show correct initial info
+  // Only merge with fullProgram after loading completes
+  const displayProgram = (!isLoadingDetails && fullProgram) ? { ...program, ...fullProgram } : program;
 
   const handleEdit = () => {
     // Merge fullProgram and program, preferring non-null values
