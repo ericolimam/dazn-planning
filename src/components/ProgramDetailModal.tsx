@@ -198,8 +198,8 @@ export function ProgramDetailModal({
       DESTAQUE_SEMANA: mergedProgram.DESTAQUE_SEMANA || false,
       PROMO_DAZN: mergedProgram.PROMO_DAZN || false,
       // Planning fields
-      COMMTYPE_ID: mergedProgram.COMMTYPE_ID ? String(mergedProgram.COMMTYPE_ID) : findIdByName(mergedProgram.COMMTYPE || '', commtypes),
-      BT_ID: mergedProgram.BT_ID ? String(mergedProgram.BT_ID) : findIdByName(mergedProgram.BT || '', bts),
+      COMMTYPE_ID: mergedProgram.COMMTYPE_ID ? String(mergedProgram.COMMTYPE_ID) : (mergedProgram.COMMTYPE ? findIdByName(mergedProgram.COMMTYPE, commtypes) : ''),
+      BT_ID: mergedProgram.BT_ID ? String(mergedProgram.BT_ID) : (mergedProgram.BT ? findIdByName(mergedProgram.BT, bts) : ''),
       PRODADDINFO: mergedProgram.PRODADDINFO || '',
       MATCHHIGH: Boolean(mergedProgram.MATCHHIGH),
       // Promoção fields
@@ -313,8 +313,8 @@ export function ProgramDetailModal({
             DESTAQUE_SEMANA: editedData.DESTAQUE_SEMANA,
             PROMO_DAZN: editedData.PROMO_DAZN,
             // Planning fields
-            COMMTYPE: editedData.COMMTYPE_ID,
-            BT: editedData.BT_ID,
+            COMMTYPE_ID: editedData.COMMTYPE_ID,
+            BT_ID: editedData.BT_ID,
             PRODADDINFO: editedData.PRODADDINFO,
             MATCHHIGH: editedData.MATCHHIGH,
             // Promoção fields

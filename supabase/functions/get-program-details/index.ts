@@ -104,6 +104,10 @@ serve(async (req) => {
 
     const data = await response.json();
     console.log('Received program details');
+    console.log('COMMTYPE_ID:', data.ROWS?.[0]?.COMMTYPE_ID);
+    console.log('COMMTYPE:', data.ROWS?.[0]?.COMMTYPE);
+    console.log('BT_ID:', data.ROWS?.[0]?.BT_ID);
+    console.log('BT:', data.ROWS?.[0]?.BT);
 
     if (!data.ROWS || data.ROWS.length === 0) {
       throw new Error('Program not found');
