@@ -51,7 +51,7 @@ interface ProgramDetailModalProps {
   program: Program | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onChange?: () => void;
+  onSave?: (updatedProgram: Program) => void;
   stateEvents?: Array<{id: string; name: string}>;
   cabines?: Array<{id: string; name: string}>;
   narrators?: Array<{id: string; name: string}>;
@@ -64,7 +64,7 @@ export function ProgramDetailModal({
   program, 
   open, 
   onOpenChange,
-  onChange,
+  onSave,
   stateEvents = [],
   cabines = [],
   narrators = [],
@@ -360,6 +360,46 @@ export function ProgramDetailModal({
       if (data?.success) {
         toast.success('Programa atualizado com sucesso!');
         setIsEditing(false);
+        
+        // Create updated program object with new values
+        const updatedProgram: Program = {
+          ...program,
+          STATE_EVENT_ID: editedData.STATE_EVENT_ID,
+          STATE_EVENT: stateEvents.find(s => s.id === editedData.STATE_EVENT_ID)?.name || program.STATE_EVENT,
+          CABINE_ID: editedData.CABINE_ID,
+          CABINE: cabines.find(c => c.id === editedData.CABINE_ID)?.name || program.CABINE,
+          NARRATOR_ID: editedData.NARRATOR_ID,
+          NARRATOR: narrators.find(n => n.id === editedData.NARRATOR_ID)?.name || program.NARRATOR,
+          COMMENTATOR: editedData.COMMENTATOR,
+          TIME_BEFORE: editedData.TIME_BEFORE,
+          TIME_ENDING: editedData.TIME_ENDING,
+          RESUMO: editedData.RESUMO,
+          DESTAQUE_SEMANA: editedData.DESTAQUE_SEMANA,
+          PROMO_DAZN: editedData.PROMO_DAZN,
+          COMMTYPE_ID: editedData.COMMTYPE_ID,
+          COMMTYPE: commtypes.find(c => c.id === editedData.COMMTYPE_ID)?.name || program.COMMTYPE,
+          BT_ID: editedData.BT_ID,
+          BT: bts.find(b => b.id === editedData.BT_ID)?.name || program.BT,
+          PRODADDINFO: editedData.PRODADDINFO,
+          MATCHHIGH: String(editedData.MATCHHIGH),
+          TOPCONTENT_RF_ID: editedData.TOPCONTENT_RF_ID,
+          TOPCONTENT_RF: topcontents.find(t => t.id === editedData.TOPCONTENT_RF_ID)?.name || program.TOPCONTENT_RF,
+          CLASSICDERBI: editedData.CLASSICDERBI,
+          CONTENTDETAIL: editedData.CONTENTDETAIL,
+          PLATAFORMBANNERS: editedData.PLATAFORMBANNERS,
+          PROMOINDIVIDUAL: editedData.PROMOINDIVIDUAL,
+          PROMOCONJUNTA: editedData.PROMOCONJUNTA,
+          PROMOGENERICA: editedData.PROMOGENERICA,
+          PROMO10S: editedData.PROMO10S,
+          DETALHESPROMO: editedData.DETALHESPROMO,
+          TELCOS: editedData.TELCOS,
+          CRM: editedData.CRM,
+          SOCIAL: editedData.SOCIAL,
+        };
+        
+        // Call onSave callback with updated program
+        onSave?.(updatedProgram);
+        
         onOpenChange(false);
       } else {
         console.error('API returned error:', data?.error);

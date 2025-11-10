@@ -200,6 +200,13 @@ const Index = () => {
     setIsModalOpen(true);
   };
 
+  const handleProgramSave = (updatedProgram: Program) => {
+    // Update the program in the local list to reflect changes immediately
+    setPrograms(prevPrograms => 
+      prevPrograms.map(p => p.ID === updatedProgram.ID ? updatedProgram : p)
+    );
+  };
+
   const handleClearFilters = () => {
     setPrograms([]);
     setCurrentFilters({ genre: "", year: "", serie: "", narrator: "", dateFrom: "", dateTo: "" });
@@ -298,6 +305,7 @@ const Index = () => {
         program={selectedProgram}
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
+        onSave={handleProgramSave}
         stateEvents={stateEvents}
         cabines={cabines}
         narrators={narrators}
