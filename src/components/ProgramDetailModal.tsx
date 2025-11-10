@@ -392,15 +392,15 @@ export function ProgramDetailModal({
                 Informações Básicas
               </h3>
                <div className="space-y-2">
-                <InfoRow label="ID" value={displayProgram.ID} />
-                <InfoRow label="Episódio" value={displayProgram.EPISODE} />
-                <InfoRow label="Tx. Date" value={displayProgram.X_TXDAY_DATE} />
+                <InfoRow label="ID" value={program.ID} />
+                <InfoRow label="Episódio" value={program.EPISODE} />
+                <InfoRow label="Tx. Date" value={program.X_TXDAY_DATE} />
                 <InfoRow label="Gênero">
-                  <Badge variant="secondary" className={getGenreColor(displayProgram.GENRE)}>
-                    {displayProgram.GENRE || '-'}
+                  <Badge variant="secondary" className={getGenreColor(program.GENRE)}>
+                    {program.GENRE || '-'}
                   </Badge>
                 </InfoRow>
-                <InfoRow label="Ano" value={displayProgram.YEAR} />
+                <InfoRow label="Ano" value={program.YEAR} />
               </div>
             </div>
 
