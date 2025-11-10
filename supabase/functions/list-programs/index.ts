@@ -58,7 +58,7 @@ serve(async (req) => {
     if (genre) {
       filters.push({
         ATTR_NM: "PROG_ID.SERIES_ID.GENRE_RF",
-        OPERATOR: "EQ",
+        OPERATOR: "=",
         VALUE: genre
       });
     }
@@ -66,7 +66,7 @@ serve(async (req) => {
     if (year) {
       filters.push({
         ATTR_NM: "PROG_ID.SERIES_ID.CREATION_DATE",
-        OPERATOR: "EQ",
+        OPERATOR: "=",
         FORMAT: "YYYY",
         VALUE: year.toString()
       });
@@ -75,7 +75,7 @@ serve(async (req) => {
     if (serie) {
       filters.push({
         ATTR_NM: "PROG_ID.SERIES_ID.TITLE",
-        OPERATOR: "EQ",
+        OPERATOR: "=",
         VALUE: serie
       });
     }
@@ -83,7 +83,7 @@ serve(async (req) => {
     if (narrator) {
       filters.push({
         ATTR_NM: "PROG_ID.NARRATOR_RF",
-        OPERATOR: "EQ",
+        OPERATOR: "=",
         FORMAT: "NAME",
         VALUE: narrator
       });
