@@ -68,7 +68,7 @@ serve(async (req) => {
         ATTR_NM: "PROG_ID.SERIES_ID.CREATION_DATE",
         OPERATOR: "=",
         FORMAT: "YYYY",
-        VALUE: `${year}-01-01`
+        VALUE: year.toString()
       });
     }
 
