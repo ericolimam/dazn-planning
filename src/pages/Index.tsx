@@ -42,9 +42,9 @@ const Index = () => {
     try {
       console.log('Loading all programs for filtering...');
       
-      // Load programs only
+      // Load programs only with limit
       const programsResult = await supabase.functions.invoke('list-programs', {
-        body: { genre: undefined, year: undefined },
+        body: { genre: undefined, year: undefined, limit: 5000, offset: 0 },
       });
 
       if (programsResult.error) throw programsResult.error;
@@ -149,6 +149,8 @@ const Index = () => {
           body: {
             genre: undefined,
             year: undefined,
+            limit: 5000,
+            offset: 0,
           },
         });
 
@@ -296,7 +298,7 @@ const Index = () => {
     // Reload all programs to get fresh data
     try {
       const { data, error } = await supabase.functions.invoke('list-programs', {
-        body: { genre: undefined, year: undefined },
+        body: { genre: undefined, year: undefined, limit: 5000, offset: 0 },
       });
 
       if (error) throw error;

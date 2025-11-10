@@ -12,11 +12,13 @@ serve(async (req) => {
   }
 
   try {
-    const { genre, year } = await req.json();
+    const { genre, year, limit = 5000, offset = 0 } = await req.json();
     
     console.log('=== FILTER REQUEST ===');
     console.log('Genre:', genre);
     console.log('Year:', year);
+    console.log('Limit:', limit);
+    console.log('Offset:', offset);
     
     const username = Deno.env.get('PROVYS_API_USERNAME');
     const password = Deno.env.get('PROVYS_API_PASSWORD');
@@ -134,20 +136,29 @@ serve(async (req) => {
     console.log('=== PROVYS API RESPONSE ===');
     console.log('Total rows received:', data.ROWS?.length || 0);
     
+    // Apply pagination
+    const allRows = data.ROWS || [];
+    const paginatedRows = allRows.slice(offset, offset + limit);
+    
+    console.log(`Returning ${paginatedRows.length} rows (offset: ${offset}, limit: ${limit})`);
+    
     // Log first 3 programs to verify filtering
-    if (data.ROWS && data.ROWS.length > 0) {
+    if (paginatedRows.length > 0) {
       console.log('First 3 programs:');
-      data.ROWS.slice(0, 3).forEach((row: any, idx: number) => {
+      paginatedRows.slice(0, 3).forEach((row: any, idx: number) => {
         console.log(`  ${idx + 1}. ${row.TITLE} - Genre: ${row.GENRE}, Year: ${row.YEAR}`);
       });
     }
 
-    // Return the rows
+    // Return the paginated rows
     return new Response(
       JSON.stringify({ 
         success: true, 
-        data: data.ROWS || [] 
-      }), 
+        data: paginatedRows,
+        total: allRows.length,
+        offset,
+        limit
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
