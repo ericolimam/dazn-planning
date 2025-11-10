@@ -298,7 +298,6 @@ const Index = () => {
         program={selectedProgram}
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
-        onChange={handleRefreshAfterEdit}
         stateEvents={stateEvents}
         cabines={cabines}
         narrators={narrators}
