@@ -77,7 +77,7 @@ serve(async (req) => {
       FILTERS: [
         {
           ATTR_NM: "PROG_ID",
-          OPERATOR: "EQ",
+          OPERATOR: "=",
           VALUE: programId
         }
       ]
