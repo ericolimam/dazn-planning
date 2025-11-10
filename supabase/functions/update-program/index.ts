@@ -60,6 +60,20 @@ serve(async (req) => {
       attrs["SATELITEEND"] = updates.TIME_ENDING;
     }
 
+    // Reference fields with IDs
+    if (updates.COMMTYPE_ID !== undefined && updates.COMMTYPE_ID !== '') {
+      attrs["COMMTYPE_RF"] = updates.COMMTYPE_ID;
+    }
+
+    if (updates.BT_ID !== undefined && updates.BT_ID !== '') {
+      attrs["BT_RF"] = updates.BT_ID;
+    }
+
+    // Text fields that can be empty
+    if (updates.PRODADDINFO !== undefined) {
+      attrs["PRODADDINFO"] = updates.PRODADDINFO;
+    }
+
     // Boolean fields are always included since they're mandatory
     if (updates.RESUMO !== undefined) {
       attrs["RESUMO"] = updates.RESUMO;
@@ -71,6 +85,10 @@ serve(async (req) => {
 
     if (updates.PROMO_DAZN !== undefined) {
       attrs["PROMODAZN"] = updates.PROMO_DAZN;
+    }
+
+    if (updates.MATCHHIGH !== undefined) {
+      attrs["MATCHHIGH"] = updates.MATCHHIGH;
     }
     
     console.log('Filtered attributes to update:', Object.keys(attrs));
