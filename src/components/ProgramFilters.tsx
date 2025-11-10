@@ -28,6 +28,11 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
   const [selectedYear, setSelectedYear] = useState<string>("all");
   const [selectedSerie, setSelectedSerie] = useState<string>("all");
   const [selectedNarrator, setSelectedNarrator] = useState<string>("all");
+  const [serieSearchQuery, setSerieSearchQuery] = useState<string>("");
+  
+  const filteredSeries = series.filter(serie => 
+    serie.toLowerCase().includes(serieSearchQuery.toLowerCase())
+  );
 
   const handleFilter = () => {
     // Validate that at least one filter is selected
@@ -96,18 +101,33 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="serie">Série</Label>
+            <Label htmlFor="serie">Série ({series.length} disponíveis)</Label>
             <Select value={selectedSerie} onValueChange={setSelectedSerie} disabled={isLoading}>
               <SelectTrigger id="serie" className="bg-background">
                 <SelectValue placeholder="Todas as séries" />
               </SelectTrigger>
-              <SelectContent className="bg-background z-50 max-h-[300px]">
+              <SelectContent className="bg-background z-50 max-h-[400px]">
+                <div className="sticky top-0 bg-background p-2 border-b z-10">
+                  <Input
+                    placeholder="Buscar série..."
+                    value={serieSearchQuery}
+                    onChange={(e) => setSerieSearchQuery(e.target.value)}
+                    className="h-8"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </div>
                 <SelectItem value="all">Todas as séries</SelectItem>
-                {series.map((serie) => (
-                  <SelectItem key={serie} value={serie}>
-                    {serie}
-                  </SelectItem>
-                ))}
+                {filteredSeries.length > 0 ? (
+                  filteredSeries.map((serie) => (
+                    <SelectItem key={serie} value={serie}>
+                      {serie}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <div className="py-6 text-center text-sm text-muted-foreground">
+                    Nenhuma série encontrada
+                  </div>
+                )}
               </SelectContent>
             </Select>
           </div>
