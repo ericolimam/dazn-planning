@@ -140,51 +140,32 @@ const Index = () => {
 
   const fetchPrograms = async (filters: { genre: string; year: string; serie: string; narrator: string }) => {
     setIsLoading(true);
-    setCurrentFilters(filters); // Save current filters
+    setCurrentFilters(filters);
     
     try {
-      // If we don't have all programs yet, fetch them
-      if (allPrograms.length === 0) {
-        const { data, error } = await supabase.functions.invoke('list-programs', {
-          body: {
-            genre: undefined,
-            year: undefined,
-            limit: 5000,
-            offset: 0,
-          },
-        });
+      console.log('Fetching programs with filters:', filters);
+      
+      // Send filters to backend - it will handle filtering before pagination
+      const { data, error } = await supabase.functions.invoke('list-programs', {
+        body: {
+          genre: filters.genre || undefined,
+          year: filters.year || undefined,
+          serie: filters.serie || undefined,
+          narrator: filters.narrator || undefined,
+          limit: 5000,
+          offset: 0,
+        },
+      });
 
-        if (error) throw error;
+      if (error) throw error;
 
-        if (data?.success && data?.data) {
-          const programsData = data.data as Program[];
-          setAllPrograms(programsData);
-          
-          // Extract unique genres, years and series
-          const uniqueGenres = [...new Set(programsData.map(p => p.GENRE).filter(Boolean))].sort();
-          setGenres(uniqueGenres);
-          
-          const uniqueYears = [...new Set(programsData.map(p => p.YEAR).filter(Boolean))].sort((a, b) => b - a);
-          setYears(uniqueYears);
-          
-          const uniqueSeries = [...new Set(programsData.map(p => p.SERIE_TITLE).filter(Boolean))].sort();
-          setSeries(uniqueSeries);
-          
-          // Note: Narrators, cabines, and state events are already loaded from the initial loadFilterOptions call
-          // No need to extract them again here since they come from separate API calls
-          
-          // Apply filters locally
-          const filtered = filterProgramsLocally(programsData, filters);
-          setPrograms(filtered);
-          toast.success(`${filtered.length} programas encontrados`);
-        } else {
-          throw new Error('Resposta inválida da API');
-        }
+      if (data?.success && data?.data) {
+        const programsData = data.data as Program[];
+        console.log(`Received ${programsData.length} programs from backend`);
+        setPrograms(programsData);
+        toast.success(`${programsData.length} programas encontrados`);
       } else {
-        // We already have all programs, just filter locally
-        const filtered = filterProgramsLocally(allPrograms, filters);
-        setPrograms(filtered);
-        toast.success(`${filtered.length} programas encontrados`);
+        throw new Error('Resposta inválida da API');
       }
     } catch (error: any) {
       console.error('Error fetching programs:', error);
@@ -195,127 +176,12 @@ const Index = () => {
     }
   };
 
-  const filterProgramsLocally = (data: Program[], filters: { genre: string; year: string; serie: string; narrator: string }): Program[] => {
-    console.log('=== FILTERING LOCALLY ===');
-    console.log('Total programs:', data.length);
-    console.log('Filters:', filters);
-    
-    let filtered = [...data];
-    
-    // Debug: Check data types in first few records
-    if (data.length > 0) {
-      console.log('Sample data (first 3):');
-      data.slice(0, 3).forEach((p, i) => {
-        console.log(`  ${i + 1}. GENRE: "${p.GENRE}" (type: ${typeof p.GENRE}), YEAR: ${p.YEAR} (type: ${typeof p.YEAR})`);
-      });
-    }
-    
-    if (filters.genre) {
-      const beforeFilter = filtered.length;
-      filtered = filtered.filter(p => {
-        const matches = p.GENRE?.trim() === filters.genre.trim();
-        return matches;
-      });
-      console.log(`After genre filter "${filters.genre}": ${filtered.length} (removed ${beforeFilter - filtered.length})`);
-      
-      // If no results, show what genres exist
-      if (filtered.length === 0) {
-        const genresInData = [...new Set(data.map(p => p.GENRE).filter(Boolean))];
-        console.log('Available genres in dataset:', genresInData.slice(0, 10));
-        console.log(`Does "${filters.genre}" exist?`, genresInData.includes(filters.genre));
-      }
-    }
-    
-    if (filters.year) {
-      const beforeFilter = filtered.length;
-      const yearNum = parseInt(filters.year);
-      
-      filtered = filtered.filter(p => {
-        // Try multiple comparison methods
-        const yearMatches = p.YEAR === yearNum || 
-                           String(p.YEAR) === filters.year;
-        return yearMatches;
-      });
-      
-      console.log(`After year filter "${filters.year}": ${filtered.length} (removed ${beforeFilter - filtered.length})`);
-      
-      // Debug year comparison
-      if (filtered.length === 0 && beforeFilter > 0) {
-        console.log('Year comparison debug:');
-        const sampleWithGenre = data.filter(p => !filters.genre || p.GENRE === filters.genre).slice(0, 5);
-        sampleWithGenre.forEach(p => {
-          console.log(`  Program: ${p.TITLE}, YEAR value: ${p.YEAR}, type: ${typeof p.YEAR}, matches: ${p.YEAR === yearNum || String(p.YEAR) === filters.year}`);
-        });
-      }
-    }
-    
-    if (filters.serie) {
-      const beforeFilter = filtered.length;
-      filtered = filtered.filter(p => p.SERIE_TITLE?.trim() === filters.serie.trim());
-      console.log(`After serie filter "${filters.serie}": ${filtered.length} (removed ${beforeFilter - filtered.length})`);
-    }
-    
-    if (filters.narrator) {
-      const beforeFilter = filtered.length;
-      filtered = filtered.filter(p => p.NARRATOR?.trim() === filters.narrator.trim());
-      console.log(`After narrator filter "${filters.narrator}": ${filtered.length} (removed ${beforeFilter - filtered.length})`);
-    }
-    
-    // Log results
-    if (filtered.length > 0) {
-      console.log('✓ Found results! First 3:');
-      filtered.slice(0, 3).forEach((p, i) => {
-        console.log(`  ${i + 1}. ${p.TITLE} | Genre: ${p.GENRE} | Year: ${p.YEAR} | Serie: ${p.SERIE_TITLE}`);
-      });
-    } else {
-      console.log('✗ NO RESULTS FOUND');
-      
-      // Deep debug - check if combination exists
-      if (filters.genre && filters.year) {
-        const yearNum = parseInt(filters.year);
-        const genreCount = data.filter(p => p.GENRE === filters.genre).length;
-        const yearCount = data.filter(p => p.YEAR === yearNum).length;
-        console.log(`Programs with genre "${filters.genre}": ${genreCount}`);
-        console.log(`Programs with year "${filters.year}": ${yearCount}`);
-        
-        // Find one example with the genre
-        const exampleWithGenre = data.find(p => p.GENRE === filters.genre);
-        if (exampleWithGenre) {
-          console.log('Example program with this genre:', {
-            title: exampleWithGenre.TITLE,
-            genre: exampleWithGenre.GENRE,
-            year: exampleWithGenre.YEAR,
-            yearType: typeof exampleWithGenre.YEAR
-          });
-        }
-      }
-    }
-    
-    return filtered;
-  };
 
   const handleRefreshAfterEdit = async () => {
-    // Reload all programs to get fresh data
-    try {
-      const { data, error } = await supabase.functions.invoke('list-programs', {
-        body: { genre: undefined, year: undefined, limit: 5000, offset: 0 },
-      });
-
-      if (error) throw error;
-
-      if (data?.success && data?.data) {
-        const programsData = data.data as Program[];
-        setAllPrograms(programsData);
-        
-        // Reapply current filters to the updated data
-        if (currentFilters.genre || currentFilters.year || currentFilters.serie || currentFilters.narrator) {
-          const filtered = filterProgramsLocally(programsData, currentFilters);
-          setPrograms(filtered);
-        }
-      }
-    } catch (error: any) {
-      console.error('Error refreshing programs:', error);
-      toast.error('Erro ao atualizar lista de programas');
+    // Reload filter options and reapply current filters
+    await loadFilterOptions();
+    if (currentFilters.genre || currentFilters.year || currentFilters.serie || currentFilters.narrator) {
+      await fetchPrograms(currentFilters);
     }
   };
 
@@ -326,6 +192,7 @@ const Index = () => {
 
   const handleClearFilters = () => {
     setPrograms([]);
+    setCurrentFilters({ genre: "", year: "", serie: "", narrator: "" });
   };
 
   return (

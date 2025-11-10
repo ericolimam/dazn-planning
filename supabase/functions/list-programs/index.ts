@@ -12,11 +12,13 @@ serve(async (req) => {
   }
 
   try {
-    const { genre, year, limit = 5000, offset = 0 } = await req.json();
+    const { genre, year, serie, narrator, limit = 5000, offset = 0 } = await req.json();
     
     console.log('=== FILTER REQUEST ===');
     console.log('Genre:', genre);
     console.log('Year:', year);
+    console.log('Serie:', serie);
+    console.log('Narrator:', narrator);
     console.log('Limit:', limit);
     console.log('Offset:', offset);
     
@@ -67,6 +69,23 @@ serve(async (req) => {
         OPERATOR: "EQ",
         FORMAT: "YYYY",
         VALUE: year.toString()
+      });
+    }
+
+    if (serie) {
+      conditions.push({
+        ATTR_NM: "PROG_ID.SERIES_ID.TITLE",
+        OPERATOR: "EQ",
+        VALUE: serie
+      });
+    }
+
+    if (narrator) {
+      conditions.push({
+        ATTR_NM: "PROG_ID.NARRATOR_RF",
+        OPERATOR: "EQ",
+        FORMAT: "NAME",
+        VALUE: narrator
       });
     }
 
