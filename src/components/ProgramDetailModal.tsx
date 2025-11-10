@@ -90,7 +90,7 @@ export function ProgramDetailModal({
     COMMTYPE_ID: program?.COMMTYPE_ID || '',
     BT_ID: program?.BT_ID || '',
     PRODADDINFO: program?.PRODADDINFO || '',
-    MATCHHIGH: program?.MATCHHIGH || '',
+    MATCHHIGH: program?.MATCHHIGH || false,
     // Promoção fields
     TOPCONTENT_RF_ID: program?.TOPCONTENT_RF_ID || '',
     CLASSICDERBI: program?.CLASSICDERBI || false,
@@ -121,7 +121,7 @@ export function ProgramDetailModal({
         COMMTYPE_ID: program.COMMTYPE_ID || '',
         BT_ID: program.BT_ID || '',
         PRODADDINFO: program.PRODADDINFO || '',
-        MATCHHIGH: program.MATCHHIGH || '',
+        MATCHHIGH: Boolean(program.MATCHHIGH),
         TOPCONTENT_RF_ID: program.TOPCONTENT_RF_ID || '',
         CLASSICDERBI: program.CLASSICDERBI || false,
         CONTENTDETAIL: program.CONTENTDETAIL || '',
@@ -201,7 +201,7 @@ export function ProgramDetailModal({
       COMMTYPE_ID: mergedProgram.COMMTYPE_ID ? String(mergedProgram.COMMTYPE_ID) : findIdByName(mergedProgram.COMMTYPE || '', commtypes),
       BT_ID: mergedProgram.BT_ID ? String(mergedProgram.BT_ID) : findIdByName(mergedProgram.BT || '', bts),
       PRODADDINFO: mergedProgram.PRODADDINFO || '',
-      MATCHHIGH: mergedProgram.MATCHHIGH || '',
+      MATCHHIGH: Boolean(mergedProgram.MATCHHIGH),
       // Promoção fields
       TOPCONTENT_RF_ID: mergedProgram.TOPCONTENT_RF_ID ? String(mergedProgram.TOPCONTENT_RF_ID) : findIdByName(mergedProgram.TOPCONTENT_RF || '', topcontents),
       CLASSICDERBI: mergedProgram.CLASSICDERBI || false,
@@ -724,15 +724,13 @@ export function ProgramDetailModal({
                     />
                   </div>
 
-                  {/* Match Highlight */}
-                  <div className="space-y-2">
-                    <Label htmlFor="matchhigh">Match Highlight</Label>
-                    <Input
+                   {/* Match Highlight */}
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="matchhigh" className="cursor-pointer">Match Highlight</Label>
+                    <Switch
                       id="matchhigh"
-                      value={editedData.MATCHHIGH}
-                      onChange={(e) => setEditedData({ ...editedData, MATCHHIGH: e.target.value })}
-                      placeholder="Match highlight"
-                      className="bg-background"
+                      checked={Boolean(editedData.MATCHHIGH)}
+                      onCheckedChange={(checked) => setEditedData({ ...editedData, MATCHHIGH: checked })}
                     />
                   </div>
                 </div>
@@ -752,7 +750,11 @@ export function ProgramDetailModal({
                   <InfoRow label="Commercial Type" value={program.COMMTYPE} />
                   <InfoRow label="BT" value={program.BT} />
                   <InfoRow label="Production Additional Info" value={program.PRODADDINFO} />
-                  <InfoRow label="Match Highlight" value={program.MATCHHIGH} />
+                  <InfoRow label="Match Highlight">
+                    <Badge variant={program.MATCHHIGH ? "default" : "outline"}>
+                      {program.MATCHHIGH ? '✓' : '✗'} Match Highlight
+                    </Badge>
+                  </InfoRow>
                 </div>
               )}
             </TabsContent>
