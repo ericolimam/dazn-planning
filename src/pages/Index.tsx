@@ -22,6 +22,12 @@ const Index = () => {
   const [narrators, setNarrators] = useState<Array<{id: string; name: string}>>([]);
   const [stateEvents, setStateEvents] = useState<Array<{id: string; name: string}>>([]);
   const [cabines, setCabines] = useState<Array<{id: string; name: string}>>([]);
+  const [currentFilters, setCurrentFilters] = useState<{ genre: string; year: string; serie: string; narrator: string }>({
+    genre: '',
+    year: '',
+    serie: '',
+    narrator: '',
+  });
 
   // Load filter options on mount, but don't show programs in table
   useEffect(() => {
@@ -101,6 +107,7 @@ const Index = () => {
 
   const fetchPrograms = async (filters: { genre: string; year: string; serie: string; narrator: string }) => {
     setIsLoading(true);
+    setCurrentFilters(filters); // Save current filters
     
     try {
       // If we don't have all programs yet, fetch them
@@ -252,6 +259,31 @@ const Index = () => {
     return filtered;
   };
 
+  const handleRefreshAfterEdit = async () => {
+    // Reload all programs to get fresh data
+    try {
+      const { data, error } = await supabase.functions.invoke('list-programs', {
+        body: { genre: undefined, year: undefined },
+      });
+
+      if (error) throw error;
+
+      if (data?.success && data?.data) {
+        const programsData = data.data as Program[];
+        setAllPrograms(programsData);
+        
+        // Reapply current filters to the updated data
+        if (currentFilters.genre || currentFilters.year || currentFilters.serie || currentFilters.narrator) {
+          const filtered = filterProgramsLocally(programsData, currentFilters);
+          setPrograms(filtered);
+        }
+      }
+    } catch (error: any) {
+      console.error('Error refreshing programs:', error);
+      toast.error('Erro ao atualizar lista de programas');
+    }
+  };
+
   const handleProgramClick = (program: Program) => {
     setSelectedProgram(program);
     setIsModalOpen(true);
@@ -354,6 +386,7 @@ const Index = () => {
         program={selectedProgram}
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
+        onChange={handleRefreshAfterEdit}
         stateEvents={stateEvents}
         cabines={cabines}
         narrators={narrators}

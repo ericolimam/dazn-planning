@@ -51,6 +51,7 @@ interface ProgramDetailModalProps {
   program: Program | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onChange?: () => void;
   stateEvents?: Array<{id: string; name: string}>;
   cabines?: Array<{id: string; name: string}>;
   narrators?: Array<{id: string; name: string}>;
@@ -60,6 +61,7 @@ export function ProgramDetailModal({
   program, 
   open, 
   onOpenChange,
+  onChange,
   stateEvents = [],
   cabines = [],
   narrators = []
@@ -147,6 +149,20 @@ export function ProgramDetailModal({
 
   const handleSave = async () => {
     setIsSaving(true);
+    console.log('=== SAVING PROGRAM ===');
+    console.log('Program ID:', program.ID);
+    console.log('Updates:', {
+      STATE_EVENT: editedData.STATE_EVENT_ID,
+      CABINE: editedData.CABINE_ID,
+      NARRATOR: editedData.NARRATOR_ID,
+      COMMENTATOR: editedData.COMMENTATOR,
+      TIME_BEFORE: editedData.TIME_BEFORE,
+      TIME_ENDING: editedData.TIME_ENDING,
+      RESUMO: editedData.RESUMO,
+      DESTAQUE_SEMANA: editedData.DESTAQUE_SEMANA,
+      PROMO_DAZN: editedData.PROMO_DAZN
+    });
+    
     try {
       const { data, error } = await supabase.functions.invoke('update-program', {
         body: {
@@ -165,18 +181,27 @@ export function ProgramDetailModal({
         }
       });
 
-      if (error) throw error;
+      console.log('=== SAVE RESPONSE ===');
+      console.log('Error:', error);
+      console.log('Data:', data);
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
 
       if (data?.success) {
         toast.success('Programa atualizado com sucesso!');
         setIsEditing(false);
         onOpenChange(false);
+        onChange?.(); // Trigger refresh
       } else {
+        console.error('API returned error:', data?.error);
         throw new Error(data?.error || 'Erro ao atualizar programa');
       }
     } catch (error) {
       console.error('Error updating program:', error);
-      toast.error('Erro ao atualizar programa. Tente novamente.');
+      toast.error(`Erro ao atualizar programa: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     } finally {
       setIsSaving(false);
     }
