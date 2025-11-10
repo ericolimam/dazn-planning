@@ -77,7 +77,7 @@ serve(async (req) => {
       FILTERS: [
         {
           ATTR_NM: "PROG_ID",
-          OPERATOR: "=",
+          OPERATOR: "EQ",
           VALUE: programId
         }
       ]
@@ -116,6 +116,16 @@ serve(async (req) => {
 
     if (!data.ROWS || data.ROWS.length === 0) {
       throw new Error('Program not found');
+    }
+
+    // CRITICAL: Validate that the returned program ID matches the requested ID
+    const returnedId = data.ROWS[0].ID;
+    if (returnedId !== programId) {
+      console.error('=== ID MISMATCH ERROR ===');
+      console.error('Requested ID:', programId);
+      console.error('Received ID:', returnedId);
+      console.error('This indicates the API is not filtering correctly!');
+      throw new Error(`API returned wrong program: requested ${programId} but got ${returnedId}`);
     }
 
     return new Response(
