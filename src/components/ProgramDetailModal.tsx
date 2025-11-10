@@ -168,8 +168,13 @@ export function ProgramDetailModal({
   const displayProgram = fullProgram || program;
 
   const handleEdit = () => {
-    // Use displayProgram to get the full program details
-    const currentProgram = displayProgram;
+    // Merge fullProgram and program, preferring non-null values
+    const mergedProgram = {
+      ...program,
+      ...(fullProgram && Object.fromEntries(
+        Object.entries(fullProgram).filter(([_, value]) => value !== null && value !== undefined)
+      ))
+    };
     
     // Find matching IDs by name as fallback
     const findIdByName = (name: string, list: Array<{id: string; name: string}>) => {
@@ -178,55 +183,55 @@ export function ProgramDetailModal({
     };
     
     // Try to use existing IDs, or find by name
-    const stateEventId = currentProgram.STATE_EVENT_ID ? String(currentProgram.STATE_EVENT_ID) : findIdByName(currentProgram.STATE_EVENT || '', stateEvents);
-    const cabineId = currentProgram.CABINE_ID ? String(currentProgram.CABINE_ID) : findIdByName(currentProgram.CABINE || '', cabines);
-    const narratorId = currentProgram.NARRATOR_ID ? String(currentProgram.NARRATOR_ID) : findIdByName(currentProgram.NARRATOR || '', narrators);
+    const stateEventId = mergedProgram.STATE_EVENT_ID ? String(mergedProgram.STATE_EVENT_ID) : findIdByName(mergedProgram.STATE_EVENT || '', stateEvents);
+    const cabineId = mergedProgram.CABINE_ID ? String(mergedProgram.CABINE_ID) : findIdByName(mergedProgram.CABINE || '', cabines);
+    const narratorId = mergedProgram.NARRATOR_ID ? String(mergedProgram.NARRATOR_ID) : findIdByName(mergedProgram.NARRATOR || '', narrators);
     
     const newData = {
       STATE_EVENT_ID: stateEventId,
       CABINE_ID: cabineId,
       NARRATOR_ID: narratorId,
-      COMMENTATOR: currentProgram.COMMENTATOR || '',
-      TIME_BEFORE: currentProgram.TIME_BEFORE || '',
-      TIME_ENDING: currentProgram.TIME_ENDING || '',
-      RESUMO: currentProgram.RESUMO || false,
-      DESTAQUE_SEMANA: currentProgram.DESTAQUE_SEMANA || false,
-      PROMO_DAZN: currentProgram.PROMO_DAZN || false,
+      COMMENTATOR: mergedProgram.COMMENTATOR || '',
+      TIME_BEFORE: mergedProgram.TIME_BEFORE || '',
+      TIME_ENDING: mergedProgram.TIME_ENDING || '',
+      RESUMO: mergedProgram.RESUMO || false,
+      DESTAQUE_SEMANA: mergedProgram.DESTAQUE_SEMANA || false,
+      PROMO_DAZN: mergedProgram.PROMO_DAZN || false,
       // Planning fields
-      COMMTYPE_ID: currentProgram.COMMTYPE_ID ? String(currentProgram.COMMTYPE_ID) : findIdByName(currentProgram.COMMTYPE || '', commtypes),
-      BT_ID: currentProgram.BT_ID ? String(currentProgram.BT_ID) : findIdByName(currentProgram.BT || '', bts),
-      PRODADDINFO: currentProgram.PRODADDINFO || '',
-      MATCHHIGH: currentProgram.MATCHHIGH || '',
+      COMMTYPE_ID: mergedProgram.COMMTYPE_ID ? String(mergedProgram.COMMTYPE_ID) : findIdByName(mergedProgram.COMMTYPE || '', commtypes),
+      BT_ID: mergedProgram.BT_ID ? String(mergedProgram.BT_ID) : findIdByName(mergedProgram.BT || '', bts),
+      PRODADDINFO: mergedProgram.PRODADDINFO || '',
+      MATCHHIGH: mergedProgram.MATCHHIGH || '',
       // Promoção fields
-      TOPCONTENT_RF_ID: currentProgram.TOPCONTENT_RF_ID ? String(currentProgram.TOPCONTENT_RF_ID) : findIdByName(currentProgram.TOPCONTENT_RF || '', topcontents),
-      CLASSICDERBI: currentProgram.CLASSICDERBI || false,
-      CONTENTDETAIL: currentProgram.CONTENTDETAIL || '',
-      PLATAFORMBANNERS: currentProgram.PLATAFORMBANNERS || false,
-      PROMOINDIVIDUAL: currentProgram.PROMOINDIVIDUAL || false,
-      PROMOCONJUNTA: currentProgram.PROMOCONJUNTA || false,
-      PROMOGENERICA: currentProgram.PROMOGENERICA || false,
-      PROMO10S: currentProgram.PROMO10S || false,
-      DETALHESPROMO: currentProgram.DETALHESPROMO || '',
-      TELCOS: currentProgram.TELCOS || false,
-      CRM: currentProgram.CRM || false,
-      SOCIAL: currentProgram.SOCIAL || false,
+      TOPCONTENT_RF_ID: mergedProgram.TOPCONTENT_RF_ID ? String(mergedProgram.TOPCONTENT_RF_ID) : findIdByName(mergedProgram.TOPCONTENT_RF || '', topcontents),
+      CLASSICDERBI: mergedProgram.CLASSICDERBI || false,
+      CONTENTDETAIL: mergedProgram.CONTENTDETAIL || '',
+      PLATAFORMBANNERS: mergedProgram.PLATAFORMBANNERS || false,
+      PROMOINDIVIDUAL: mergedProgram.PROMOINDIVIDUAL || false,
+      PROMOCONJUNTA: mergedProgram.PROMOCONJUNTA || false,
+      PROMOGENERICA: mergedProgram.PROMOGENERICA || false,
+      PROMO10S: mergedProgram.PROMO10S || false,
+      DETALHESPROMO: mergedProgram.DETALHESPROMO || '',
+      TELCOS: mergedProgram.TELCOS || false,
+      CRM: mergedProgram.CRM || false,
+      SOCIAL: mergedProgram.SOCIAL || false,
     };
     
     console.log('=== OPENING EDIT MODE ===');
-    console.log('Program:', currentProgram.TITLE);
-    console.log('Current values from program:', {
-      STATE_EVENT: currentProgram.STATE_EVENT,
-      STATE_EVENT_ID: currentProgram.STATE_EVENT_ID,
-      CABINE: currentProgram.CABINE,
-      CABINE_ID: currentProgram.CABINE_ID,
-      NARRATOR: currentProgram.NARRATOR,
-      NARRATOR_ID: currentProgram.NARRATOR_ID,
-      COMMTYPE: currentProgram.COMMTYPE,
-      COMMTYPE_ID: currentProgram.COMMTYPE_ID,
-      BT: currentProgram.BT,
-      BT_ID: currentProgram.BT_ID,
-      PRODADDINFO: currentProgram.PRODADDINFO,
-      MATCHHIGH: currentProgram.MATCHHIGH,
+    console.log('Program:', mergedProgram.TITLE);
+    console.log('Current values from merged program:', {
+      STATE_EVENT: mergedProgram.STATE_EVENT,
+      STATE_EVENT_ID: mergedProgram.STATE_EVENT_ID,
+      CABINE: mergedProgram.CABINE,
+      CABINE_ID: mergedProgram.CABINE_ID,
+      NARRATOR: mergedProgram.NARRATOR,
+      NARRATOR_ID: mergedProgram.NARRATOR_ID,
+      COMMTYPE: mergedProgram.COMMTYPE,
+      COMMTYPE_ID: mergedProgram.COMMTYPE_ID,
+      BT: mergedProgram.BT,
+      BT_ID: mergedProgram.BT_ID,
+      PRODADDINFO: mergedProgram.PRODADDINFO,
+      MATCHHIGH: mergedProgram.MATCHHIGH,
     });
     console.log('Matched IDs:', {
       stateEventId,
