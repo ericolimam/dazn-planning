@@ -25,11 +25,13 @@ const Index = () => {
   const [commtypes, setCommtypes] = useState<Array<{id: string; name: string}>>([]);
   const [bts, setBts] = useState<Array<{id: string; name: string}>>([]);
   const [topcontents, setTopcontents] = useState<Array<{id: string; name: string}>>([]);
-  const [currentFilters, setCurrentFilters] = useState<{ genre: string; year: string; serie: string; narrator: string }>({
+  const [currentFilters, setCurrentFilters] = useState<{ genre: string; year: string; serie: string; narrator: string; dateFrom: string; dateTo: string }>({
     genre: '',
     year: '',
     serie: '',
     narrator: '',
+    dateFrom: '',
+    dateTo: '',
   });
 
   // Load filter options on mount, but don't show programs in table
@@ -138,7 +140,7 @@ const Index = () => {
     }
   };
 
-  const fetchPrograms = async (filters: { genre: string; year: string; serie: string; narrator: string }) => {
+  const fetchPrograms = async (filters: { genre: string; year: string; serie: string; narrator: string; dateFrom: string; dateTo: string }) => {
     setIsLoading(true);
     setCurrentFilters(filters);
     
@@ -152,6 +154,8 @@ const Index = () => {
           year: filters.year || undefined,
           serie: filters.serie || undefined,
           narrator: filters.narrator || undefined,
+          dateFrom: filters.dateFrom || undefined,
+          dateTo: filters.dateTo || undefined,
           limit: 5000,
           offset: 0,
         },
@@ -180,7 +184,7 @@ const Index = () => {
   const handleRefreshAfterEdit = async () => {
     // Reload filter options and reapply current filters
     await loadFilterOptions();
-    if (currentFilters.genre || currentFilters.year || currentFilters.serie || currentFilters.narrator) {
+    if (currentFilters.genre || currentFilters.year || currentFilters.serie || currentFilters.narrator || currentFilters.dateFrom || currentFilters.dateTo) {
       await fetchPrograms(currentFilters);
     }
   };
@@ -192,7 +196,7 @@ const Index = () => {
 
   const handleClearFilters = () => {
     setPrograms([]);
-    setCurrentFilters({ genre: "", year: "", serie: "", narrator: "" });
+    setCurrentFilters({ genre: "", year: "", serie: "", narrator: "", dateFrom: "", dateTo: "" });
   };
 
   return (

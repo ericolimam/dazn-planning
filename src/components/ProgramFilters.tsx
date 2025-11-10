@@ -10,15 +10,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, X } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Search, X, CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface ProgramFiltersProps {
   genres: string[];
   years: number[];
   series: string[];
   narrators: Array<{id: string; name: string}>;
-  onFilter: (filters: { genre: string; year: string; serie: string; narrator: string }) => void;
+  onFilter: (filters: { genre: string; year: string; serie: string; narrator: string; dateFrom: string; dateTo: string }) => void;
   onClear: () => void;
   isLoading?: boolean;
 }
@@ -29,6 +33,8 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
   const [selectedSerie, setSelectedSerie] = useState<string>("all");
   const [selectedNarrator, setSelectedNarrator] = useState<string>("all");
   const [serieSearchQuery, setSerieSearchQuery] = useState<string>("");
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
   
   const filteredSeries = series.filter(serie => {
     const searchTerms = serieSearchQuery.toLowerCase().trim().split(/\s+/);
@@ -38,8 +44,14 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
 
   const handleFilter = () => {
     // Validate that at least one filter is selected
-    if (selectedGenre === "all" && selectedYear === "all" && selectedSerie === "all" && selectedNarrator === "all") {
+    if (selectedGenre === "all" && selectedYear === "all" && selectedSerie === "all" && selectedNarrator === "all" && !dateFrom && !dateTo) {
       toast.error("Selecione pelo menos um critério de filtro para realizar a busca");
+      return;
+    }
+
+    // Validate date range
+    if (dateFrom && dateTo && dateFrom > dateTo) {
+      toast.error("A data inicial deve ser anterior à data final");
       return;
     }
 
@@ -48,6 +60,8 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
       year: selectedYear === "all" ? "" : selectedYear,
       serie: selectedSerie === "all" ? "" : selectedSerie,
       narrator: selectedNarrator === "all" ? "" : selectedNarrator,
+      dateFrom: dateFrom ? format(dateFrom, "yyyy-MM-dd") : "",
+      dateTo: dateTo ? format(dateTo, "yyyy-MM-dd") : "",
     });
   };
 
@@ -57,6 +71,8 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
     setSelectedSerie("all");
     setSelectedNarrator("all");
     setSerieSearchQuery("");
+    setDateFrom(undefined);
+    setDateTo(undefined);
     onClear();
   };
 
@@ -68,7 +84,7 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
           <h2 className="text-lg font-semibold">Filtros</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="space-y-2">
             <Label htmlFor="genre">Gênero</Label>
             <Select value={selectedGenre} onValueChange={setSelectedGenre} disabled={isLoading}>
@@ -150,6 +166,64 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="dateFrom">Tx. Date (De)</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  id="dateFrom"
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal bg-background",
+                    !dateFrom && "text-muted-foreground"
+                  )}
+                  disabled={isLoading}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dateFrom ? format(dateFrom, "dd/MM/yyyy") : "Selecionar"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dateFrom}
+                  onSelect={setDateFrom}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="dateTo">Tx. Date (Até)</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  id="dateTo"
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal bg-background",
+                    !dateTo && "text-muted-foreground"
+                  )}
+                  disabled={isLoading}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dateTo ? format(dateTo, "dd/MM/yyyy") : "Selecionar"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dateTo}
+                  onSelect={setDateTo}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
 
           <div className="flex items-end gap-2 md:col-span-2">
