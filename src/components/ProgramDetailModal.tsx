@@ -168,6 +168,9 @@ export function ProgramDetailModal({
   const displayProgram = fullProgram || program;
 
   const handleEdit = () => {
+    // Use displayProgram to get the full program details
+    const currentProgram = displayProgram;
+    
     // Find matching IDs by name as fallback
     const findIdByName = (name: string, list: Array<{id: string; name: string}>) => {
       const match = list.find(item => item.name === name);
@@ -175,49 +178,55 @@ export function ProgramDetailModal({
     };
     
     // Try to use existing IDs, or find by name
-    const stateEventId = program.STATE_EVENT_ID ? String(program.STATE_EVENT_ID) : findIdByName(program.STATE_EVENT || '', stateEvents);
-    const cabineId = program.CABINE_ID ? String(program.CABINE_ID) : findIdByName(program.CABINE || '', cabines);
-    const narratorId = program.NARRATOR_ID ? String(program.NARRATOR_ID) : findIdByName(program.NARRATOR || '', narrators);
+    const stateEventId = currentProgram.STATE_EVENT_ID ? String(currentProgram.STATE_EVENT_ID) : findIdByName(currentProgram.STATE_EVENT || '', stateEvents);
+    const cabineId = currentProgram.CABINE_ID ? String(currentProgram.CABINE_ID) : findIdByName(currentProgram.CABINE || '', cabines);
+    const narratorId = currentProgram.NARRATOR_ID ? String(currentProgram.NARRATOR_ID) : findIdByName(currentProgram.NARRATOR || '', narrators);
     
     const newData = {
       STATE_EVENT_ID: stateEventId,
       CABINE_ID: cabineId,
       NARRATOR_ID: narratorId,
-      COMMENTATOR: program.COMMENTATOR || '',
-      TIME_BEFORE: program.TIME_BEFORE || '',
-      TIME_ENDING: program.TIME_ENDING || '',
-      RESUMO: program.RESUMO || false,
-      DESTAQUE_SEMANA: program.DESTAQUE_SEMANA || false,
-      PROMO_DAZN: program.PROMO_DAZN || false,
+      COMMENTATOR: currentProgram.COMMENTATOR || '',
+      TIME_BEFORE: currentProgram.TIME_BEFORE || '',
+      TIME_ENDING: currentProgram.TIME_ENDING || '',
+      RESUMO: currentProgram.RESUMO || false,
+      DESTAQUE_SEMANA: currentProgram.DESTAQUE_SEMANA || false,
+      PROMO_DAZN: currentProgram.PROMO_DAZN || false,
       // Planning fields
-      COMMTYPE_ID: program.COMMTYPE_ID ? String(program.COMMTYPE_ID) : findIdByName(program.COMMTYPE || '', commtypes),
-      BT_ID: program.BT_ID ? String(program.BT_ID) : findIdByName(program.BT || '', bts),
-      PRODADDINFO: program.PRODADDINFO || '',
-      MATCHHIGH: program.MATCHHIGH || '',
+      COMMTYPE_ID: currentProgram.COMMTYPE_ID ? String(currentProgram.COMMTYPE_ID) : findIdByName(currentProgram.COMMTYPE || '', commtypes),
+      BT_ID: currentProgram.BT_ID ? String(currentProgram.BT_ID) : findIdByName(currentProgram.BT || '', bts),
+      PRODADDINFO: currentProgram.PRODADDINFO || '',
+      MATCHHIGH: currentProgram.MATCHHIGH || '',
       // Promoção fields
-      TOPCONTENT_RF_ID: program.TOPCONTENT_RF_ID ? String(program.TOPCONTENT_RF_ID) : findIdByName(program.TOPCONTENT_RF || '', topcontents),
-      CLASSICDERBI: program.CLASSICDERBI || false,
-      CONTENTDETAIL: program.CONTENTDETAIL || '',
-      PLATAFORMBANNERS: program.PLATAFORMBANNERS || false,
-      PROMOINDIVIDUAL: program.PROMOINDIVIDUAL || false,
-      PROMOCONJUNTA: program.PROMOCONJUNTA || false,
-      PROMOGENERICA: program.PROMOGENERICA || false,
-      PROMO10S: program.PROMO10S || false,
-      DETALHESPROMO: program.DETALHESPROMO || '',
-      TELCOS: program.TELCOS || false,
-      CRM: program.CRM || false,
-      SOCIAL: program.SOCIAL || false,
+      TOPCONTENT_RF_ID: currentProgram.TOPCONTENT_RF_ID ? String(currentProgram.TOPCONTENT_RF_ID) : findIdByName(currentProgram.TOPCONTENT_RF || '', topcontents),
+      CLASSICDERBI: currentProgram.CLASSICDERBI || false,
+      CONTENTDETAIL: currentProgram.CONTENTDETAIL || '',
+      PLATAFORMBANNERS: currentProgram.PLATAFORMBANNERS || false,
+      PROMOINDIVIDUAL: currentProgram.PROMOINDIVIDUAL || false,
+      PROMOCONJUNTA: currentProgram.PROMOCONJUNTA || false,
+      PROMOGENERICA: currentProgram.PROMOGENERICA || false,
+      PROMO10S: currentProgram.PROMO10S || false,
+      DETALHESPROMO: currentProgram.DETALHESPROMO || '',
+      TELCOS: currentProgram.TELCOS || false,
+      CRM: currentProgram.CRM || false,
+      SOCIAL: currentProgram.SOCIAL || false,
     };
     
     console.log('=== OPENING EDIT MODE ===');
-    console.log('Program:', program.TITLE);
+    console.log('Program:', currentProgram.TITLE);
     console.log('Current values from program:', {
-      STATE_EVENT: program.STATE_EVENT,
-      STATE_EVENT_ID: program.STATE_EVENT_ID,
-      CABINE: program.CABINE,
-      CABINE_ID: program.CABINE_ID,
-      NARRATOR: program.NARRATOR,
-      NARRATOR_ID: program.NARRATOR_ID,
+      STATE_EVENT: currentProgram.STATE_EVENT,
+      STATE_EVENT_ID: currentProgram.STATE_EVENT_ID,
+      CABINE: currentProgram.CABINE,
+      CABINE_ID: currentProgram.CABINE_ID,
+      NARRATOR: currentProgram.NARRATOR,
+      NARRATOR_ID: currentProgram.NARRATOR_ID,
+      COMMTYPE: currentProgram.COMMTYPE,
+      COMMTYPE_ID: currentProgram.COMMTYPE_ID,
+      BT: currentProgram.BT,
+      BT_ID: currentProgram.BT_ID,
+      PRODADDINFO: currentProgram.PRODADDINFO,
+      MATCHHIGH: currentProgram.MATCHHIGH,
     });
     console.log('Matched IDs:', {
       stateEventId,
