@@ -231,12 +231,13 @@ export default function Timeline() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-8">
-              <img src={daznLogo} alt="DAZN" className="h-10 w-10 dark:invert" />
-              <nav className="flex gap-6">
-                <NavLink to="/">Programas</NavLink>
-                <NavLink to="/schedule">Grade de Programação</NavLink>
-                <NavLink to="/timeline">Timeline</NavLink>
-              </nav>
+            <img src={daznLogo} alt="DAZN" className="h-10 w-10 dark:invert" />
+            <nav className="flex gap-6">
+              <NavLink to="/dashboard">Dashboard</NavLink>
+              <NavLink to="/">Programas</NavLink>
+              <NavLink to="/schedule">Grade de Programação</NavLink>
+              <NavLink to="/timeline">Timeline</NavLink>
+            </nav>
             </div>
             <UserMenu />
           </div>

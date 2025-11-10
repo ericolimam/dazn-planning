@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProgramTable, Program } from "@/components/ProgramTable";
 import { ProgramDetailModal } from "@/components/ProgramDetailModal";
 import { ProgramFilters } from "@/components/ProgramFilters";
-import { Dashboard } from "@/components/Dashboard";
+import { ProgramStatistics } from "@/components/ProgramStatistics";
 import { toast } from "sonner";
 import daznLogo from "@/assets/dazn-logo.png";
 import { NavLink } from "@/components/NavLink";
@@ -270,6 +270,7 @@ const Index = () => {
             <div className="flex items-center gap-8">
               <img src={daznLogo} alt="DAZN" className="h-10 w-10 dark:invert" />
               <nav className="flex gap-6">
+                <NavLink to="/dashboard">Dashboard</NavLink>
                 <NavLink to="/">Programas</NavLink>
                 <NavLink to="/schedule">Grade de Programação</NavLink>
                 <NavLink to="/timeline">Timeline</NavLink>
@@ -283,11 +284,16 @@ const Index = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-4xl font-bold text-foreground">
-            Dashboard de Programas
-          </h1>
+          <div className="flex items-baseline gap-3">
+            <h1 className="text-4xl font-bold text-foreground">
+              Catálogo de Programas
+            </h1>
+            <span className="text-2xl font-semibold text-primary">
+              ({allPrograms.length.toLocaleString()})
+            </span>
+          </div>
           <p className="text-muted-foreground mt-2">
-            Visão geral do catálogo de programas e estatísticas
+            Consulte e filtre o catálogo completo de programas
           </p>
         </div>
         
@@ -301,7 +307,7 @@ const Index = () => {
           ) : (
             <>
               {allPrograms.length > 0 && (
-                <Dashboard programs={allPrograms} />
+                <ProgramStatistics programs={allPrograms} />
               )}
               
               <ProgramFilters

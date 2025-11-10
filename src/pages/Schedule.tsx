@@ -326,6 +326,7 @@ export default function Schedule() {
             <div className="flex items-center gap-8">
               <img src={daznLogo} alt="DAZN" className="h-10 w-10 dark:invert" />
               <nav className="flex gap-6">
+                <NavLink to="/dashboard">Dashboard</NavLink>
                 <NavLink to="/">Programas</NavLink>
                 <NavLink to="/schedule">Grade de Programação</NavLink>
                 <NavLink to="/timeline">Timeline</NavLink>
