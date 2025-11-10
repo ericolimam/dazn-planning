@@ -333,7 +333,6 @@ export function ProgramDetailModal({
         toast.success('Programa atualizado com sucesso!');
         setIsEditing(false);
         onOpenChange(false);
-        onChange?.(); // Trigger refresh
       } else {
         console.error('API returned error:', data?.error);
         throw new Error(data?.error || 'Erro ao atualizar programa');
