@@ -25,12 +25,11 @@ const Index = () => {
   const [commtypes, setCommtypes] = useState<Array<{id: string; name: string}>>([]);
   const [bts, setBts] = useState<Array<{id: string; name: string}>>([]);
   const [topcontents, setTopcontents] = useState<Array<{id: string; name: string}>>([]);
-  const [currentFilters, setCurrentFilters] = useState<{ genre: string; year: string; serie: string; narrator: string; programId?: string }>({
+  const [currentFilters, setCurrentFilters] = useState<{ genre: string; year: string; serie: string; narrator: string }>({
     genre: '',
     year: '',
     serie: '',
     narrator: '',
-    programId: '',
   });
 
   // Load filter options on mount, but don't show programs in table
@@ -41,18 +40,18 @@ const Index = () => {
   const loadFilterOptions = async () => {
     setIsInitialLoading(true);
     try {
-      console.log('Loading all programs for filtering...');
+      console.log('Loading ALL programs for filtering options...');
       
-      // Load programs only with limit
+      // Load ALL programs without limit to get all series
       const programsResult = await supabase.functions.invoke('list-programs', {
-        body: { genre: undefined, year: undefined, limit: 5000, offset: 0 },
+        body: { limit: 100000, offset: 0 },
       });
 
       if (programsResult.error) throw programsResult.error;
 
       if (programsResult.data?.success && programsResult.data?.data) {
         const programsData = programsResult.data.data as Program[];
-        console.log(`Loaded ${programsData.length} programs into cache`);
+        console.log(`Loaded ${programsData.length} total programs`);
         setAllPrograms(programsData);
         
         // Extract unique genres
@@ -139,7 +138,7 @@ const Index = () => {
     }
   };
 
-  const fetchPrograms = async (filters: { genre: string; year: string; serie: string; narrator: string; programId?: string }) => {
+  const fetchPrograms = async (filters: { genre: string; year: string; serie: string; narrator: string }) => {
     setIsLoading(true);
     setCurrentFilters(filters);
     
@@ -153,7 +152,6 @@ const Index = () => {
           year: filters.year || undefined,
           serie: filters.serie || undefined,
           narrator: filters.narrator || undefined,
-          programId: filters.programId || undefined,
           limit: 5000,
           offset: 0,
         },
@@ -194,7 +192,7 @@ const Index = () => {
 
   const handleClearFilters = () => {
     setPrograms([]);
-    setCurrentFilters({ genre: "", year: "", serie: "", narrator: "", programId: "" });
+    setCurrentFilters({ genre: "", year: "", serie: "", narrator: "" });
   };
 
   return (

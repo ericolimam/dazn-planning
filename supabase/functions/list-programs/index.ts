@@ -12,14 +12,13 @@ serve(async (req) => {
   }
 
   try {
-    const { genre, year, serie, narrator, programId, limit = 5000, offset = 0 } = await req.json();
+    const { genre, year, serie, narrator, limit = 5000, offset = 0 } = await req.json();
     
     console.log('=== FILTER REQUEST ===');
     console.log('Genre:', genre);
     console.log('Year:', year);
     console.log('Serie:', serie);
     console.log('Narrator:', narrator);
-    console.log('Program ID:', programId);
     console.log('Limit:', limit);
     console.log('Offset:', offset);
     
@@ -55,14 +54,6 @@ serve(async (req) => {
 
     // Add filters if provided
     const conditions: any[] = [];
-    
-    if (programId) {
-      conditions.push({
-        ATTR_NM: "PROG_ID",
-        OPERATOR: "EQ",
-        VALUE: programId
-      });
-    }
     
     if (genre) {
       conditions.push({
