@@ -64,11 +64,16 @@ serve(async (req) => {
     }
     
     if (year) {
+      // Filter by year using date range (>= start of year AND < start of next year)
       filters.push({
         ATTR_NM: "PROG_ID.SERIES_ID.CREATION_DATE",
-        OPERATOR: "=",
-        FORMAT: "YYYY",
-        VALUE: `${year}-01-01T00:00:00.000Z`
+        OPERATOR: ">=",
+        VALUE: `${year}-01-01`
+      });
+      filters.push({
+        ATTR_NM: "PROG_ID.SERIES_ID.CREATION_DATE",
+        OPERATOR: "<",
+        VALUE: `${parseInt(year) + 1}-01-01`
       });
     }
 
