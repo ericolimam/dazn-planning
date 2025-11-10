@@ -144,6 +144,11 @@ export function ProgramDetailModal({
   const loadProgramDetails = async () => {
     if (!program?.ID) return;
     
+    console.log('=== LOADING PROGRAM DETAILS ===');
+    console.log('Program ID received in modal:', program.ID);
+    console.log('Program Title:', program.TITLE);
+    console.log('Program object in modal:', program);
+    
     setIsLoadingDetails(true);
     try {
       const { data, error } = await supabase.functions.invoke('get-program-details', {

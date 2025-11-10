@@ -191,7 +191,13 @@ export function ProgramTable({ programs, onProgramClick, isLoading }: ProgramTab
             {sortedPrograms.map((program) => (
               <TableRow
                 key={program.ID}
-                onDoubleClick={() => onProgramClick(program)}
+                onDoubleClick={() => {
+                  console.log('=== TABLE ROW DOUBLE-CLICKED ===');
+                  console.log('Program ID:', program.ID);
+                  console.log('Program Title:', program.TITLE);
+                  console.log('Full program object:', program);
+                  onProgramClick(program);
+                }}
                 className={`cursor-pointer transition-colors ${getRowBackgroundColor(program.STATE_EVENT)}`}
               >
                 <TableCell className="font-medium">{program.EPISODE || '-'}</TableCell>
