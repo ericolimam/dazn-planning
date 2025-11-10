@@ -737,22 +737,22 @@ export function ProgramDetailModal({
               ) : (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <InfoRow label="Time Before" value={program.TIME_BEFORE} />
-                    <InfoRow label="Time Ending" value={program.TIME_ENDING} />
+                    <InfoRow label="Time Before" value={displayProgram.TIME_BEFORE} />
+                    <InfoRow label="Time Ending" value={displayProgram.TIME_ENDING} />
                   </div>
                   <InfoRow label="Broadcast Type">
                     <Badge variant="outline" className="bg-muted border-border">
-                      {program.STATE_EVENT || '-'}
+                      {displayProgram.STATE_EVENT || '-'}
                     </Badge>
                   </InfoRow>
-                  <InfoRow label="Narrador" value={program.NARRATOR} />
-                  <InfoRow label="Comentador(es)" value={program.COMMENTATOR} />
-                  <InfoRow label="Commercial Type" value={program.COMMTYPE} />
-                  <InfoRow label="BT" value={program.BT} />
-                  <InfoRow label="Production Additional Info" value={program.PRODADDINFO} />
+                  <InfoRow label="Narrador" value={displayProgram.NARRATOR} />
+                  <InfoRow label="Comentador(es)" value={displayProgram.COMMENTATOR} />
+                  <InfoRow label="Commercial Type" value={displayProgram.COMMTYPE} />
+                  <InfoRow label="BT" value={displayProgram.BT} />
+                  <InfoRow label="Production Additional Info" value={displayProgram.PRODADDINFO} />
                   <InfoRow label="Match Highlight">
-                    <Badge variant={program.MATCHHIGH ? "default" : "outline"}>
-                      {program.MATCHHIGH ? '✓' : '✗'} Match Highlight
+                    <Badge variant={displayProgram.MATCHHIGH ? "default" : "outline"}>
+                      {displayProgram.MATCHHIGH ? '✓' : '✗'} Match Highlight
                     </Badge>
                   </InfoRow>
                 </div>
