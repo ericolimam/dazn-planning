@@ -90,6 +90,55 @@ serve(async (req) => {
     if (updates.MATCHHIGH !== undefined) {
       attrs["MATCHHIGH"] = updates.MATCHHIGH;
     }
+
+    // Promoção fields
+    if (updates.TOPCONTENT_RF !== undefined && updates.TOPCONTENT_RF !== '') {
+      attrs["TOPCONTENT_RF"] = updates.TOPCONTENT_RF;
+    }
+
+    if (updates.CLASSICDERBI !== undefined) {
+      attrs["CLASSICDERBI"] = updates.CLASSICDERBI;
+    }
+
+    if (updates.CONTENTDETAIL !== undefined) {
+      attrs["CONTENTDETAIL"] = updates.CONTENTDETAIL;
+    }
+
+    if (updates.PLATAFORMBANNERS !== undefined) {
+      attrs["PLATAFORMBANNERS"] = updates.PLATAFORMBANNERS;
+    }
+
+    if (updates.PROMOINDIVIDUAL !== undefined) {
+      attrs["PROMOINDIVIDUAL"] = updates.PROMOINDIVIDUAL;
+    }
+
+    if (updates.PROMOCONJUNTA !== undefined) {
+      attrs["PROMOCONJUNTA"] = updates.PROMOCONJUNTA;
+    }
+
+    if (updates.PROMOGENERICA !== undefined) {
+      attrs["PROMOGENERICA"] = updates.PROMOGENERICA;
+    }
+
+    if (updates.PROMO10S !== undefined) {
+      attrs["PROMO10S"] = updates.PROMO10S;
+    }
+
+    if (updates.DETALHESPROMO !== undefined) {
+      attrs["DETALHESPROMO"] = updates.DETALHESPROMO;
+    }
+
+    if (updates.TELCOS !== undefined) {
+      attrs["TELCOS"] = updates.TELCOS;
+    }
+
+    if (updates.CRM !== undefined) {
+      attrs["CRM"] = updates.CRM;
+    }
+
+    if (updates.SOCIAL !== undefined) {
+      attrs["SOCIAL"] = updates.SOCIAL;
+    }
     
     console.log('Filtered attributes to update:', Object.keys(attrs));
 
