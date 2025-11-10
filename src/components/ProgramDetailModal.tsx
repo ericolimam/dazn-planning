@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -74,6 +74,8 @@ export function ProgramDetailModal({
 }: ProgramDetailModalProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [fullProgram, setFullProgram] = useState<Program | null>(null);
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [editedData, setEditedData] = useState({
     STATE_EVENT_ID: program?.STATE_EVENT_ID || '',
     CABINE_ID: program?.CABINE_ID || '',
@@ -104,7 +106,66 @@ export function ProgramDetailModal({
     SOCIAL: program?.SOCIAL || false,
   });
 
+  useEffect(() => {
+    if (program && open) {
+      setEditedData({
+        STATE_EVENT_ID: program.STATE_EVENT_ID || '',
+        CABINE_ID: program.CABINE_ID || '',
+        NARRATOR_ID: program.NARRATOR_ID || '',
+        COMMENTATOR: program.COMMENTATOR || '',
+        TIME_BEFORE: program.TIME_BEFORE || '',
+        TIME_ENDING: program.TIME_ENDING || '',
+        RESUMO: program.RESUMO || false,
+        DESTAQUE_SEMANA: program.DESTAQUE_SEMANA || false,
+        PROMO_DAZN: program.PROMO_DAZN || false,
+        COMMTYPE_ID: program.COMMTYPE_ID || '',
+        BT_ID: program.BT_ID || '',
+        PRODADDINFO: program.PRODADDINFO || '',
+        MATCHHIGH: program.MATCHHIGH || '',
+        TOPCONTENT_RF_ID: program.TOPCONTENT_RF_ID || '',
+        CLASSICDERBI: program.CLASSICDERBI || false,
+        CONTENTDETAIL: program.CONTENTDETAIL || '',
+        PLATAFORMBANNERS: program.PLATAFORMBANNERS || false,
+        PROMOINDIVIDUAL: program.PROMOINDIVIDUAL || false,
+        PROMOCONJUNTA: program.PROMOCONJUNTA || false,
+        PROMOGENERICA: program.PROMOGENERICA || false,
+        PROMO10S: program.PROMO10S || false,
+        DETALHESPROMO: program.DETALHESPROMO || '',
+        TELCOS: program.TELCOS || false,
+        CRM: program.CRM || false,
+        SOCIAL: program.SOCIAL || false,
+      });
+      setIsEditing(false);
+      setFullProgram(null);
+      loadProgramDetails();
+    }
+  }, [program?.ID, open]);
+
+  const loadProgramDetails = async () => {
+    if (!program?.ID) return;
+    
+    setIsLoadingDetails(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('get-program-details', {
+        body: { programId: program.ID }
+      });
+
+      if (error) throw error;
+
+      if (data?.success && data?.data) {
+        setFullProgram(data.data);
+      }
+    } catch (error: any) {
+      console.error('Error loading program details:', error);
+      toast.error('Erro ao carregar detalhes do programa');
+    } finally {
+      setIsLoadingDetails(false);
+    }
+  };
+
   if (!program) return null;
+  
+  const displayProgram = fullProgram || program;
 
   const handleEdit = () => {
     // Find matching IDs by name as fallback
@@ -290,30 +351,38 @@ export function ProgramDetailModal({
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-foreground">
-            {program.TITLE}
+            {displayProgram.TITLE}
           </DialogTitle>
           <DialogDescription className="text-base">
-            {program.SERIE_TITLE && `Série: ${program.SERIE_TITLE}`}
+            {displayProgram.SERIE_TITLE && `Série: ${displayProgram.SERIE_TITLE}`}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 mt-4">
-          {/* Main Information */}
+        {isLoadingDetails && (
+          <div className="flex items-center justify-center py-8">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
+            <span className="ml-3 text-muted-foreground">Carregando detalhes...</span>
+          </div>
+        )}
+
+        <div className="space-y-6 mt-4">{!isLoadingDetails && (
+          <>
+           {/* Main Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                 Informações Básicas
               </h3>
                <div className="space-y-2">
-                <InfoRow label="ID" value={program.ID} />
-                <InfoRow label="Episódio" value={program.EPISODE} />
-                <InfoRow label="Tx. Date" value={program.X_TXDAY_DATE} />
+                <InfoRow label="ID" value={displayProgram.ID} />
+                <InfoRow label="Episódio" value={displayProgram.EPISODE} />
+                <InfoRow label="Tx. Date" value={displayProgram.X_TXDAY_DATE} />
                 <InfoRow label="Gênero">
-                  <Badge variant="secondary" className={getGenreColor(program.GENRE)}>
-                    {program.GENRE || '-'}
+                  <Badge variant="secondary" className={getGenreColor(displayProgram.GENRE)}>
+                    {displayProgram.GENRE || '-'}
                   </Badge>
                 </InfoRow>
-                <InfoRow label="Ano" value={program.YEAR} />
+                <InfoRow label="Ano" value={displayProgram.YEAR} />
               </div>
             </div>
 
@@ -322,10 +391,10 @@ export function ProgramDetailModal({
                 Classificação
               </h3>
               <div className="space-y-2">
-                <InfoRow label="Tipo de Programa" value={program.PROG_TYPE} />
-                <InfoRow label="Categoria" value={program.PROG_CATEGORY} />
-                <InfoRow label="Tipo de Requisição" value={program.REQ_TYPE} />
-                <InfoRow label="Tipo de Aquisição" value={program.ACQ_TYPE} />
+                <InfoRow label="Tipo de Programa" value={displayProgram.PROG_TYPE} />
+                <InfoRow label="Categoria" value={displayProgram.PROG_CATEGORY} />
+                <InfoRow label="Tipo de Requisição" value={displayProgram.REQ_TYPE} />
+                <InfoRow label="Tipo de Aquisição" value={displayProgram.ACQ_TYPE} />
               </div>
             </div>
           </div>
@@ -867,8 +936,10 @@ export function ProgramDetailModal({
                   <InfoRow label="Detalhes Promo" value={program.DETALHESPROMO} />
                 </div>
               )}
-            </TabsContent>
-          </Tabs>
+        </TabsContent>
+        </Tabs>
+        </>
+        )}
         </div>
 
         <DialogFooter className="gap-2">
