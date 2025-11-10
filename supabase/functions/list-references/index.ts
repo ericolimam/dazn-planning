@@ -36,6 +36,7 @@ serve(async (req) => {
       'commtype': 'COMMTYPE',
       'bt': 'BT',
       'topcontent': 'TOPCONTENT',
+      'genre': 'GENRE',
     };
 
     const filterValue = filterMap[referenceType];

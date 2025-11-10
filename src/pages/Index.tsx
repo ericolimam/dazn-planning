@@ -16,7 +16,7 @@ const Index = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
-  const [genres, setGenres] = useState<string[]>([]);
+  const [genres, setGenres] = useState<Array<{id: string; name: string}>>([]);
   const [years, setYears] = useState<number[]>([]);
   const [series, setSeries] = useState<string[]>([]);
   const [narrators, setNarrators] = useState<Array<{id: string; name: string}>>([]);
@@ -56,9 +56,15 @@ const Index = () => {
         console.log(`Loaded ${programsData.length} total programs`);
         setAllPrograms(programsData);
         
-        // Extract unique genres
-        const uniqueGenres = [...new Set(programsData.map(p => p.GENRE).filter(Boolean))].sort();
-        setGenres(uniqueGenres);
+        // Load genres from API
+        const genresResult = await supabase.functions.invoke('list-references', {
+          body: { referenceType: 'genre' },
+        });
+        
+        if (genresResult.data?.success && genresResult.data?.data) {
+          setGenres(genresResult.data.data);
+          console.log(`Loaded ${genresResult.data.data.length} genres from API`);
+        }
         
         // Extract unique years
         const uniqueYears = [...new Set(programsData.map(p => p.YEAR).filter(Boolean))].sort((a, b) => b - a);
@@ -128,7 +134,7 @@ const Index = () => {
           console.log(`Loaded ${topcontentsResult.data.data.length} top contents from API`);
         }
         
-        console.log(`Genres: ${uniqueGenres.length}, Years: ${uniqueYears.length}, Series: ${uniqueSeries.length}`);
+        console.log(`Genres: ${genres.length}, Years: ${uniqueYears.length}, Series: ${uniqueSeries.length}`);
         
         toast.success(`${programsData.length} programas carregados. Use os filtros para buscar.`);
       }

@@ -18,7 +18,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
 interface ProgramFiltersProps {
-  genres: string[];
+  genres: Array<{id: string; name: string}>;
   years: number[];
   series: string[];
   narrators: Array<{id: string; name: string}>;
@@ -94,8 +94,8 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
               <SelectContent className="bg-background z-50">
                 <SelectItem value="all">Todos os gêneros</SelectItem>
                 {genres.map((genre) => (
-                  <SelectItem key={genre} value={genre}>
-                    {genre}
+                  <SelectItem key={genre.id} value={genre.id}>
+                    {genre.name}
                   </SelectItem>
                 ))}
               </SelectContent>
