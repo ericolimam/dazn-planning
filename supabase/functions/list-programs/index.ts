@@ -53,10 +53,10 @@ serve(async (req) => {
     };
 
     // Add filters if provided
-    const conditions: any[] = [];
+    const filters: any[] = [];
     
     if (genre) {
-      conditions.push({
+      filters.push({
         ATTR_NM: "PROG_ID.SERIES_ID.GENRE_RF",
         OPERATOR: "EQ",
         VALUE: genre
@@ -64,7 +64,7 @@ serve(async (req) => {
     }
     
     if (year) {
-      conditions.push({
+      filters.push({
         ATTR_NM: "PROG_ID.SERIES_ID.CREATION_DATE",
         OPERATOR: "EQ",
         FORMAT: "YYYY",
@@ -73,7 +73,7 @@ serve(async (req) => {
     }
 
     if (serie) {
-      conditions.push({
+      filters.push({
         ATTR_NM: "PROG_ID.SERIES_ID.TITLE",
         OPERATOR: "EQ",
         VALUE: serie
@@ -81,7 +81,7 @@ serve(async (req) => {
     }
 
     if (narrator) {
-      conditions.push({
+      filters.push({
         ATTR_NM: "PROG_ID.NARRATOR_RF",
         OPERATOR: "EQ",
         FORMAT: "NAME",
@@ -89,8 +89,8 @@ serve(async (req) => {
       });
     }
 
-    if (conditions.length > 0) {
-      requestBody.CONDITIONS = conditions;
+    if (filters.length > 0) {
+      requestBody.FILTERS = filters;
     }
 
     console.log('=== API REQUEST BODY ===');
