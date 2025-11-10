@@ -18,7 +18,7 @@ interface ProgramFiltersProps {
   years: number[];
   series: string[];
   narrators: Array<{id: string; name: string}>;
-  onFilter: (filters: { genre: string; year: string; serie: string; narrator: string }) => void;
+  onFilter: (filters: { genre: string; year: string; serie: string; narrator: string; programId?: string }) => void;
   onClear: () => void;
   isLoading?: boolean;
 }
@@ -29,6 +29,7 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
   const [selectedSerie, setSelectedSerie] = useState<string>("all");
   const [selectedNarrator, setSelectedNarrator] = useState<string>("all");
   const [serieSearchQuery, setSerieSearchQuery] = useState<string>("");
+  const [programId, setProgramId] = useState<string>("");
   
   const filteredSeries = series.filter(serie => {
     const searchTerms = serieSearchQuery.toLowerCase().trim().split(/\s+/);
@@ -38,7 +39,7 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
 
   const handleFilter = () => {
     // Validate that at least one filter is selected
-    if (selectedGenre === "all" && selectedYear === "all" && selectedSerie === "all" && selectedNarrator === "all") {
+    if (selectedGenre === "all" && selectedYear === "all" && selectedSerie === "all" && selectedNarrator === "all" && !programId.trim()) {
       toast.error("Selecione pelo menos um critério de filtro para realizar a busca");
       return;
     }
@@ -48,6 +49,7 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
       year: selectedYear === "all" ? "" : selectedYear,
       serie: selectedSerie === "all" ? "" : selectedSerie,
       narrator: selectedNarrator === "all" ? "" : selectedNarrator,
+      programId: programId.trim() || undefined,
     });
   };
 
@@ -56,6 +58,8 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
     setSelectedYear("all");
     setSelectedSerie("all");
     setSelectedNarrator("all");
+    setSerieSearchQuery("");
+    setProgramId("");
     onClear();
   };
 
@@ -65,6 +69,18 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
         <div className="flex items-center gap-2">
           <Search className="h-5 w-5 text-primary" />
           <h2 className="text-lg font-semibold">Filtros</h2>
+        </div>
+
+        <div className="mb-4">
+          <Label htmlFor="program-id">ID do Programa</Label>
+          <Input
+            id="program-id"
+            placeholder="Digite o ID do programa (ex: 10617568976)"
+            value={programId}
+            onChange={(e) => setProgramId(e.target.value)}
+            disabled={isLoading}
+            className="bg-background"
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">

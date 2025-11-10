@@ -25,11 +25,12 @@ const Index = () => {
   const [commtypes, setCommtypes] = useState<Array<{id: string; name: string}>>([]);
   const [bts, setBts] = useState<Array<{id: string; name: string}>>([]);
   const [topcontents, setTopcontents] = useState<Array<{id: string; name: string}>>([]);
-  const [currentFilters, setCurrentFilters] = useState<{ genre: string; year: string; serie: string; narrator: string }>({
+  const [currentFilters, setCurrentFilters] = useState<{ genre: string; year: string; serie: string; narrator: string; programId?: string }>({
     genre: '',
     year: '',
     serie: '',
     narrator: '',
+    programId: '',
   });
 
   // Load filter options on mount, but don't show programs in table
@@ -138,7 +139,7 @@ const Index = () => {
     }
   };
 
-  const fetchPrograms = async (filters: { genre: string; year: string; serie: string; narrator: string }) => {
+  const fetchPrograms = async (filters: { genre: string; year: string; serie: string; narrator: string; programId?: string }) => {
     setIsLoading(true);
     setCurrentFilters(filters);
     
@@ -152,6 +153,7 @@ const Index = () => {
           year: filters.year || undefined,
           serie: filters.serie || undefined,
           narrator: filters.narrator || undefined,
+          programId: filters.programId || undefined,
           limit: 5000,
           offset: 0,
         },
@@ -192,7 +194,7 @@ const Index = () => {
 
   const handleClearFilters = () => {
     setPrograms([]);
-    setCurrentFilters({ genre: "", year: "", serie: "", narrator: "" });
+    setCurrentFilters({ genre: "", year: "", serie: "", narrator: "", programId: "" });
   };
 
   return (
