@@ -365,7 +365,7 @@ export function ProgramDetailModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog key={program.ID} open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-foreground">
@@ -392,15 +392,15 @@ export function ProgramDetailModal({
                 Informações Básicas
               </h3>
                <div className="space-y-2">
-                <InfoRow label="ID" value={program.ID} />
-                <InfoRow label="Episódio" value={program.EPISODE} />
-                <InfoRow label="Tx. Date" value={program.X_TXDAY_DATE} />
+                <InfoRow label="ID" value={displayProgram.ID} />
+                <InfoRow label="Episódio" value={displayProgram.EPISODE} />
+                <InfoRow label="Tx. Date" value={displayProgram.X_TXDAY_DATE} />
                 <InfoRow label="Gênero">
-                  <Badge variant="secondary" className={getGenreColor(program.GENRE)}>
-                    {program.GENRE || '-'}
+                  <Badge variant="secondary" className={getGenreColor(displayProgram.GENRE)}>
+                    {displayProgram.GENRE || '-'}
                   </Badge>
                 </InfoRow>
-                <InfoRow label="Ano" value={program.YEAR} />
+                <InfoRow label="Ano" value={displayProgram.YEAR} />
               </div>
             </div>
 
