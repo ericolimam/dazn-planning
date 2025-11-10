@@ -33,6 +33,9 @@ serve(async (req) => {
       'narrator': 'NARRATOR',
       'cabine': 'CABINE',
       'state_event': 'STATE_EVENT',
+      'commtype': 'COMMTYPE',
+      'bt': 'BT',
+      'topcontent': 'TOPCONTENT',
     };
 
     const filterValue = filterMap[referenceType];

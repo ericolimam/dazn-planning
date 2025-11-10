@@ -22,6 +22,9 @@ const Index = () => {
   const [narrators, setNarrators] = useState<Array<{id: string; name: string}>>([]);
   const [stateEvents, setStateEvents] = useState<Array<{id: string; name: string}>>([]);
   const [cabines, setCabines] = useState<Array<{id: string; name: string}>>([]);
+  const [commtypes, setCommtypes] = useState<Array<{id: string; name: string}>>([]);
+  const [bts, setBts] = useState<Array<{id: string; name: string}>>([]);
+  const [topcontents, setTopcontents] = useState<Array<{id: string; name: string}>>([]);
   const [currentFilters, setCurrentFilters] = useState<{ genre: string; year: string; serie: string; narrator: string }>({
     genre: '',
     year: '',
@@ -91,6 +94,36 @@ const Index = () => {
         if (stateEventsResult.data?.success && stateEventsResult.data?.data) {
           setStateEvents(stateEventsResult.data.data);
           console.log(`Loaded ${stateEventsResult.data.data.length} state events from API`);
+        }
+        
+        // Load commtypes from API
+        const commtypesResult = await supabase.functions.invoke('list-references', {
+          body: { referenceType: 'commtype' },
+        });
+        
+        if (commtypesResult.data?.success && commtypesResult.data?.data) {
+          setCommtypes(commtypesResult.data.data);
+          console.log(`Loaded ${commtypesResult.data.data.length} commtypes from API`);
+        }
+        
+        // Load BTs from API
+        const btsResult = await supabase.functions.invoke('list-references', {
+          body: { referenceType: 'bt' },
+        });
+        
+        if (btsResult.data?.success && btsResult.data?.data) {
+          setBts(btsResult.data.data);
+          console.log(`Loaded ${btsResult.data.data.length} BTs from API`);
+        }
+        
+        // Load top contents from API
+        const topcontentsResult = await supabase.functions.invoke('list-references', {
+          body: { referenceType: 'topcontent' },
+        });
+        
+        if (topcontentsResult.data?.success && topcontentsResult.data?.data) {
+          setTopcontents(topcontentsResult.data.data);
+          console.log(`Loaded ${topcontentsResult.data.data.length} top contents from API`);
         }
         
         console.log(`Genres: ${uniqueGenres.length}, Years: ${uniqueYears.length}, Series: ${uniqueSeries.length}`);
@@ -390,6 +423,9 @@ const Index = () => {
         stateEvents={stateEvents}
         cabines={cabines}
         narrators={narrators}
+        commtypes={commtypes}
+        bts={bts}
+        topcontents={topcontents}
       />
     </div>
   );

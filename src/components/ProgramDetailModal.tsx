@@ -55,6 +55,9 @@ interface ProgramDetailModalProps {
   stateEvents?: Array<{id: string; name: string}>;
   cabines?: Array<{id: string; name: string}>;
   narrators?: Array<{id: string; name: string}>;
+  commtypes?: Array<{id: string; name: string}>;
+  bts?: Array<{id: string; name: string}>;
+  topcontents?: Array<{id: string; name: string}>;
 }
 
 export function ProgramDetailModal({ 
@@ -64,7 +67,10 @@ export function ProgramDetailModal({
   onChange,
   stateEvents = [],
   cabines = [],
-  narrators = []
+  narrators = [],
+  commtypes = [],
+  bts = [],
+  topcontents = []
 }: ProgramDetailModalProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -79,12 +85,12 @@ export function ProgramDetailModal({
     DESTAQUE_SEMANA: program?.DESTAQUE_SEMANA || false,
     PROMO_DAZN: program?.PROMO_DAZN || false,
     // Planning fields
-    COMMTYPE: program?.COMMTYPE || '',
-    BT: program?.BT || '',
+    COMMTYPE_ID: program?.COMMTYPE_ID || '',
+    BT_ID: program?.BT_ID || '',
     PRODADDINFO: program?.PRODADDINFO || '',
     MATCHHIGH: program?.MATCHHIGH || '',
     // Promoção fields
-    TOPCONTENT_RF: program?.TOPCONTENT_RF || false,
+    TOPCONTENT_RF_ID: program?.TOPCONTENT_RF_ID || '',
     CLASSICDERBI: program?.CLASSICDERBI || false,
     CONTENTDETAIL: program?.CONTENTDETAIL || '',
     PLATAFORMBANNERS: program?.PLATAFORMBANNERS || false,
@@ -123,12 +129,12 @@ export function ProgramDetailModal({
       DESTAQUE_SEMANA: program.DESTAQUE_SEMANA || false,
       PROMO_DAZN: program.PROMO_DAZN || false,
       // Planning fields
-      COMMTYPE: program.COMMTYPE || '',
-      BT: program.BT || '',
+      COMMTYPE_ID: program.COMMTYPE_ID ? String(program.COMMTYPE_ID) : findIdByName(program.COMMTYPE || '', commtypes),
+      BT_ID: program.BT_ID ? String(program.BT_ID) : findIdByName(program.BT || '', bts),
       PRODADDINFO: program.PRODADDINFO || '',
       MATCHHIGH: program.MATCHHIGH || '',
       // Promoção fields
-      TOPCONTENT_RF: program.TOPCONTENT_RF || false,
+      TOPCONTENT_RF_ID: program.TOPCONTENT_RF_ID ? String(program.TOPCONTENT_RF_ID) : findIdByName(program.TOPCONTENT_RF || '', topcontents),
       CLASSICDERBI: program.CLASSICDERBI || false,
       CONTENTDETAIL: program.CONTENTDETAIL || '',
       PLATAFORMBANNERS: program.PLATAFORMBANNERS || false,
@@ -181,12 +187,12 @@ export function ProgramDetailModal({
       DESTAQUE_SEMANA: program.DESTAQUE_SEMANA || false,
       PROMO_DAZN: program.PROMO_DAZN || false,
       // Planning fields
-      COMMTYPE: program.COMMTYPE || '',
-      BT: program.BT || '',
+      COMMTYPE_ID: program.COMMTYPE_ID || '',
+      BT_ID: program.BT_ID || '',
       PRODADDINFO: program.PRODADDINFO || '',
       MATCHHIGH: program.MATCHHIGH || '',
       // Promoção fields
-      TOPCONTENT_RF: program.TOPCONTENT_RF || false,
+      TOPCONTENT_RF_ID: program.TOPCONTENT_RF_ID || '',
       CLASSICDERBI: program.CLASSICDERBI || false,
       CONTENTDETAIL: program.CONTENTDETAIL || '',
       PLATAFORMBANNERS: program.PLATAFORMBANNERS || false,
@@ -232,12 +238,12 @@ export function ProgramDetailModal({
             DESTAQUE_SEMANA: editedData.DESTAQUE_SEMANA,
             PROMO_DAZN: editedData.PROMO_DAZN,
             // Planning fields
-            COMMTYPE: editedData.COMMTYPE,
-            BT: editedData.BT,
+            COMMTYPE: editedData.COMMTYPE_ID,
+            BT: editedData.BT_ID,
             PRODADDINFO: editedData.PRODADDINFO,
             MATCHHIGH: editedData.MATCHHIGH,
             // Promoção fields
-            TOPCONTENT_RF: editedData.TOPCONTENT_RF,
+            TOPCONTENT_RF: editedData.TOPCONTENT_RF_ID,
             CLASSICDERBI: editedData.CLASSICDERBI,
             CONTENTDETAIL: editedData.CONTENTDETAIL,
             PLATAFORMBANNERS: editedData.PLATAFORMBANNERS,
@@ -550,26 +556,78 @@ export function ProgramDetailModal({
 
                   {/* Commercial Type */}
                   <div className="space-y-2">
-                    <Label htmlFor="commtype">Commercial Type</Label>
-                    <Input
-                      id="commtype"
-                      value={editedData.COMMTYPE}
-                      onChange={(e) => setEditedData({ ...editedData, COMMTYPE: e.target.value })}
-                      placeholder="Commercial type"
-                      className="bg-background"
-                    />
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="commtype">Commercial Type</Label>
+                      {editedData.COMMTYPE_ID && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2 text-xs"
+                          onClick={() => setEditedData({ ...editedData, COMMTYPE_ID: '' })}
+                        >
+                          Limpar
+                        </Button>
+                      )}
+                    </div>
+                    {program.COMMTYPE && (
+                      <p className="text-xs text-muted-foreground">
+                        Valor atual: {program.COMMTYPE}
+                      </p>
+                    )}
+                    <Select
+                      value={editedData.COMMTYPE_ID || undefined}
+                      onValueChange={(value) => setEditedData({ ...editedData, COMMTYPE_ID: value })}
+                    >
+                      <SelectTrigger className="bg-background">
+                        <SelectValue placeholder="Selecione o commercial type" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-background z-50">
+                        {commtypes.map((commtype) => (
+                          <SelectItem key={commtype.id} value={String(commtype.id)}>
+                            {commtype.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   {/* BT */}
                   <div className="space-y-2">
-                    <Label htmlFor="bt">BT</Label>
-                    <Input
-                      id="bt"
-                      value={editedData.BT}
-                      onChange={(e) => setEditedData({ ...editedData, BT: e.target.value })}
-                      placeholder="BT"
-                      className="bg-background"
-                    />
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="bt">BT</Label>
+                      {editedData.BT_ID && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2 text-xs"
+                          onClick={() => setEditedData({ ...editedData, BT_ID: '' })}
+                        >
+                          Limpar
+                        </Button>
+                      )}
+                    </div>
+                    {program.BT && (
+                      <p className="text-xs text-muted-foreground">
+                        Valor atual: {program.BT}
+                      </p>
+                    )}
+                    <Select
+                      value={editedData.BT_ID || undefined}
+                      onValueChange={(value) => setEditedData({ ...editedData, BT_ID: value })}
+                    >
+                      <SelectTrigger className="bg-background">
+                        <SelectValue placeholder="Selecione o BT" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-background z-50">
+                        {bts.map((bt) => (
+                          <SelectItem key={bt.id} value={String(bt.id)}>
+                            {bt.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   {/* Production Additional Info */}
@@ -622,13 +680,41 @@ export function ProgramDetailModal({
               {isEditing ? (
                 <div className="space-y-4">
                   {/* Top Content */}
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="topcontent" className="cursor-pointer">Top Content</Label>
-                    <Switch
-                      id="topcontent"
-                      checked={editedData.TOPCONTENT_RF}
-                      onCheckedChange={(checked) => setEditedData({ ...editedData, TOPCONTENT_RF: checked })}
-                    />
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="topcontent">Top Content</Label>
+                      {editedData.TOPCONTENT_RF_ID && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2 text-xs"
+                          onClick={() => setEditedData({ ...editedData, TOPCONTENT_RF_ID: '' })}
+                        >
+                          Limpar
+                        </Button>
+                      )}
+                    </div>
+                    {program.TOPCONTENT_RF && (
+                      <p className="text-xs text-muted-foreground">
+                        Valor atual: {program.TOPCONTENT_RF}
+                      </p>
+                    )}
+                    <Select
+                      value={editedData.TOPCONTENT_RF_ID || undefined}
+                      onValueChange={(value) => setEditedData({ ...editedData, TOPCONTENT_RF_ID: value })}
+                    >
+                      <SelectTrigger className="bg-background">
+                        <SelectValue placeholder="Selecione o top content" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-background z-50">
+                        {topcontents.map((topcontent) => (
+                          <SelectItem key={topcontent.id} value={String(topcontent.id)}>
+                            {topcontent.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   {/* Classic/Derbi */}
@@ -747,10 +833,8 @@ export function ProgramDetailModal({
                 </div>
               ) : (
                 <div className="space-y-4">
+                  <InfoRow label="Top Content" value={program.TOPCONTENT_RF} />
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant={program.TOPCONTENT_RF ? "default" : "outline"}>
-                      {program.TOPCONTENT_RF ? '✓' : '✗'} Top Content
-                    </Badge>
                     <Badge variant={program.CLASSICDERBI ? "default" : "outline"}>
                       {program.CLASSICDERBI ? '✓' : '✗'} Classic/Derbi
                     </Badge>

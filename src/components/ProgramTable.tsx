@@ -75,11 +75,14 @@ export interface Program {
   STATE_EVENT_ID: string;
   // Planning fields
   COMMTYPE?: string;
+  COMMTYPE_ID?: string;
   BT?: string;
+  BT_ID?: string;
   PRODADDINFO?: string;
   MATCHHIGH?: string;
   // Promoção fields
-  TOPCONTENT_RF?: boolean;
+  TOPCONTENT_RF?: string;
+  TOPCONTENT_RF_ID?: string;
   CLASSICDERBI?: boolean;
   CONTENTDETAIL?: string;
   PLATAFORMBANNERS?: boolean;
