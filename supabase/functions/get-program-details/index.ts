@@ -74,15 +74,18 @@ serve(async (req) => {
         { ALIAS: "CRM", ATTR_NM: "CRM" },
         { ALIAS: "SOCIAL", ATTR_NM: "SOCIAL" }
       ],
-      CONDITIONS: [
+      FILTERS: [
         {
           ATTR_NM: "PROG_ID",
-          OPERATOR: "EQ",
+          OPERATOR: "=",
           VALUE: programId
         }
       ]
     };
 
+    console.log('=== REQUEST DETAILS ===');
+    console.log('Requested Program ID:', programId);
+    console.log('Request body FILTERS:', JSON.stringify(requestBody.FILTERS));
     console.log('Fetching program details from API...');
     
     const encodedCredentials = btoa(`${username}:${password}`);
@@ -103,11 +106,13 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log('Received program details');
-    console.log('COMMTYPE_ID:', data.ROWS?.[0]?.COMMTYPE_ID);
-    console.log('COMMTYPE:', data.ROWS?.[0]?.COMMTYPE);
-    console.log('BT_ID:', data.ROWS?.[0]?.BT_ID);
-    console.log('BT:', data.ROWS?.[0]?.BT);
+    console.log('=== API RESPONSE ===');
+    console.log('Total rows received:', data.ROWS?.length);
+    console.log('Returned Program ID:', data.ROWS?.[0]?.ID);
+    console.log('Returned Program Title:', data.ROWS?.[0]?.TITLE);
+    console.log('Returned Program Episode:', data.ROWS?.[0]?.EPISODE);
+    console.log('Expected Program ID:', programId);
+    console.log('IDs Match:', data.ROWS?.[0]?.ID === programId);
 
     if (!data.ROWS || data.ROWS.length === 0) {
       throw new Error('Program not found');
