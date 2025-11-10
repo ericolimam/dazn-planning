@@ -30,9 +30,11 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
   const [selectedNarrator, setSelectedNarrator] = useState<string>("all");
   const [serieSearchQuery, setSerieSearchQuery] = useState<string>("");
   
-  const filteredSeries = series.filter(serie => 
-    serie.toLowerCase().includes(serieSearchQuery.toLowerCase())
-  );
+  const filteredSeries = series.filter(serie => {
+    const searchTerms = serieSearchQuery.toLowerCase().trim().split(/\s+/);
+    const serieLower = serie.toLowerCase();
+    return searchTerms.every(term => serieLower.includes(term));
+  });
 
   const handleFilter = () => {
     // Validate that at least one filter is selected
