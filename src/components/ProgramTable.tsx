@@ -52,6 +52,7 @@ const getRowBackgroundColor = (stateEvent: string) => {
 export interface Program {
   ID: number;
   EPISODE: number;
+  X_TXDAY_DATE?: string;
   TITLE: string;
   SERIE_TITLE: string;
   GENRE: string;
@@ -72,6 +73,24 @@ export interface Program {
   YEAR: number;
   STATE_EVENT: string;
   STATE_EVENT_ID: string;
+  // Planning fields
+  COMMTYPE?: string;
+  BT?: string;
+  PRODADDINFO?: string;
+  MATCHHIGH?: string;
+  // Promoção fields
+  TOPCONTENT_RF?: boolean;
+  CLASSICDERBI?: boolean;
+  CONTENTDETAIL?: string;
+  PLATAFORMBANNERS?: boolean;
+  PROMOINDIVIDUAL?: boolean;
+  PROMOCONJUNTA?: boolean;
+  PROMOGENERICA?: boolean;
+  PROMO10S?: boolean;
+  DETALHESPROMO?: string;
+  TELCOS?: boolean;
+  CRM?: boolean;
+  SOCIAL?: boolean;
 }
 
 interface ProgramTableProps {
@@ -145,6 +164,9 @@ export function ProgramTable({ programs, onProgramClick, isLoading }: ProgramTab
               <TableHead onClick={() => handleSort('EPISODE')} className="cursor-pointer hover:bg-muted transition-colors">
                 Episódio {sortColumn === 'EPISODE' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
+              <TableHead onClick={() => handleSort('X_TXDAY_DATE')} className="cursor-pointer hover:bg-muted transition-colors">
+                Tx. Date {sortColumn === 'X_TXDAY_DATE' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </TableHead>
               <TableHead onClick={() => handleSort('TITLE')} className="cursor-pointer hover:bg-muted transition-colors">
                 Título {sortColumn === 'TITLE' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
@@ -170,6 +192,7 @@ export function ProgramTable({ programs, onProgramClick, isLoading }: ProgramTab
                 className={`cursor-pointer transition-colors ${getRowBackgroundColor(program.STATE_EVENT)}`}
               >
                 <TableCell className="font-medium">{program.EPISODE || '-'}</TableCell>
+                <TableCell className="text-sm">{program.X_TXDAY_DATE || '-'}</TableCell>
                 <TableCell className="font-semibold">{program.TITLE || '-'}</TableCell>
                 <TableCell>{program.SERIE_TITLE || '-'}</TableCell>
                 <TableCell>

@@ -78,6 +78,24 @@ export function ProgramDetailModal({
     RESUMO: program?.RESUMO || false,
     DESTAQUE_SEMANA: program?.DESTAQUE_SEMANA || false,
     PROMO_DAZN: program?.PROMO_DAZN || false,
+    // Planning fields
+    COMMTYPE: program?.COMMTYPE || '',
+    BT: program?.BT || '',
+    PRODADDINFO: program?.PRODADDINFO || '',
+    MATCHHIGH: program?.MATCHHIGH || '',
+    // Promoção fields
+    TOPCONTENT_RF: program?.TOPCONTENT_RF || false,
+    CLASSICDERBI: program?.CLASSICDERBI || false,
+    CONTENTDETAIL: program?.CONTENTDETAIL || '',
+    PLATAFORMBANNERS: program?.PLATAFORMBANNERS || false,
+    PROMOINDIVIDUAL: program?.PROMOINDIVIDUAL || false,
+    PROMOCONJUNTA: program?.PROMOCONJUNTA || false,
+    PROMOGENERICA: program?.PROMOGENERICA || false,
+    PROMO10S: program?.PROMO10S || false,
+    DETALHESPROMO: program?.DETALHESPROMO || '',
+    TELCOS: program?.TELCOS || false,
+    CRM: program?.CRM || false,
+    SOCIAL: program?.SOCIAL || false,
   });
 
   if (!program) return null;
@@ -104,6 +122,24 @@ export function ProgramDetailModal({
       RESUMO: program.RESUMO || false,
       DESTAQUE_SEMANA: program.DESTAQUE_SEMANA || false,
       PROMO_DAZN: program.PROMO_DAZN || false,
+      // Planning fields
+      COMMTYPE: program.COMMTYPE || '',
+      BT: program.BT || '',
+      PRODADDINFO: program.PRODADDINFO || '',
+      MATCHHIGH: program.MATCHHIGH || '',
+      // Promoção fields
+      TOPCONTENT_RF: program.TOPCONTENT_RF || false,
+      CLASSICDERBI: program.CLASSICDERBI || false,
+      CONTENTDETAIL: program.CONTENTDETAIL || '',
+      PLATAFORMBANNERS: program.PLATAFORMBANNERS || false,
+      PROMOINDIVIDUAL: program.PROMOINDIVIDUAL || false,
+      PROMOCONJUNTA: program.PROMOCONJUNTA || false,
+      PROMOGENERICA: program.PROMOGENERICA || false,
+      PROMO10S: program.PROMO10S || false,
+      DETALHESPROMO: program.DETALHESPROMO || '',
+      TELCOS: program.TELCOS || false,
+      CRM: program.CRM || false,
+      SOCIAL: program.SOCIAL || false,
     };
     
     console.log('=== OPENING EDIT MODE ===');
@@ -144,6 +180,24 @@ export function ProgramDetailModal({
       RESUMO: program.RESUMO || false,
       DESTAQUE_SEMANA: program.DESTAQUE_SEMANA || false,
       PROMO_DAZN: program.PROMO_DAZN || false,
+      // Planning fields
+      COMMTYPE: program.COMMTYPE || '',
+      BT: program.BT || '',
+      PRODADDINFO: program.PRODADDINFO || '',
+      MATCHHIGH: program.MATCHHIGH || '',
+      // Promoção fields
+      TOPCONTENT_RF: program.TOPCONTENT_RF || false,
+      CLASSICDERBI: program.CLASSICDERBI || false,
+      CONTENTDETAIL: program.CONTENTDETAIL || '',
+      PLATAFORMBANNERS: program.PLATAFORMBANNERS || false,
+      PROMOINDIVIDUAL: program.PROMOINDIVIDUAL || false,
+      PROMOCONJUNTA: program.PROMOCONJUNTA || false,
+      PROMOGENERICA: program.PROMOGENERICA || false,
+      PROMO10S: program.PROMO10S || false,
+      DETALHESPROMO: program.DETALHESPROMO || '',
+      TELCOS: program.TELCOS || false,
+      CRM: program.CRM || false,
+      SOCIAL: program.SOCIAL || false,
     });
   };
 
@@ -176,7 +230,25 @@ export function ProgramDetailModal({
             TIME_ENDING: editedData.TIME_ENDING,
             RESUMO: editedData.RESUMO,
             DESTAQUE_SEMANA: editedData.DESTAQUE_SEMANA,
-            PROMO_DAZN: editedData.PROMO_DAZN
+            PROMO_DAZN: editedData.PROMO_DAZN,
+            // Planning fields
+            COMMTYPE: editedData.COMMTYPE,
+            BT: editedData.BT,
+            PRODADDINFO: editedData.PRODADDINFO,
+            MATCHHIGH: editedData.MATCHHIGH,
+            // Promoção fields
+            TOPCONTENT_RF: editedData.TOPCONTENT_RF,
+            CLASSICDERBI: editedData.CLASSICDERBI,
+            CONTENTDETAIL: editedData.CONTENTDETAIL,
+            PLATAFORMBANNERS: editedData.PLATAFORMBANNERS,
+            PROMOINDIVIDUAL: editedData.PROMOINDIVIDUAL,
+            PROMOCONJUNTA: editedData.PROMOCONJUNTA,
+            PROMOGENERICA: editedData.PROMOGENERICA,
+            PROMO10S: editedData.PROMO10S,
+            DETALHESPROMO: editedData.DETALHESPROMO,
+            TELCOS: editedData.TELCOS,
+            CRM: editedData.CRM,
+            SOCIAL: editedData.SOCIAL
           }
         }
       });
@@ -229,6 +301,7 @@ export function ProgramDetailModal({
                <div className="space-y-2">
                 <InfoRow label="ID" value={program.ID} />
                 <InfoRow label="Episódio" value={program.EPISODE} />
+                <InfoRow label="Tx. Date" value={program.X_TXDAY_DATE} />
                 <InfoRow label="Gênero">
                   <Badge variant="secondary" className={getGenreColor(program.GENRE)}>
                     {program.GENRE || '-'}
@@ -474,6 +547,54 @@ export function ProgramDetailModal({
                       className="bg-background"
                     />
                   </div>
+
+                  {/* Commercial Type */}
+                  <div className="space-y-2">
+                    <Label htmlFor="commtype">Commercial Type</Label>
+                    <Input
+                      id="commtype"
+                      value={editedData.COMMTYPE}
+                      onChange={(e) => setEditedData({ ...editedData, COMMTYPE: e.target.value })}
+                      placeholder="Commercial type"
+                      className="bg-background"
+                    />
+                  </div>
+
+                  {/* BT */}
+                  <div className="space-y-2">
+                    <Label htmlFor="bt">BT</Label>
+                    <Input
+                      id="bt"
+                      value={editedData.BT}
+                      onChange={(e) => setEditedData({ ...editedData, BT: e.target.value })}
+                      placeholder="BT"
+                      className="bg-background"
+                    />
+                  </div>
+
+                  {/* Production Additional Info */}
+                  <div className="space-y-2">
+                    <Label htmlFor="prodaddinfo">Production Additional Info</Label>
+                    <Input
+                      id="prodaddinfo"
+                      value={editedData.PRODADDINFO}
+                      onChange={(e) => setEditedData({ ...editedData, PRODADDINFO: e.target.value })}
+                      placeholder="Production additional info"
+                      className="bg-background"
+                    />
+                  </div>
+
+                  {/* Match Highlight */}
+                  <div className="space-y-2">
+                    <Label htmlFor="matchhigh">Match Highlight</Label>
+                    <Input
+                      id="matchhigh"
+                      value={editedData.MATCHHIGH}
+                      onChange={(e) => setEditedData({ ...editedData, MATCHHIGH: e.target.value })}
+                      placeholder="Match highlight"
+                      className="bg-background"
+                    />
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -488,15 +609,180 @@ export function ProgramDetailModal({
                   </InfoRow>
                   <InfoRow label="Narrador" value={program.NARRATOR} />
                   <InfoRow label="Comentador(es)" value={program.COMMENTATOR} />
+                  <InfoRow label="Commercial Type" value={program.COMMTYPE} />
+                  <InfoRow label="BT" value={program.BT} />
+                  <InfoRow label="Production Additional Info" value={program.PRODADDINFO} />
+                  <InfoRow label="Match Highlight" value={program.MATCHHIGH} />
                 </div>
               )}
             </TabsContent>
 
             {/* Promoção Tab */}
             <TabsContent value="promocao" className="space-y-4 mt-4">
-              <p className="text-sm text-muted-foreground text-center py-8">
-                Em breve...
-              </p>
+              {isEditing ? (
+                <div className="space-y-4">
+                  {/* Top Content */}
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="topcontent" className="cursor-pointer">Top Content</Label>
+                    <Switch
+                      id="topcontent"
+                      checked={editedData.TOPCONTENT_RF}
+                      onCheckedChange={(checked) => setEditedData({ ...editedData, TOPCONTENT_RF: checked })}
+                    />
+                  </div>
+
+                  {/* Classic/Derbi */}
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="classicderbi" className="cursor-pointer">Classic/Derbi</Label>
+                    <Switch
+                      id="classicderbi"
+                      checked={editedData.CLASSICDERBI}
+                      onCheckedChange={(checked) => setEditedData({ ...editedData, CLASSICDERBI: checked })}
+                    />
+                  </div>
+
+                  {/* Content Detail */}
+                  <div className="space-y-2">
+                    <Label htmlFor="contentdetail">Content Detail</Label>
+                    <Input
+                      id="contentdetail"
+                      value={editedData.CONTENTDETAIL}
+                      onChange={(e) => setEditedData({ ...editedData, CONTENTDETAIL: e.target.value })}
+                      placeholder="Content detail"
+                      className="bg-background"
+                    />
+                  </div>
+
+                  {/* Platform Banners */}
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="plataformbanners" className="cursor-pointer">Platform Banners</Label>
+                    <Switch
+                      id="plataformbanners"
+                      checked={editedData.PLATAFORMBANNERS}
+                      onCheckedChange={(checked) => setEditedData({ ...editedData, PLATAFORMBANNERS: checked })}
+                    />
+                  </div>
+
+                  {/* Promo Individual */}
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="promoindividual" className="cursor-pointer">Promo Individual</Label>
+                    <Switch
+                      id="promoindividual"
+                      checked={editedData.PROMOINDIVIDUAL}
+                      onCheckedChange={(checked) => setEditedData({ ...editedData, PROMOINDIVIDUAL: checked })}
+                    />
+                  </div>
+
+                  {/* Promo Conjunta */}
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="promoconjunta" className="cursor-pointer">Promo Conjunta</Label>
+                    <Switch
+                      id="promoconjunta"
+                      checked={editedData.PROMOCONJUNTA}
+                      onCheckedChange={(checked) => setEditedData({ ...editedData, PROMOCONJUNTA: checked })}
+                    />
+                  </div>
+
+                  {/* Promo Genérica */}
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="promogenerica" className="cursor-pointer">Promo Genérica</Label>
+                    <Switch
+                      id="promogenerica"
+                      checked={editedData.PROMOGENERICA}
+                      onCheckedChange={(checked) => setEditedData({ ...editedData, PROMOGENERICA: checked })}
+                    />
+                  </div>
+
+                  {/* Promo 10 Segundos */}
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="promo10s" className="cursor-pointer">Promo 10 Segundos</Label>
+                    <Switch
+                      id="promo10s"
+                      checked={editedData.PROMO10S}
+                      onCheckedChange={(checked) => setEditedData({ ...editedData, PROMO10S: checked })}
+                    />
+                  </div>
+
+                  {/* Detalhes Promo */}
+                  <div className="space-y-2">
+                    <Label htmlFor="detalhespromo">Detalhes Promo</Label>
+                    <Input
+                      id="detalhespromo"
+                      value={editedData.DETALHESPROMO}
+                      onChange={(e) => setEditedData({ ...editedData, DETALHESPROMO: e.target.value })}
+                      placeholder="Detalhes da promoção"
+                      className="bg-background"
+                    />
+                  </div>
+
+                  {/* Telcos */}
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="telcos" className="cursor-pointer">Telcos</Label>
+                    <Switch
+                      id="telcos"
+                      checked={editedData.TELCOS}
+                      onCheckedChange={(checked) => setEditedData({ ...editedData, TELCOS: checked })}
+                    />
+                  </div>
+
+                  {/* CRM */}
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="crm" className="cursor-pointer">CRM</Label>
+                    <Switch
+                      id="crm"
+                      checked={editedData.CRM}
+                      onCheckedChange={(checked) => setEditedData({ ...editedData, CRM: checked })}
+                    />
+                  </div>
+
+                  {/* Social */}
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="social" className="cursor-pointer">Social</Label>
+                    <Switch
+                      id="social"
+                      checked={editedData.SOCIAL}
+                      onCheckedChange={(checked) => setEditedData({ ...editedData, SOCIAL: checked })}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant={program.TOPCONTENT_RF ? "default" : "outline"}>
+                      {program.TOPCONTENT_RF ? '✓' : '✗'} Top Content
+                    </Badge>
+                    <Badge variant={program.CLASSICDERBI ? "default" : "outline"}>
+                      {program.CLASSICDERBI ? '✓' : '✗'} Classic/Derbi
+                    </Badge>
+                    <Badge variant={program.PLATAFORMBANNERS ? "default" : "outline"}>
+                      {program.PLATAFORMBANNERS ? '✓' : '✗'} Platform Banners
+                    </Badge>
+                    <Badge variant={program.PROMOINDIVIDUAL ? "default" : "outline"}>
+                      {program.PROMOINDIVIDUAL ? '✓' : '✗'} Promo Individual
+                    </Badge>
+                    <Badge variant={program.PROMOCONJUNTA ? "default" : "outline"}>
+                      {program.PROMOCONJUNTA ? '✓' : '✗'} Promo Conjunta
+                    </Badge>
+                    <Badge variant={program.PROMOGENERICA ? "default" : "outline"}>
+                      {program.PROMOGENERICA ? '✓' : '✗'} Promo Genérica
+                    </Badge>
+                    <Badge variant={program.PROMO10S ? "default" : "outline"}>
+                      {program.PROMO10S ? '✓' : '✗'} Promo 10s
+                    </Badge>
+                    <Badge variant={program.TELCOS ? "default" : "outline"}>
+                      {program.TELCOS ? '✓' : '✗'} Telcos
+                    </Badge>
+                    <Badge variant={program.CRM ? "default" : "outline"}>
+                      {program.CRM ? '✓' : '✗'} CRM
+                    </Badge>
+                    <Badge variant={program.SOCIAL ? "default" : "outline"}>
+                      {program.SOCIAL ? '✓' : '✗'} Social
+                    </Badge>
+                  </div>
+                  <InfoRow label="Content Detail" value={program.CONTENTDETAIL} />
+                  <InfoRow label="Detalhes Promo" value={program.DETALHESPROMO} />
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>
