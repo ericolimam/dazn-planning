@@ -61,7 +61,6 @@ serve(async (req) => {
       filters.push({
         ATTR_NM: "PROG_ID.SERIES_ID.GENRE_RF",
         OPERATOR: "=",
-        FORMAT: "NAME",
         VALUE: genre
       });
     }
