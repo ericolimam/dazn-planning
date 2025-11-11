@@ -299,42 +299,42 @@ export function ProgramTable({
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead onClick={() => handleSort('EPISODE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[80px]">
+              <TableHead onClick={() => handleSort('EPISODE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[80px] h-8 py-1 text-xs">
                 Episódio {sortColumn === 'EPISODE' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
-              <TableHead onClick={() => handleSort('X_TXDAY_DATE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[100px]">
+              <TableHead onClick={() => handleSort('X_TXDAY_DATE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[100px] h-8 py-1 text-xs">
                 Tx. Date {sortColumn === 'X_TXDAY_DATE' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
-              <TableHead onClick={() => handleSort('TITLE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[200px]">
+              <TableHead onClick={() => handleSort('TITLE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[200px] h-8 py-1 text-xs">
                 Título {sortColumn === 'TITLE' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
-              <TableHead onClick={() => handleSort('SERIE_TITLE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[150px]">
+              <TableHead onClick={() => handleSort('SERIE_TITLE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[150px] h-8 py-1 text-xs">
                 Série {sortColumn === 'SERIE_TITLE' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
-              <TableHead onClick={() => handleSort('GENRE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[120px]">
+              <TableHead onClick={() => handleSort('GENRE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[120px] h-8 py-1 text-xs">
                 Gênero {sortColumn === 'GENRE' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
-              <TableHead onClick={() => handleSort('YEAR')} className="cursor-pointer hover:bg-muted transition-colors min-w-[60px]">
+              <TableHead onClick={() => handleSort('YEAR')} className="cursor-pointer hover:bg-muted transition-colors min-w-[60px] h-8 py-1 text-xs">
                 Ano {sortColumn === 'YEAR' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
               {/* Planning Fields */}
-              <TableHead className="min-w-[150px]">Tipo Comentário</TableHead>
-              <TableHead className="min-w-[100px]">BT</TableHead>
-              <TableHead className="min-w-[200px]">Info Adicional</TableHead>
-              <TableHead className="min-w-[100px]">Match High</TableHead>
+              <TableHead className="min-w-[150px] h-8 py-1 text-xs">Tipo Comentário</TableHead>
+              <TableHead className="min-w-[100px] h-8 py-1 text-xs">BT</TableHead>
+              <TableHead className="min-w-[200px] h-8 py-1 text-xs">Info Adicional</TableHead>
+              <TableHead className="min-w-[100px] h-8 py-1 text-xs">Match High</TableHead>
               {/* Promoção Fields */}
-              <TableHead className="min-w-[150px]">Top Content</TableHead>
-              <TableHead className="min-w-[120px]">Clássico/Dérbi</TableHead>
-              <TableHead className="min-w-[200px]">Detalhe Conteúdo</TableHead>
-              <TableHead className="min-w-[120px]">Banners Plat.</TableHead>
-              <TableHead className="min-w-[120px]">Promo Individual</TableHead>
-              <TableHead className="min-w-[120px]">Promo Conjunta</TableHead>
-              <TableHead className="min-w-[120px]">Promo Genérica</TableHead>
-              <TableHead className="min-w-[100px]">Promo 10s</TableHead>
-              <TableHead className="min-w-[200px]">Detalhes Promo</TableHead>
-              <TableHead className="min-w-[80px]">Telcos</TableHead>
-              <TableHead className="min-w-[80px]">CRM</TableHead>
-              <TableHead className="min-w-[80px]">Social</TableHead>
+              <TableHead className="min-w-[150px] h-8 py-1 text-xs">Top Content</TableHead>
+              <TableHead className="min-w-[120px] h-8 py-1 text-xs">Clássico/Dérbi</TableHead>
+              <TableHead className="min-w-[200px] h-8 py-1 text-xs">Detalhe Conteúdo</TableHead>
+              <TableHead className="min-w-[120px] h-8 py-1 text-xs">Banners Plat.</TableHead>
+              <TableHead className="min-w-[120px] h-8 py-1 text-xs">Promo Individual</TableHead>
+              <TableHead className="min-w-[120px] h-8 py-1 text-xs">Promo Conjunta</TableHead>
+              <TableHead className="min-w-[120px] h-8 py-1 text-xs">Promo Genérica</TableHead>
+              <TableHead className="min-w-[100px] h-8 py-1 text-xs">Promo 10s</TableHead>
+              <TableHead className="min-w-[200px] h-8 py-1 text-xs">Detalhes Promo</TableHead>
+              <TableHead className="min-w-[80px] h-8 py-1 text-xs">Telcos</TableHead>
+              <TableHead className="min-w-[80px] h-8 py-1 text-xs">CRM</TableHead>
+              <TableHead className="min-w-[80px] h-8 py-1 text-xs">Social</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -354,27 +354,27 @@ export function ProgramTable({
                       onProgramClick(program);
                     }
                   }}
-                  className={`transition-colors ${getRowBackgroundColor(program.STATE_EVENT)}`}
+                  className={`transition-colors h-9 ${getRowBackgroundColor(program.STATE_EVENT)}`}
                 >
-                  <TableCell className="font-medium">{program.EPISODE || '-'}</TableCell>
-                  <TableCell className="text-sm">{program.X_TXDAY_DATE || '-'}</TableCell>
-                  <TableCell className="font-semibold">{program.TITLE || '-'}</TableCell>
-                  <TableCell>{program.SERIE_TITLE || '-'}</TableCell>
-                  <TableCell>
-                    <Badge variant="secondary" className={getGenreColor(program.GENRE)}>
+                  <TableCell className="font-medium text-xs py-1">{program.EPISODE || '-'}</TableCell>
+                  <TableCell className="text-xs py-1">{program.X_TXDAY_DATE || '-'}</TableCell>
+                  <TableCell className="font-semibold text-xs py-1">{program.TITLE || '-'}</TableCell>
+                  <TableCell className="text-xs py-1">{program.SERIE_TITLE || '-'}</TableCell>
+                  <TableCell className="py-1">
+                    <Badge variant="secondary" className={`${getGenreColor(program.GENRE)} text-[10px] py-0 px-1.5`}>
                       {program.GENRE || '-'}
                     </Badge>
                   </TableCell>
-                  <TableCell>{program.YEAR || '-'}</TableCell>
+                  <TableCell className="text-xs py-1">{program.YEAR || '-'}</TableCell>
                   
                   {/* Planning Fields */}
-                  <TableCell onClick={(e) => e.stopPropagation()}>
+                  <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
                     <Select
                       value={program.COMMTYPE_ID || ''}
                       onValueChange={(value) => handleCellUpdate(program, 'COMMTYPE_ID', value)}
                       disabled={isSaving('COMMTYPE_ID')}
                     >
-                      <SelectTrigger className="h-8 text-xs">
+                      <SelectTrigger className="h-7 text-[11px]">
                         <SelectValue placeholder="-" />
                       </SelectTrigger>
                       <SelectContent>
@@ -385,13 +385,13 @@ export function ProgramTable({
                     </Select>
                   </TableCell>
                   
-                  <TableCell onClick={(e) => e.stopPropagation()}>
+                  <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
                     <Select
                       value={program.BT_ID || ''}
                       onValueChange={(value) => handleCellUpdate(program, 'BT_ID', value)}
                       disabled={isSaving('BT_ID')}
                     >
-                      <SelectTrigger className="h-8 text-xs">
+                      <SelectTrigger className="h-7 text-[11px]">
                         <SelectValue placeholder="-" />
                       </SelectTrigger>
                       <SelectContent>
@@ -402,7 +402,7 @@ export function ProgramTable({
                     </Select>
                   </TableCell>
                   
-                  <TableCell onClick={(e) => e.stopPropagation()}>
+                  <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
                     <Input
                       value={program.PRODADDINFO || ''}
                       onChange={(e) => setEditingCell({ programId: program.ID, field: 'PRODADDINFO' })}
@@ -416,27 +416,28 @@ export function ProgramTable({
                           e.currentTarget.blur();
                         }
                       }}
-                      className="h-8 text-xs"
+                      className="h-7 text-[11px]"
                       disabled={isSaving('PRODADDINFO')}
                     />
                   </TableCell>
                   
-                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
+                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center py-1">
                     <Switch
                       checked={Boolean(program.MATCHHIGH)}
                       onCheckedChange={(checked) => handleCellUpdate(program, 'MATCHHIGH', checked)}
                       disabled={isSaving('MATCHHIGH')}
+                      className="scale-75"
                     />
                   </TableCell>
                   
                   {/* Promoção Fields */}
-                  <TableCell onClick={(e) => e.stopPropagation()}>
+                  <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
                     <Select
                       value={program.TOPCONTENT_RF_ID || ''}
                       onValueChange={(value) => handleCellUpdate(program, 'TOPCONTENT_RF_ID', value)}
                       disabled={isSaving('TOPCONTENT_RF_ID')}
                     >
-                      <SelectTrigger className="h-8 text-xs">
+                      <SelectTrigger className="h-7 text-[11px]">
                         <SelectValue placeholder="-" />
                       </SelectTrigger>
                       <SelectContent>
@@ -447,15 +448,16 @@ export function ProgramTable({
                     </Select>
                   </TableCell>
                   
-                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
+                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center py-1">
                     <Switch
                       checked={Boolean(program.CLASSICDERBI)}
                       onCheckedChange={(checked) => handleCellUpdate(program, 'CLASSICDERBI', checked)}
                       disabled={isSaving('CLASSICDERBI')}
+                      className="scale-75"
                     />
                   </TableCell>
                   
-                  <TableCell onClick={(e) => e.stopPropagation()}>
+                  <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
                     <Input
                       value={program.CONTENTDETAIL || ''}
                       onBlur={(e) => {
@@ -468,52 +470,57 @@ export function ProgramTable({
                           e.currentTarget.blur();
                         }
                       }}
-                      className="h-8 text-xs"
+                      className="h-7 text-[11px]"
                       disabled={isSaving('CONTENTDETAIL')}
                     />
                   </TableCell>
                   
-                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
+                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center py-1">
                     <Switch
                       checked={Boolean(program.PLATAFORMBANNERS)}
                       onCheckedChange={(checked) => handleCellUpdate(program, 'PLATAFORMBANNERS', checked)}
                       disabled={isSaving('PLATAFORMBANNERS')}
+                      className="scale-75"
                     />
                   </TableCell>
                   
-                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
+                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center py-1">
                     <Switch
                       checked={Boolean(program.PROMOINDIVIDUAL)}
                       onCheckedChange={(checked) => handleCellUpdate(program, 'PROMOINDIVIDUAL', checked)}
                       disabled={isSaving('PROMOINDIVIDUAL')}
+                      className="scale-75"
                     />
                   </TableCell>
                   
-                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
+                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center py-1">
                     <Switch
                       checked={Boolean(program.PROMOCONJUNTA)}
                       onCheckedChange={(checked) => handleCellUpdate(program, 'PROMOCONJUNTA', checked)}
                       disabled={isSaving('PROMOCONJUNTA')}
+                      className="scale-75"
                     />
                   </TableCell>
                   
-                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
+                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center py-1">
                     <Switch
                       checked={Boolean(program.PROMOGENERICA)}
                       onCheckedChange={(checked) => handleCellUpdate(program, 'PROMOGENERICA', checked)}
                       disabled={isSaving('PROMOGENERICA')}
+                      className="scale-75"
                     />
                   </TableCell>
                   
-                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
+                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center py-1">
                     <Switch
                       checked={Boolean(program.PROMO10S)}
                       onCheckedChange={(checked) => handleCellUpdate(program, 'PROMO10S', checked)}
                       disabled={isSaving('PROMO10S')}
+                      className="scale-75"
                     />
                   </TableCell>
                   
-                  <TableCell onClick={(e) => e.stopPropagation()}>
+                  <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
                     <Input
                       value={program.DETALHESPROMO || ''}
                       onBlur={(e) => {
@@ -526,32 +533,35 @@ export function ProgramTable({
                           e.currentTarget.blur();
                         }
                       }}
-                      className="h-8 text-xs"
+                      className="h-7 text-[11px]"
                       disabled={isSaving('DETALHESPROMO')}
                     />
                   </TableCell>
                   
-                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
+                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center py-1">
                     <Switch
                       checked={Boolean(program.TELCOS)}
                       onCheckedChange={(checked) => handleCellUpdate(program, 'TELCOS', checked)}
                       disabled={isSaving('TELCOS')}
+                      className="scale-75"
                     />
                   </TableCell>
                   
-                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
+                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center py-1">
                     <Switch
                       checked={Boolean(program.CRM)}
                       onCheckedChange={(checked) => handleCellUpdate(program, 'CRM', checked)}
                       disabled={isSaving('CRM')}
+                      className="scale-75"
                     />
                   </TableCell>
                   
-                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
+                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center py-1">
                     <Switch
                       checked={Boolean(program.SOCIAL)}
                       onCheckedChange={(checked) => handleCellUpdate(program, 'SOCIAL', checked)}
                       disabled={isSaving('SOCIAL')}
+                      className="scale-75"
                     />
                   </TableCell>
                 </TableRow>
