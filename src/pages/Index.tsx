@@ -293,6 +293,13 @@ const Index = () => {
                   programs={programs}
                   onProgramClick={handleProgramClick}
                   isLoading={isLoading}
+                  onProgramUpdate={handleProgramSave}
+                  stateEvents={stateEvents}
+                  cabines={cabines}
+                  narrators={narrators}
+                  commtypes={commtypes}
+                  bts={bts}
+                  topcontents={topcontents}
                 />
               </div>
             </>

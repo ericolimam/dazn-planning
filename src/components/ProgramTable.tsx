@@ -9,6 +9,11 @@ import {
 } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const getGenreColor = (genre: string) => {
   const colors: Record<string, string> = {
@@ -100,11 +105,31 @@ interface ProgramTableProps {
   programs: Program[];
   onProgramClick: (program: Program) => void;
   isLoading?: boolean;
+  onProgramUpdate?: (updatedProgram: Program) => void;
+  stateEvents?: Array<{id: string; name: string}>;
+  cabines?: Array<{id: string; name: string}>;
+  narrators?: Array<{id: string; name: string}>;
+  commtypes?: Array<{id: string; name: string}>;
+  bts?: Array<{id: string; name: string}>;
+  topcontents?: Array<{id: string; name: string}>;
 }
 
-export function ProgramTable({ programs, onProgramClick, isLoading }: ProgramTableProps) {
+export function ProgramTable({ 
+  programs, 
+  onProgramClick, 
+  isLoading, 
+  onProgramUpdate,
+  stateEvents = [],
+  cabines = [],
+  narrators = [],
+  commtypes = [],
+  bts = [],
+  topcontents = []
+}: ProgramTableProps) {
   const [sortColumn, setSortColumn] = useState<keyof Program | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [editingCell, setEditingCell] = useState<{programId: number; field: string} | null>(null);
+  const [savingCell, setSavingCell] = useState<{programId: number; field: string} | null>(null);
 
   const handleSort = (column: keyof Program) => {
     if (sortColumn === column) {
@@ -112,6 +137,53 @@ export function ProgramTable({ programs, onProgramClick, isLoading }: ProgramTab
     } else {
       setSortColumn(column);
       setSortDirection('asc');
+    }
+  };
+
+  const handleCellUpdate = async (program: Program, field: string, value: any) => {
+    setSavingCell({ programId: program.ID, field });
+    
+    try {
+      const updates: any = {};
+      updates[field] = value;
+      
+      const { data, error } = await supabase.functions.invoke('update-program', {
+        body: {
+          programId: program.ID,
+          updates
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.success) {
+        toast.success('Campo atualizado com sucesso!');
+        
+        // Create updated program object
+        const updatedProgram: Program = {
+          ...program,
+          [field]: value
+        };
+        
+        // Update display name if it's an ID field
+        if (field === 'COMMTYPE_ID') {
+          updatedProgram.COMMTYPE = commtypes.find(c => c.id === value)?.name || program.COMMTYPE;
+        } else if (field === 'BT_ID') {
+          updatedProgram.BT = bts.find(b => b.id === value)?.name || program.BT;
+        } else if (field === 'TOPCONTENT_RF_ID') {
+          updatedProgram.TOPCONTENT_RF = topcontents.find(t => t.id === value)?.name || program.TOPCONTENT_RF;
+        }
+        
+        onProgramUpdate?.(updatedProgram);
+        setEditingCell(null);
+      } else {
+        toast.error(data?.error || 'Erro ao atualizar campo');
+      }
+    } catch (error: any) {
+      console.error('Error updating field:', error);
+      toast.error('Erro ao atualizar campo');
+    } finally {
+      setSavingCell(null);
     }
   };
 
@@ -164,63 +236,264 @@ export function ProgramTable({ programs, onProgramClick, isLoading }: ProgramTab
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead onClick={() => handleSort('EPISODE')} className="cursor-pointer hover:bg-muted transition-colors">
+              <TableHead onClick={() => handleSort('EPISODE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[80px]">
                 Episódio {sortColumn === 'EPISODE' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
-              <TableHead onClick={() => handleSort('X_TXDAY_DATE')} className="cursor-pointer hover:bg-muted transition-colors">
+              <TableHead onClick={() => handleSort('X_TXDAY_DATE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[100px]">
                 Tx. Date {sortColumn === 'X_TXDAY_DATE' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
-              <TableHead onClick={() => handleSort('TITLE')} className="cursor-pointer hover:bg-muted transition-colors">
+              <TableHead onClick={() => handleSort('TITLE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[200px]">
                 Título {sortColumn === 'TITLE' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
-              <TableHead onClick={() => handleSort('SERIE_TITLE')} className="cursor-pointer hover:bg-muted transition-colors">
-                Título da Série {sortColumn === 'SERIE_TITLE' && (sortDirection === 'asc' ? '↑' : '↓')}
+              <TableHead onClick={() => handleSort('SERIE_TITLE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[150px]">
+                Série {sortColumn === 'SERIE_TITLE' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
-              <TableHead onClick={() => handleSort('GENRE')} className="cursor-pointer hover:bg-muted transition-colors">
+              <TableHead onClick={() => handleSort('GENRE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[120px]">
                 Gênero {sortColumn === 'GENRE' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
-              <TableHead onClick={() => handleSort('YEAR')} className="cursor-pointer hover:bg-muted transition-colors">
+              <TableHead onClick={() => handleSort('YEAR')} className="cursor-pointer hover:bg-muted transition-colors min-w-[60px]">
                 Ano {sortColumn === 'YEAR' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
-              <TableHead>Tipo Prog.</TableHead>
-              <TableHead>Categoria</TableHead>
-              <TableHead>Tags</TableHead>
+              {/* Planning Fields */}
+              <TableHead className="min-w-[150px]">Tipo Comentário</TableHead>
+              <TableHead className="min-w-[100px]">BT</TableHead>
+              <TableHead className="min-w-[200px]">Info Adicional</TableHead>
+              <TableHead className="min-w-[100px]">Match High</TableHead>
+              {/* Promoção Fields */}
+              <TableHead className="min-w-[150px]">Top Content</TableHead>
+              <TableHead className="min-w-[120px]">Clássico/Dérbi</TableHead>
+              <TableHead className="min-w-[200px]">Detalhe Conteúdo</TableHead>
+              <TableHead className="min-w-[120px]">Banners Plat.</TableHead>
+              <TableHead className="min-w-[120px]">Promo Individual</TableHead>
+              <TableHead className="min-w-[120px]">Promo Conjunta</TableHead>
+              <TableHead className="min-w-[120px]">Promo Genérica</TableHead>
+              <TableHead className="min-w-[100px]">Promo 10s</TableHead>
+              <TableHead className="min-w-[200px]">Detalhes Promo</TableHead>
+              <TableHead className="min-w-[80px]">Telcos</TableHead>
+              <TableHead className="min-w-[80px]">CRM</TableHead>
+              <TableHead className="min-w-[80px]">Social</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sortedPrograms.map((program) => (
-              <TableRow
-                key={program.ID}
-                onDoubleClick={() => {
-                  console.log('=== TABLE ROW DOUBLE-CLICKED ===');
-                  console.log('Program ID:', program.ID);
-                  console.log('Program Title:', program.TITLE);
-                  console.log('Full program object:', program);
-                  onProgramClick(program);
-                }}
-                className={`cursor-pointer transition-colors ${getRowBackgroundColor(program.STATE_EVENT)}`}
-              >
-                <TableCell className="font-medium">{program.EPISODE || '-'}</TableCell>
-                <TableCell className="text-sm">{program.X_TXDAY_DATE || '-'}</TableCell>
-                <TableCell className="font-semibold">{program.TITLE || '-'}</TableCell>
-                <TableCell>{program.SERIE_TITLE || '-'}</TableCell>
-                <TableCell>
-                  <Badge variant="secondary" className={getGenreColor(program.GENRE)}>
-                    {program.GENRE || '-'}
-                  </Badge>
-                </TableCell>
-                <TableCell>{program.YEAR || '-'}</TableCell>
-                <TableCell className="text-sm text-muted-foreground">{program.PROG_TYPE || '-'}</TableCell>
-                <TableCell className="text-sm text-muted-foreground">{program.PROG_CATEGORY || '-'}</TableCell>
-                <TableCell>
-                  <div className="flex gap-1 flex-wrap">
-                    {program.RESUMO && <Badge variant="outline" className="text-xs">Resumo</Badge>}
-                    {program.DESTAQUE_SEMANA && <Badge variant="outline" className="text-xs">Destaque</Badge>}
-                    {program.PROMO_DAZN && <Badge variant="outline" className="text-xs">DAZN</Badge>}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+            {sortedPrograms.map((program) => {
+              const isSaving = (field: string) => 
+                savingCell?.programId === program.ID && savingCell?.field === field;
+              
+              const isEditing = (field: string) => 
+                editingCell?.programId === program.ID && editingCell?.field === field;
+
+              return (
+                <TableRow
+                  key={program.ID}
+                  onDoubleClick={(e) => {
+                    // Only trigger if not clicking on an input/select
+                    if (!(e.target as HTMLElement).closest('input, select, button')) {
+                      onProgramClick(program);
+                    }
+                  }}
+                  className={`transition-colors ${getRowBackgroundColor(program.STATE_EVENT)}`}
+                >
+                  <TableCell className="font-medium">{program.EPISODE || '-'}</TableCell>
+                  <TableCell className="text-sm">{program.X_TXDAY_DATE || '-'}</TableCell>
+                  <TableCell className="font-semibold">{program.TITLE || '-'}</TableCell>
+                  <TableCell>{program.SERIE_TITLE || '-'}</TableCell>
+                  <TableCell>
+                    <Badge variant="secondary" className={getGenreColor(program.GENRE)}>
+                      {program.GENRE || '-'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{program.YEAR || '-'}</TableCell>
+                  
+                  {/* Planning Fields */}
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <Select
+                      value={program.COMMTYPE_ID || ''}
+                      onValueChange={(value) => handleCellUpdate(program, 'COMMTYPE_ID', value)}
+                      disabled={isSaving('COMMTYPE_ID')}
+                    >
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue placeholder="-" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {commtypes.map((ct) => (
+                          <SelectItem key={ct.id} value={ct.id}>{ct.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <Select
+                      value={program.BT_ID || ''}
+                      onValueChange={(value) => handleCellUpdate(program, 'BT_ID', value)}
+                      disabled={isSaving('BT_ID')}
+                    >
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue placeholder="-" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {bts.map((bt) => (
+                          <SelectItem key={bt.id} value={bt.id}>{bt.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <Input
+                      value={program.PRODADDINFO || ''}
+                      onChange={(e) => setEditingCell({ programId: program.ID, field: 'PRODADDINFO' })}
+                      onBlur={(e) => {
+                        if (e.target.value !== program.PRODADDINFO) {
+                          handleCellUpdate(program, 'PRODADDINFO', e.target.value);
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.currentTarget.blur();
+                        }
+                      }}
+                      className="h-8 text-xs"
+                      disabled={isSaving('PRODADDINFO')}
+                    />
+                  </TableCell>
+                  
+                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
+                    <Switch
+                      checked={Boolean(program.MATCHHIGH)}
+                      onCheckedChange={(checked) => handleCellUpdate(program, 'MATCHHIGH', checked)}
+                      disabled={isSaving('MATCHHIGH')}
+                    />
+                  </TableCell>
+                  
+                  {/* Promoção Fields */}
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <Select
+                      value={program.TOPCONTENT_RF_ID || ''}
+                      onValueChange={(value) => handleCellUpdate(program, 'TOPCONTENT_RF_ID', value)}
+                      disabled={isSaving('TOPCONTENT_RF_ID')}
+                    >
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue placeholder="-" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {topcontents.map((tc) => (
+                          <SelectItem key={tc.id} value={tc.id}>{tc.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  
+                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
+                    <Switch
+                      checked={Boolean(program.CLASSICDERBI)}
+                      onCheckedChange={(checked) => handleCellUpdate(program, 'CLASSICDERBI', checked)}
+                      disabled={isSaving('CLASSICDERBI')}
+                    />
+                  </TableCell>
+                  
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <Input
+                      value={program.CONTENTDETAIL || ''}
+                      onBlur={(e) => {
+                        if (e.target.value !== program.CONTENTDETAIL) {
+                          handleCellUpdate(program, 'CONTENTDETAIL', e.target.value);
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.currentTarget.blur();
+                        }
+                      }}
+                      className="h-8 text-xs"
+                      disabled={isSaving('CONTENTDETAIL')}
+                    />
+                  </TableCell>
+                  
+                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
+                    <Switch
+                      checked={Boolean(program.PLATAFORMBANNERS)}
+                      onCheckedChange={(checked) => handleCellUpdate(program, 'PLATAFORMBANNERS', checked)}
+                      disabled={isSaving('PLATAFORMBANNERS')}
+                    />
+                  </TableCell>
+                  
+                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
+                    <Switch
+                      checked={Boolean(program.PROMOINDIVIDUAL)}
+                      onCheckedChange={(checked) => handleCellUpdate(program, 'PROMOINDIVIDUAL', checked)}
+                      disabled={isSaving('PROMOINDIVIDUAL')}
+                    />
+                  </TableCell>
+                  
+                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
+                    <Switch
+                      checked={Boolean(program.PROMOCONJUNTA)}
+                      onCheckedChange={(checked) => handleCellUpdate(program, 'PROMOCONJUNTA', checked)}
+                      disabled={isSaving('PROMOCONJUNTA')}
+                    />
+                  </TableCell>
+                  
+                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
+                    <Switch
+                      checked={Boolean(program.PROMOGENERICA)}
+                      onCheckedChange={(checked) => handleCellUpdate(program, 'PROMOGENERICA', checked)}
+                      disabled={isSaving('PROMOGENERICA')}
+                    />
+                  </TableCell>
+                  
+                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
+                    <Switch
+                      checked={Boolean(program.PROMO10S)}
+                      onCheckedChange={(checked) => handleCellUpdate(program, 'PROMO10S', checked)}
+                      disabled={isSaving('PROMO10S')}
+                    />
+                  </TableCell>
+                  
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <Input
+                      value={program.DETALHESPROMO || ''}
+                      onBlur={(e) => {
+                        if (e.target.value !== program.DETALHESPROMO) {
+                          handleCellUpdate(program, 'DETALHESPROMO', e.target.value);
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.currentTarget.blur();
+                        }
+                      }}
+                      className="h-8 text-xs"
+                      disabled={isSaving('DETALHESPROMO')}
+                    />
+                  </TableCell>
+                  
+                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
+                    <Switch
+                      checked={Boolean(program.TELCOS)}
+                      onCheckedChange={(checked) => handleCellUpdate(program, 'TELCOS', checked)}
+                      disabled={isSaving('TELCOS')}
+                    />
+                  </TableCell>
+                  
+                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
+                    <Switch
+                      checked={Boolean(program.CRM)}
+                      onCheckedChange={(checked) => handleCellUpdate(program, 'CRM', checked)}
+                      disabled={isSaving('CRM')}
+                    />
+                  </TableCell>
+                  
+                  <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
+                    <Switch
+                      checked={Boolean(program.SOCIAL)}
+                      onCheckedChange={(checked) => handleCellUpdate(program, 'SOCIAL', checked)}
+                      disabled={isSaving('SOCIAL')}
+                    />
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>
