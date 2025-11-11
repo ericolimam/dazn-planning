@@ -329,7 +329,7 @@ export function ProgramTable({
               <TableHead className="min-w-[150px] h-8 py-1 text-xs">Narrador</TableHead>
               <TableHead className="min-w-[150px] h-8 py-1 text-xs">Comentador(es)</TableHead>
               {/* Planning Fields */}
-              <TableHead className="min-w-[150px] h-8 py-1 text-xs">Tipo Comentário</TableHead>
+              <TableHead className="min-w-[150px] h-8 py-1 text-xs">Commercial Type</TableHead>
               <TableHead className="min-w-[100px] h-8 py-1 text-xs">BT</TableHead>
               <TableHead className="min-w-[200px] h-8 py-1 text-xs">Info Adicional</TableHead>
               <TableHead className="min-w-[100px] h-8 py-1 text-xs">Match High</TableHead>
