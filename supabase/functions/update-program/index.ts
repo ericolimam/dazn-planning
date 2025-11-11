@@ -40,12 +40,20 @@ serve(async (req) => {
       attrs["STATE_EVENT_RF"] = updates.STATE_EVENT;
     }
 
+    if (updates.STATE_EVENT_ID !== undefined && updates.STATE_EVENT_ID !== '') {
+      attrs["STATE_EVENT_RF"] = updates.STATE_EVENT_ID;
+    }
+
     if (updates.CABINE !== undefined && updates.CABINE !== '') {
       attrs["CABINE_RF"] = updates.CABINE;
     }
 
     if (updates.NARRATOR !== undefined && updates.NARRATOR !== '') {
       attrs["NARRATOR_RF"] = updates.NARRATOR;
+    }
+
+    if (updates.NARRATOR_ID !== undefined && updates.NARRATOR_ID !== '') {
+      attrs["NARRATOR_RF"] = updates.NARRATOR_ID;
     }
 
     if (updates.COMMENTATOR !== undefined && updates.COMMENTATOR !== '') {
@@ -94,6 +102,10 @@ serve(async (req) => {
     // Promoção fields
     if (updates.TOPCONTENT_RF !== undefined && updates.TOPCONTENT_RF !== '') {
       attrs["TOPCONTENT_RF"] = updates.TOPCONTENT_RF;
+    }
+
+    if (updates.TOPCONTENT_RF_ID !== undefined && updates.TOPCONTENT_RF_ID !== '') {
+      attrs["TOPCONTENT_RF"] = updates.TOPCONTENT_RF_ID;
     }
 
     if (updates.CLASSICDERBI !== undefined) {

@@ -184,6 +184,10 @@ export function ProgramTable({
           updatedProgram.BT = bts.find(b => b.id === value)?.name || program.BT;
         } else if (field === 'TOPCONTENT_RF_ID') {
           updatedProgram.TOPCONTENT_RF = topcontents.find(t => t.id === value)?.name || program.TOPCONTENT_RF;
+        } else if (field === 'NARRATOR_ID') {
+          updatedProgram.NARRATOR = narrators.find(n => n.id === value)?.name || program.NARRATOR;
+        } else if (field === 'STATE_EVENT_ID') {
+          updatedProgram.STATE_EVENT = stateEvents.find(s => s.id === value)?.name || program.STATE_EVENT;
         }
         
         onProgramUpdate?.(updatedProgram);
@@ -318,6 +322,12 @@ export function ProgramTable({
               <TableHead onClick={() => handleSort('YEAR')} className="cursor-pointer hover:bg-muted transition-colors min-w-[60px] h-8 py-1 text-xs">
                 Ano {sortColumn === 'YEAR' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
+              {/* Produção Fields */}
+              <TableHead className="min-w-[100px] h-8 py-1 text-xs">Time Before</TableHead>
+              <TableHead className="min-w-[100px] h-8 py-1 text-xs">Time Ending</TableHead>
+              <TableHead className="min-w-[120px] h-8 py-1 text-xs">Broadcast Type</TableHead>
+              <TableHead className="min-w-[150px] h-8 py-1 text-xs">Narrador</TableHead>
+              <TableHead className="min-w-[150px] h-8 py-1 text-xs">Comentador(es)</TableHead>
               {/* Planning Fields */}
               <TableHead className="min-w-[150px] h-8 py-1 text-xs">Tipo Comentário</TableHead>
               <TableHead className="min-w-[100px] h-8 py-1 text-xs">BT</TableHead>
@@ -394,6 +404,88 @@ export function ProgramTable({
                     </Badge>
                   </TableCell>
                   <TableCell className="text-xs py-1">{program.YEAR || '-'}</TableCell>
+                  
+                  {/* Produção Fields */}
+                  <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
+                    <Input
+                      value={getEditingValue('TIME_BEFORE', program.TIME_BEFORE)}
+                      onChange={(e) => handleInputChange('TIME_BEFORE', e.target.value)}
+                      onBlur={() => handleInputBlur('TIME_BEFORE', program.TIME_BEFORE)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.currentTarget.blur();
+                        }
+                      }}
+                      className="h-7 text-[11px]"
+                      disabled={isSaving('TIME_BEFORE')}
+                      placeholder="HH:MM"
+                    />
+                  </TableCell>
+                  
+                  <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
+                    <Input
+                      value={getEditingValue('TIME_ENDING', program.TIME_ENDING)}
+                      onChange={(e) => handleInputChange('TIME_ENDING', e.target.value)}
+                      onBlur={() => handleInputBlur('TIME_ENDING', program.TIME_ENDING)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.currentTarget.blur();
+                        }
+                      }}
+                      className="h-7 text-[11px]"
+                      disabled={isSaving('TIME_ENDING')}
+                      placeholder="HH:MM"
+                    />
+                  </TableCell>
+                  
+                  <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
+                    <Select
+                      value={program.STATE_EVENT_ID || ''}
+                      onValueChange={(value) => handleCellUpdate(program, 'STATE_EVENT_ID', value)}
+                      disabled={isSaving('STATE_EVENT_ID')}
+                    >
+                      <SelectTrigger className="h-7 text-[11px]">
+                        <SelectValue placeholder="-" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {stateEvents.map((se) => (
+                          <SelectItem key={se.id} value={se.id}>{se.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  
+                  <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
+                    <Select
+                      value={program.NARRATOR_ID || ''}
+                      onValueChange={(value) => handleCellUpdate(program, 'NARRATOR_ID', value)}
+                      disabled={isSaving('NARRATOR_ID')}
+                    >
+                      <SelectTrigger className="h-7 text-[11px]">
+                        <SelectValue placeholder="-" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {narrators.map((n) => (
+                          <SelectItem key={n.id} value={n.id}>{n.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  
+                  <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
+                    <Input
+                      value={getEditingValue('COMMENTATOR', program.COMMENTATOR)}
+                      onChange={(e) => handleInputChange('COMMENTATOR', e.target.value)}
+                      onBlur={() => handleInputBlur('COMMENTATOR', program.COMMENTATOR)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.currentTarget.blur();
+                        }
+                      }}
+                      className="h-7 text-[11px]"
+                      disabled={isSaving('COMMENTATOR')}
+                    />
+                  </TableCell>
                   
                   {/* Planning Fields */}
                   <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
