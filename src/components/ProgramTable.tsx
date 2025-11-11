@@ -141,6 +141,7 @@ export function ProgramTable({
   const [savingCell, setSavingCell] = useState<{programId: number; field: string} | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [editingValues, setEditingValues] = useState<{[key: string]: string}>({});
 
   const handleSort = (column: keyof Program) => {
     if (sortColumn === column) {
@@ -345,6 +346,33 @@ export function ProgramTable({
               const isEditing = (field: string) => 
                 editingCell?.programId === program.ID && editingCell?.field === field;
 
+              const getEditingValue = (field: string, originalValue: any) => {
+                const key = `${program.ID}-${field}`;
+                return editingValues[key] !== undefined ? editingValues[key] : (originalValue || '');
+              };
+
+              const handleInputChange = (field: string, value: string) => {
+                const key = `${program.ID}-${field}`;
+                setEditingValues(prev => ({ ...prev, [key]: value }));
+                setEditingCell({ programId: program.ID, field });
+              };
+
+              const handleInputBlur = async (field: string, originalValue: any) => {
+                const key = `${program.ID}-${field}`;
+                const newValue = editingValues[key];
+                
+                if (newValue !== undefined && newValue !== originalValue) {
+                  await handleCellUpdate(program, field, newValue);
+                }
+                
+                // Clear editing value after save
+                setEditingValues(prev => {
+                  const newValues = { ...prev };
+                  delete newValues[key];
+                  return newValues;
+                });
+              };
+
               return (
                 <TableRow
                   key={program.ID}
@@ -404,13 +432,9 @@ export function ProgramTable({
                   
                   <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
                     <Input
-                      value={program.PRODADDINFO || ''}
-                      onChange={(e) => setEditingCell({ programId: program.ID, field: 'PRODADDINFO' })}
-                      onBlur={(e) => {
-                        if (e.target.value !== program.PRODADDINFO) {
-                          handleCellUpdate(program, 'PRODADDINFO', e.target.value);
-                        }
-                      }}
+                      value={getEditingValue('PRODADDINFO', program.PRODADDINFO)}
+                      onChange={(e) => handleInputChange('PRODADDINFO', e.target.value)}
+                      onBlur={() => handleInputBlur('PRODADDINFO', program.PRODADDINFO)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           e.currentTarget.blur();
@@ -459,12 +483,9 @@ export function ProgramTable({
                   
                   <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
                     <Input
-                      value={program.CONTENTDETAIL || ''}
-                      onBlur={(e) => {
-                        if (e.target.value !== program.CONTENTDETAIL) {
-                          handleCellUpdate(program, 'CONTENTDETAIL', e.target.value);
-                        }
-                      }}
+                      value={getEditingValue('CONTENTDETAIL', program.CONTENTDETAIL)}
+                      onChange={(e) => handleInputChange('CONTENTDETAIL', e.target.value)}
+                      onBlur={() => handleInputBlur('CONTENTDETAIL', program.CONTENTDETAIL)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           e.currentTarget.blur();
@@ -522,12 +543,9 @@ export function ProgramTable({
                   
                   <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
                     <Input
-                      value={program.DETALHESPROMO || ''}
-                      onBlur={(e) => {
-                        if (e.target.value !== program.DETALHESPROMO) {
-                          handleCellUpdate(program, 'DETALHESPROMO', e.target.value);
-                        }
-                      }}
+                      value={getEditingValue('DETALHESPROMO', program.DETALHESPROMO)}
+                      onChange={(e) => handleInputChange('DETALHESPROMO', e.target.value)}
+                      onBlur={() => handleInputBlur('DETALHESPROMO', program.DETALHESPROMO)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           e.currentTarget.blur();
