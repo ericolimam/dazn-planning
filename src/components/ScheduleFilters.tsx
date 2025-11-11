@@ -49,10 +49,10 @@ export function ScheduleFilters({
   };
 
   return (
-    <Card className="p-4 mb-6 bg-card border-border">
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="year-filter" className="text-sm font-medium">
+    <Card className="p-3 mb-6 bg-card border-border">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+        <div className="space-y-1.5">
+          <Label htmlFor="year-filter" className="text-xs font-medium">
             Ano
           </Label>
           <div className="flex gap-2">
@@ -60,7 +60,7 @@ export function ScheduleFilters({
               value={selectedYear?.toString() || "all"}
               onValueChange={(value) => onYearChange(value === "all" ? null : parseInt(value))}
             >
-              <SelectTrigger id="year-filter" className="bg-background border-input">
+              <SelectTrigger id="year-filter" className="bg-background border-input h-8 text-xs">
                 <SelectValue placeholder="Todos os anos" />
               </SelectTrigger>
               <SelectContent>
@@ -85,8 +85,8 @@ export function ScheduleFilters({
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="week-filter" className="text-sm font-medium">
+        <div className="space-y-1.5">
+          <Label htmlFor="week-filter" className="text-xs font-medium">
             Semana
           </Label>
           <div className="flex gap-2">
@@ -94,7 +94,7 @@ export function ScheduleFilters({
               value={selectedWeek?.toString() || "all"}
               onValueChange={(value) => onWeekChange(value === "all" ? null : parseInt(value))}
             >
-              <SelectTrigger id="week-filter" className="bg-background border-input">
+              <SelectTrigger id="week-filter" className="bg-background border-input h-8 text-xs">
                 <SelectValue placeholder="Todas as semanas" />
               </SelectTrigger>
               <SelectContent>
@@ -119,14 +119,14 @@ export function ScheduleFilters({
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Label className="text-sm font-medium">
+        <div className="space-y-1.5">
+          <Label className="text-xs font-medium">
             Canais
           </Label>
           <div className="flex gap-2">
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start bg-background border-input">
+                <Button variant="outline" className="w-full justify-start bg-background border-input h-8 text-xs">
                   {selectedChannels.length === 0 ? "Selecione canais..." : `${selectedChannels.length} canal(is) selecionado(s)`}
                 </Button>
               </PopoverTrigger>
@@ -164,39 +164,39 @@ export function ScheduleFilters({
         </div>
 
         {onShowOverlapsChange && (
-          <div className="space-y-2">
-            <Label htmlFor="overlap-toggle" className="text-sm font-medium">
+          <div className="space-y-1.5">
+            <Label htmlFor="overlap-toggle" className="text-xs font-medium">
               Visualização
             </Label>
-            <div className="flex items-center gap-2 h-10">
+            <div className="flex items-center gap-2 h-8">
               <Switch
                 id="overlap-toggle"
                 checked={!showOverlaps}
                 onCheckedChange={(checked) => onShowOverlapsChange(!checked)}
               />
-              <span className="text-sm">Sem Overlaps</span>
+              <span className="text-xs">Sem Overlaps</span>
             </div>
           </div>
         )}
 
-        <div className="space-y-2">
-          <Label className="text-sm font-medium">Filtros Ativos</Label>
-          <div className="flex flex-wrap gap-2 items-center min-h-10">
+        <div className="space-y-1.5">
+          <Label className="text-xs font-medium">Filtros Ativos</Label>
+          <div className="flex flex-wrap gap-1.5 items-center min-h-8">
             {!selectedYear && !selectedWeek && selectedChannels.length === 0 && (
-              <span className="text-sm text-muted-foreground">Nenhum filtro aplicado</span>
+              <span className="text-xs text-muted-foreground">Nenhum filtro aplicado</span>
             )}
             {selectedYear && (
-              <span className="text-sm bg-muted px-2 py-1 rounded">
+              <span className="text-xs bg-muted px-2 py-0.5 rounded">
                 Ano {selectedYear}
               </span>
             )}
             {selectedWeek && (
-              <span className="text-sm bg-muted px-2 py-1 rounded">
+              <span className="text-xs bg-muted px-2 py-0.5 rounded">
                 Semana {selectedWeek}
               </span>
             )}
             {selectedChannels.map(channel => (
-              <span key={channel} className="text-sm bg-muted px-2 py-1 rounded">
+              <span key={channel} className="text-xs bg-muted px-2 py-0.5 rounded">
                 {channel}
               </span>
             ))}

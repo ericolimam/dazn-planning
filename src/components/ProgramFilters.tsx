@@ -80,15 +80,15 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
     <Card className="p-6 shadow-[var(--shadow-card)] bg-gradient-to-br from-card to-muted/30">
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <Search className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-semibold">Filtros</h2>
+          <Search className="h-4 w-4 text-primary" />
+          <h2 className="text-base font-semibold">Filtros</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="genre">Gênero</Label>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="genre" className="text-xs">Gênero</Label>
             <Select value={selectedGenre} onValueChange={setSelectedGenre} disabled={isLoading}>
-              <SelectTrigger id="genre" className="bg-background">
+              <SelectTrigger id="genre" className="bg-background h-8 text-xs">
                 <SelectValue placeholder="Todos os gêneros" />
               </SelectTrigger>
               <SelectContent className="bg-background z-50">
@@ -102,10 +102,10 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="year">Ano</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="year" className="text-xs">Ano</Label>
             <Select value={selectedYear} onValueChange={setSelectedYear} disabled={isLoading}>
-              <SelectTrigger id="year" className="bg-background">
+              <SelectTrigger id="year" className="bg-background h-8 text-xs">
                 <SelectValue placeholder="Todos os anos" />
               </SelectTrigger>
               <SelectContent className="bg-background z-50">
@@ -119,10 +119,10 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="serie">Série ({series.length} disponíveis)</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="serie" className="text-xs">Série ({series.length} disponíveis)</Label>
             <Select value={selectedSerie} onValueChange={setSelectedSerie} disabled={isLoading}>
-              <SelectTrigger id="serie" className="bg-background">
+              <SelectTrigger id="serie" className="bg-background h-8 text-xs">
                 <SelectValue placeholder="Todas as séries" />
               </SelectTrigger>
               <SelectContent className="bg-background z-50 max-h-[400px]">
@@ -151,10 +151,10 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="narrator">Narrador</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="narrator" className="text-xs">Narrador</Label>
             <Select value={selectedNarrator} onValueChange={setSelectedNarrator} disabled={isLoading}>
-              <SelectTrigger id="narrator" className="bg-background">
+              <SelectTrigger id="narrator" className="bg-background h-8 text-xs">
                 <SelectValue placeholder="Todos os narradores" />
               </SelectTrigger>
               <SelectContent className="bg-background z-50 max-h-[300px]">
@@ -168,20 +168,20 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="dateFrom">Tx. Date (De)</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="dateFrom" className="text-xs">Tx. Date (De)</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   id="dateFrom"
                   variant="outline"
                   className={cn(
-                    "w-full justify-start text-left font-normal bg-background",
+                    "w-full justify-start text-left font-normal bg-background h-8 text-xs",
                     !dateFrom && "text-muted-foreground"
                   )}
                   disabled={isLoading}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  <CalendarIcon className="mr-1.5 h-3 w-3" />
                   {dateFrom ? format(dateFrom, "dd/MM/yyyy") : "Selecionar"}
                 </Button>
               </PopoverTrigger>
@@ -197,20 +197,20 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
             </Popover>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="dateTo">Tx. Date (Até)</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="dateTo" className="text-xs">Tx. Date (Até)</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   id="dateTo"
                   variant="outline"
                   className={cn(
-                    "w-full justify-start text-left font-normal bg-background",
+                    "w-full justify-start text-left font-normal bg-background h-8 text-xs",
                     !dateTo && "text-muted-foreground"
                   )}
                   disabled={isLoading}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  <CalendarIcon className="mr-1.5 h-3 w-3" />
                   {dateTo ? format(dateTo, "dd/MM/yyyy") : "Selecionar"}
                 </Button>
               </PopoverTrigger>
@@ -230,18 +230,18 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
             <Button
               onClick={handleFilter}
               disabled={isLoading}
-              className="flex-1 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity"
+              className="flex-1 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity h-8 text-xs"
             >
-              <Search className="mr-2 h-4 w-4" />
+              <Search className="mr-1.5 h-3 w-3" />
               Buscar
             </Button>
             <Button
               onClick={handleClear}
               variant="outline"
               disabled={isLoading}
-              className="min-w-[100px]"
+              className="min-w-[80px] h-8 text-xs"
             >
-              <X className="mr-2 h-4 w-4" />
+              <X className="mr-1.5 h-3 w-3" />
               Limpar
             </Button>
           </div>
