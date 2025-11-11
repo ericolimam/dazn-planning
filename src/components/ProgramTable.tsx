@@ -304,16 +304,16 @@ export function ProgramTable({
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead onClick={() => handleSort('EPISODE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[80px] h-8 py-1 text-xs">
+              <TableHead onClick={() => handleSort('EPISODE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[80px] h-8 py-1 text-xs sticky left-0 z-10 bg-muted/50">
                 Episódio {sortColumn === 'EPISODE' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
-              <TableHead onClick={() => handleSort('X_TXDAY_DATE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[100px] h-8 py-1 text-xs">
+              <TableHead onClick={() => handleSort('X_TXDAY_DATE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[100px] h-8 py-1 text-xs sticky left-[80px] z-10 bg-muted/50">
                 Tx. Date {sortColumn === 'X_TXDAY_DATE' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
-              <TableHead onClick={() => handleSort('TITLE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[200px] h-8 py-1 text-xs">
+              <TableHead onClick={() => handleSort('TITLE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[200px] h-8 py-1 text-xs sticky left-[180px] z-10 bg-muted/50">
                 Título {sortColumn === 'TITLE' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
-              <TableHead onClick={() => handleSort('SERIE_TITLE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[150px] h-8 py-1 text-xs">
+              <TableHead onClick={() => handleSort('SERIE_TITLE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[150px] h-8 py-1 text-xs sticky left-[380px] z-10 bg-muted/50">
                 Série {sortColumn === 'SERIE_TITLE' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
               <TableHead onClick={() => handleSort('GENRE')} className="cursor-pointer hover:bg-muted transition-colors min-w-[120px] h-8 py-1 text-xs">
@@ -394,10 +394,10 @@ export function ProgramTable({
                   }}
                   className={`transition-colors h-9 ${getRowBackgroundColor(program.STATE_EVENT)}`}
                 >
-                  <TableCell className="font-medium text-xs py-1">{program.EPISODE || '-'}</TableCell>
-                  <TableCell className="text-xs py-1">{program.X_TXDAY_DATE || '-'}</TableCell>
-                  <TableCell className="font-semibold text-xs py-1">{program.TITLE || '-'}</TableCell>
-                  <TableCell className="text-xs py-1">{program.SERIE_TITLE || '-'}</TableCell>
+                  <TableCell className="font-medium text-xs py-1 sticky left-0 z-10 bg-background">{program.EPISODE || '-'}</TableCell>
+                  <TableCell className="text-xs py-1 sticky left-[80px] z-10 bg-background">{program.X_TXDAY_DATE || '-'}</TableCell>
+                  <TableCell className="font-semibold text-xs py-1 sticky left-[180px] z-10 bg-background">{program.TITLE || '-'}</TableCell>
+                  <TableCell className="text-xs py-1 sticky left-[380px] z-10 bg-background">{program.SERIE_TITLE || '-'}</TableCell>
                   <TableCell className="py-1">
                     <Badge variant="secondary" className={`${getGenreColor(program.GENRE)} text-[10px] py-0 px-1.5`}>
                       {program.GENRE || '-'}
