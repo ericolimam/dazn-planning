@@ -35,6 +35,13 @@ const getGenreColor = (genre: string) => {
   return colors[genre] || '#6b7280';
 };
 
+const getEventColor = (event: ScheduleEvent) => {
+  if (event.TXSLOT_NAME === 'SEM EMISSÃO') {
+    return '#000000';
+  }
+  return getGenreColor(event.GENRE);
+};
+
 const getPremiereIcon = (premiere: string) => {
   if (!premiere) return null;
   
@@ -325,8 +332,8 @@ export default function Timeline() {
         const blockX = x + (startOffset * width);
         const blockWidth = duration * width;
         
-        // Get color for genre
-        const color = getGenreColor(event.GENRE);
+        // Get color for event
+        const color = getEventColor(event);
         const [r, g, b] = hexToRgb(color);
         
         // Draw event block
@@ -592,7 +599,7 @@ export default function Timeline() {
                                    style={{
                                      left: `${left}px`,
                                      width: `${width}px`,
-                                     backgroundColor: getGenreColor(event.GENRE),
+                                     backgroundColor: getEventColor(event),
                                    }}
                                    onClick={() => {
                                      setSelectedEvent(event);
