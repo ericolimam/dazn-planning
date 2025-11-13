@@ -1,21 +1,14 @@
-import { useState, useEffect } from "react";
-import { Calendar, momentLocalizer, View } from "react-big-calendar";
-import moment from "moment";
-import "moment/locale/pt-br";
-import "react-big-calendar/lib/css/react-big-calendar.css";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { ScheduleFilters } from "@/components/ScheduleFilters";
 import { ScheduleEventModal } from "@/components/ScheduleEventModal";
-import { Loader2 } from "lucide-react";
+import { Loader2, Star, Sparkles, TrendingUp } from "lucide-react";
 import daznLogo from "@/assets/dazn-logo.png";
 import { NavLink } from "@/components/NavLink";
 import { UserMenu } from "@/components/UserMenu";
-import { Star, Sparkles, TrendingUp } from "lucide-react";
-
-moment.locale("pt-br");
-const localizer = momentLocalizer(moment);
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export interface ScheduleEvent {
   ID: number;
@@ -35,14 +28,12 @@ export interface ScheduleEvent {
   PREMIERE?: string;
 }
 
-// Função para gerar cor consistente baseada no nome do gênero
 const stringToColor = (str: string): string => {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
   }
   
-  // Paleta de cores bem distintas
   const colors = [
     '#10b981', '#f59e0b', '#3b82f6', '#ef4444', '#8b5cf6',
     '#e11d48', '#06b6d4', '#fb923c', '#0284c7', '#16a34a',
@@ -53,462 +44,202 @@ const stringToColor = (str: string): string => {
     '#fcd34d', '#818cf8', '#f472b6', '#fdba74', '#2dd4bf',
   ];
   
-  const index = Math.abs(hash) % colors.length;
-  return colors[index];
+  return colors[Math.abs(hash) % colors.length];
 };
 
 const getGenreColor = (genre: string) => {
   if (!genre) return '#6b7280';
   
-  // Cores fixas e únicas para cada gênero principal
   const fixedColors: Record<string, string> = {
-    'FUTEBOL': '#10b981',
-    'BASQUETEBOL': '#f59e0b',
-    'ATLETISMO': '#3b82f6',
-    'BOXE': '#ef4444',
-    'PROGRAMAS': '#8b5cf6',
-    'MMA': '#e11d48',
-    'TÉNIS': '#06b6d4',
-    'TENNIS': '#06b6d4', // Mesmo que TÉNIS
-    'DARDOS': '#fb923c',
-    'HÓQUEI': '#0284c7',
-    'RÂGUEBI': '#16a34a',
-    'ANDEBOL': '#6366f1',
-    'TÉNIS DE MESA': '#14b8a6',
-    'VOLEIBOL': '#ec4899',
-    'CICLISMO': '#facc15',
-    'AUTOMOBILISMO': '#64748b',
-    'FUTEBOL AMERICANO': '#f43f5e',
-    'GOLFE': '#84cc16',
-    'NATAÇÃO': '#22c55e',
-    'GINÁSTICA': '#a855f7',
-    'SURF': '#0ea5e9',
-    'ESGRIMA': '#eab308',
-    'JUDO': '#d946ef',
-    'KARATE': '#fb7185',
-    'TAEKWONDO': '#4ade80',
-    'WRESTLE': '#fbbf24',
-    'LUTAS': '#c084fc',
-    'MOTOCICLISMO': '#38bdf8',
-    'RALLY': '#a3e635',
-    'F1': '#34d399',
-    'CRÍQUETE': '#fcd34d',
-    'BASEBALL': '#818cf8',
-    'SOFTBALL': '#f472b6',
-    'HÓQUEI NO GELO': '#fdba74',
-    'PATINAGEM': '#2dd4bf',
+    'FUTEBOL': '#10b981', 'BASQUETEBOL': '#f59e0b', 'ATLETISMO': '#3b82f6',
+    'BOXE': '#ef4444', 'PROGRAMAS': '#8b5cf6', 'MMA': '#e11d48',
+    'TÉNIS': '#06b6d4', 'TENNIS': '#06b6d4', 'DARDOS': '#fb923c',
+    'HÓQUEI': '#0284c7', 'RÂGUEBI': '#16a34a', 'ANDEBOL': '#6366f1',
+    'TÉNIS DE MESA': '#14b8a6', 'VOLEIBOL': '#ec4899', 'CICLISMO': '#facc15',
   };
   
-  // Se tem cor fixa, usa ela
-  if (fixedColors[genre]) {
-    return fixedColors[genre];
-  }
-  
-  // Para gêneros desconhecidos, gera cor baseada no hash do nome
-  // Isso garante que o mesmo gênero sempre terá a mesma cor
-  return stringToColor(genre);
+  return fixedColors[genre] || stringToColor(genre);
 };
 
 const getPremiereIcon = (premiere: string | undefined) => {
   if (!premiere) return null;
-  
   const icons: Record<string, JSX.Element> = {
-    'ESTREIA': <Star className="h-3 w-3 flex-shrink-0" fill="gold" color="gold" />,
-    'EXCLUSIVO': <Sparkles className="h-3 w-3 flex-shrink-0" fill="white" color="white" />,
-    'DESTAQUE': <TrendingUp className="h-3 w-3 flex-shrink-0" color="yellow" />,
+    'ESTREIA': <Star className="h-3 w-3" fill="gold" color="gold" />,
+    'EXCLUSIVO': <Sparkles className="h-3 w-3" fill="white" color="white" />,
+    'DESTAQUE': <TrendingUp className="h-3 w-3" color="yellow" />,
   };
-  
   return icons[premiere] || null;
 };
 
-const parseDateTime = (dateStr: string, timeStr: string) => {
-  // Parse date MM/DD/YYYY
+const parseDateTime = (dateStr: string, timeStr: string): Date => {
   const [month, day, year] = dateStr.split('/');
-  // Parse time HH:MM:SS (with colons)
   const [hours, minutes, seconds] = timeStr.split(':').map(s => parseInt(s));
-  
   return new Date(parseInt(year), parseInt(month) - 1, parseInt(day), hours, minutes, seconds || 0);
 };
 
 const parseDuration = (duration: string) => {
-  // Duration format HH:MM:SS.ms (with colons)
   const parts = duration.split(':').map(s => parseFloat(s));
-  const hours = parts[0] || 0;
-  const minutes = parts[1] || 0;
-  const seconds = parts[2] || 0;
-  return (hours * 60 * 60 + minutes * 60 + seconds) * 1000; // Convert to milliseconds
+  return ((parts[0] || 0) * 3600 + (parts[1] || 0) * 60 + (parts[2] || 0)) * 1000;
 };
 
 const extractYearFromDate = (dateStr: string | null | undefined): number | null => {
   if (!dateStr) return null;
-  // Date format: MM/DD/YYYY
-  const parts = dateStr.split('/');
-  return parseInt(parts[2]);
+  return parseInt(dateStr.split('/')[2]);
 };
 
-// Get current week number
 const getCurrentWeek = () => {
   const now = new Date();
   const start = new Date(now.getFullYear(), 0, 1);
-  const diff = now.getTime() - start.getTime();
-  const oneWeek = 1000 * 60 * 60 * 24 * 7;
-  return Math.ceil(diff / oneWeek);
-};
-
-// Calculate date from week number
-const getDateFromWeek = (week: number, year: number) => {
-  const start = new Date(year, 0, 1);
-  const daysToAdd = (week - 1) * 7;
-  const result = new Date(start.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
-  return result;
+  return Math.ceil((now.getTime() - start.getTime()) / (7 * 24 * 60 * 60 * 1000));
 };
 
 export default function Schedule() {
   const [selectedWeek, setSelectedWeek] = useState<number | null>(getCurrentWeek());
   const [selectedChannels, setSelectedChannels] = useState<string[]>(["DAZN 1"]);
   const [selectedYear, setSelectedYear] = useState<number | null>(new Date().getFullYear());
-  const [view, setView] = useState<View>("month");
-  const [date, setDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<ScheduleEvent | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [timeStep, setTimeStep] = useState<15 | 30 | 60>(30); // 15, 30 or 60 minutes
-  const [showOverlaps, setShowOverlaps] = useState(false); // Default: Sem Overlaps
 
-  // Update calendar date when week selection changes (for week/day views)
-  useEffect(() => {
-    if (selectedWeek !== null && selectedYear !== null && (view === "week" || view === "day")) {
-      const weekDate = getDateFromWeek(selectedWeek, selectedYear);
-      setDate(weekDate);
-    }
-  }, [selectedWeek, selectedYear, view]);
-
-  // First query: Load all data for filters
   const { data: allScheduleData } = useQuery({
     queryKey: ["schedule-all"],
     queryFn: async () => {
-      console.log('Loading all schedule data for filters...');
-      const { data, error } = await supabase.functions.invoke("list-schedule", {
-        body: {},
-      });
-
-      if (error) {
-        console.error('Error loading schedule:', error);
-        throw error;
-      }
-      
-      console.log('=== SCHEDULE DATA LOADED ===');
-      console.log('Success:', data?.success !== false);
-      console.log('Total rows received:', data?.ROWS?.length || 0);
-      
-      if (data?.ROWS && data.ROWS.length > 0) {
-        console.log('First 3 raw events from API:');
-        data.ROWS.slice(0, 3).forEach((row: any, i: number) => {
-          console.log(`  ${i + 1}.`, {
-            ID: row.ID,
-            PROGRAMME: row.PROGRAMME,
-            SERIES: row.SERIES,
-            DATE: row.DATE,
-            START_TIME: row.START_TIME,
-            DURATION: row.DURATION,
-            CHANNEL: row.CHANNEL,
-            WEEK: row.WEEK
-          });
-        });
-      } else {
-        console.log('NO ROWS in response!');
-      }
-      
+      const { data, error } = await supabase.functions.invoke("list-schedule", { body: {} });
+      if (error) throw error;
       return data;
     },
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 
-  // Extract unique weeks, channels, and years
-  const weeks = allScheduleData?.ROWS 
-    ? [...new Set<number>(allScheduleData.ROWS.map((r: ScheduleEvent) => r.WEEK).filter((w: number) => w))].sort((a: number, b: number) => a - b)
-    : [];
-  
-  const channels = allScheduleData?.ROWS 
-    ? [...new Set<string>(allScheduleData.ROWS.map((r: ScheduleEvent) => r.CHANNEL).filter((c: string) => c))].sort()
-    : [];
+  const weeks: number[] = allScheduleData?.ROWS ? Array.from(new Set(allScheduleData.ROWS.map((row: any) => row.WEEK).filter(Boolean))) as number[] : [];
+  weeks.sort((a, b) => a - b);
+  const channels: string[] = allScheduleData?.ROWS ? Array.from(new Set(allScheduleData.ROWS.map((row: any) => row.CHANNEL).filter(Boolean))) as string[] : [];
+  channels.sort();
+  const years: number[] = allScheduleData?.ROWS ? Array.from(new Set(allScheduleData.ROWS.map((row: any) => extractYearFromDate(row.DATE)).filter((y): y is number => y !== null))) as number[] : [];
+  years.sort((a, b) => a - b);
 
-  const years = allScheduleData?.ROWS 
-    ? [...new Set<number>(allScheduleData.ROWS.map((r: ScheduleEvent) => extractYearFromDate(r.DATE)).filter((y): y is number => y !== null))].sort((a: number, b: number) => b - a)
-    : [];
-
-  console.log('Filters available:', { weeks: weeks.length, channels: channels.length, years: years.length });
-
-  // Second query: Filter data based on selections
   const { data: scheduleData, isLoading } = useQuery({
     queryKey: ["schedule-filtered", selectedWeek, selectedChannels, selectedYear],
     queryFn: async () => {
-      console.log('Filtering schedule data:', { selectedWeek, selectedChannels, selectedYear });
-      
-      // Apply filters locally on cached data
-      if (!allScheduleData?.ROWS) return { ROWS: [] };
-      
-      let filtered = [...allScheduleData.ROWS];
-      
-      if (selectedWeek !== null) {
-        filtered = filtered.filter((r: ScheduleEvent) => r.WEEK === selectedWeek);
-      }
-      
-      if (selectedChannels.length > 0) {
-        filtered = filtered.filter((r: ScheduleEvent) => selectedChannels.includes(r.CHANNEL));
-      }
-      
-      if (selectedYear !== null) {
-        filtered = filtered.filter((r: ScheduleEvent) => {
-          const year = extractYearFromDate(r.DATE);
-          return year !== null && year === selectedYear;
-        });
-      }
-      
-      console.log('Filtered results:', filtered.length, 'events');
-      return { ROWS: filtered };
+      const filters: any = {};
+      if (selectedWeek !== null) filters.week = selectedWeek;
+      if (selectedChannels.length > 0) filters.channel = selectedChannels;
+      if (selectedYear !== null) filters.year = selectedYear;
+      const { data, error } = await supabase.functions.invoke("list-schedule", { body: filters });
+      if (error) throw error;
+      return data;
     },
-    enabled: !!allScheduleData,
+    enabled: selectedWeek !== null && selectedChannels.length > 0 && selectedYear !== null,
+    staleTime: 5 * 60 * 1000,
   });
 
-  let events = scheduleData?.ROWS?.filter((event: ScheduleEvent) => event.PROG_REQTYPE === 'PROGRAMA')
-    .map((event: ScheduleEvent) => {
-    try {
-      const start = parseDateTime(event.DATE, event.START_TIME);
-      const duration = parseDuration(event.DURATION);
-      const end = new Date(start.getTime() + duration);
-
-      const calendarEvent = {
-        id: event.ID,
-        title: event.PROGRAMME || event.SERIES || event.TXSLOT_NAME || 'Sem título',
-        start,
-        end,
-        resource: event,
-      };
-
-      return calendarEvent;
-    } catch (error) {
-      console.error('Error parsing event:', event, error);
-      return null;
+  const generateTimeSlots = () => {
+    const slots: string[] = [];
+    for (let hour = 5; hour < 29; hour++) {
+      slots.push(`${String(hour >= 24 ? hour - 24 : hour).padStart(2, '0')}:00`);
     }
-  }).filter(e => e !== null) || [];
+    return slots;
+  };
 
-  // Remove overlaps if needed
-  if (!showOverlaps && events.length > 0) {
-    const sortedEvents = [...events].sort((a, b) => a.start.getTime() - b.start.getTime());
-    const filteredEvents = [];
-    const channelLastEnd: Record<string, number> = {};
+  const timeSlots = generateTimeSlots();
 
-    for (const event of sortedEvents) {
-      const channel = event.resource.CHANNEL;
-      const eventStart = event.start.getTime();
-      const lastEnd = channelLastEnd[channel] || 0;
-
-      // Only include event if it doesn't overlap with previous event on same channel
-      if (eventStart >= lastEnd) {
-        filteredEvents.push(event);
-        channelLastEnd[channel] = event.end.getTime();
-      }
-    }
-
-    events = filteredEvents;
-  }
-
-  console.log('=== CALENDAR EVENTS DEBUG ===');
-  console.log('Total events after mapping:', events.length);
-  if (events.length > 0) {
-    console.log('First event:', events[0]);
-    console.log('Sample event dates:', {
-      start: events[0].start,
-      end: events[0].end,
-      title: events[0].title
-    });
-  } else {
-    console.log('NO EVENTS MAPPED!');
-    console.log('scheduleData:', scheduleData);
-    console.log('scheduleData?.ROWS?.length:', scheduleData?.ROWS?.length);
-    if (scheduleData?.ROWS && scheduleData.ROWS.length > 0) {
-      console.log('Sample raw event:', scheduleData.ROWS[0]);
-    }
-  }
-
-  const eventStyleGetter = (event: any) => {
-    const genre = event.resource.GENRE;
-    const backgroundColor = getGenreColor(genre);
+  const groupedEvents = scheduleData?.ROWS?.reduce((acc: any, event: ScheduleEvent) => {
+    if (!selectedChannels.includes(event.CHANNEL)) return acc;
+    if (!acc[event.CHANNEL]) acc[event.CHANNEL] = {};
     
-    return {
-      style: {
-        backgroundColor,
-        borderRadius: '4px',
-        opacity: 0.9,
-        color: '#ffffff',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '4px',
-        fontSize: '12px',
-        padding: '2px 4px',
-      }
-    };
-  };
-
-  const EventComponent = ({ event }: any) => {
-    const premiereIcon = getPremiereIcon(event.resource?.PREMIERE);
-    return (
-      <div className="flex items-center gap-1 w-full overflow-hidden">
-        {premiereIcon && (
-          <span className="flex-shrink-0">
-            {premiereIcon}
-          </span>
-        )}
-        <span className="truncate text-xs">{event.title}</span>
-      </div>
-    );
-  };
-
-  const handleDoubleClickEvent = (event: any) => {
-    setSelectedEvent(event.resource);
-    setModalOpen(true);
-  };
+    const startTime = parseDateTime(event.DATE, event.START_TIME);
+    let adjustedHour = startTime.getHours();
+    if (adjustedHour < 5) adjustedHour += 24;
+    
+    const timeKey = `${String(adjustedHour).padStart(2, '0')}:00`;
+    if (!acc[event.CHANNEL][timeKey]) acc[event.CHANNEL][timeKey] = [];
+    
+    acc[event.CHANNEL][timeKey].push({ ...event, startTime, duration: parseDuration(event.DURATION) });
+    return acc;
+  }, {}) || {};
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-8">
-              <img src={daznLogo} alt="DAZN" className="h-10 w-10 dark:invert" />
-              <nav className="flex gap-6">
-                <NavLink to="/dashboard">Dashboard</NavLink>
-                <NavLink to="/">Programas</NavLink>
-                <NavLink to="/schedule">Grade de Programação</NavLink>
-                <NavLink to="/timeline">Timeline</NavLink>
-              </nav>
-            </div>
-            <UserMenu />
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
+        <div className="flex h-14 items-center px-4">
+          <div className="mr-4 flex items-center space-x-2">
+            <img src={daznLogo} alt="DAZN Logo" className="h-8" />
           </div>
+          <nav className="flex items-center space-x-6 text-sm font-medium flex-1">
+            <NavLink to="/">Catálogo de Programas</NavLink>
+            <NavLink to="/timeline">Timeline</NavLink>
+            <NavLink to="/schedule">Grade de Programação</NavLink>
+          </nav>
+          <UserMenu />
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-4xl font-bold text-foreground mb-2">
-            Grade de Programação
-          </h1>
-          <p className="text-muted-foreground">
-            Visualize e gerencie a programação por canal e período
-          </p>
-        </div>
+      <main className="container mx-auto p-6">
+        <h1 className="text-3xl font-bold mb-6">Guia de Programação</h1>
+        <Card className="p-4 mb-6">
+          <ScheduleFilters
+            selectedYear={selectedYear}
+            selectedWeek={selectedWeek}
+            selectedChannels={selectedChannels}
+            years={years}
+            weeks={weeks}
+            channels={channels}
+            onYearChange={setSelectedYear}
+            onWeekChange={setSelectedWeek}
+            onChannelsChange={setSelectedChannels}
+          />
+        </Card>
 
-        <ScheduleFilters
-          selectedWeek={selectedWeek}
-          selectedChannels={selectedChannels}
-          selectedYear={selectedYear}
-          showOverlaps={showOverlaps}
-          onWeekChange={setSelectedWeek}
-          onChannelsChange={setSelectedChannels}
-          onYearChange={setSelectedYear}
-          onShowOverlapsChange={setShowOverlaps}
-          weeks={weeks}
-          channels={channels}
-          years={years}
-        />
-
-        {view === "week" && (
-          <div className="mb-4 flex items-center gap-3">
-            <label className="text-sm font-medium text-foreground">
-              Intervalo de Tempo:
-            </label>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setTimeStep(15)}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  timeStep === 15
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-                }`}
-              >
-                15 minutos
-              </button>
-              <button
-                onClick={() => setTimeStep(30)}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  timeStep === 30
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-                }`}
-              >
-                30 minutos
-              </button>
-              <button
-                onClick={() => setTimeStep(60)}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  timeStep === 60
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-                }`}
-              >
-                1 hora
-              </button>
-            </div>
+        {isLoading ? (
+          <div className="flex items-center justify-center h-96">
+            <Loader2 className="h-8 w-8 animate-spin" />
           </div>
+        ) : (
+          <Card className="p-4">
+            <ScrollArea className="w-full h-[calc(100vh-320px)]">
+              <div className="min-w-max">
+                <div className="flex border-b sticky top-0 bg-background z-10">
+                  <div className="w-32 flex-shrink-0 p-2 font-semibold border-r">Canal</div>
+                  {timeSlots.map((slot) => (
+                    <div key={slot} className="w-40 flex-shrink-0 p-2 text-center font-semibold border-r text-xs">{slot}</div>
+                  ))}
+                </div>
+
+                {selectedChannels.map((channel) => (
+                  <div key={channel} className="flex border-b hover:bg-muted/50">
+                    <div className="w-32 flex-shrink-0 p-2 font-medium border-r flex items-center">{channel}</div>
+                    {timeSlots.map((slot) => {
+                      const events = groupedEvents[channel]?.[slot] || [];
+                      return (
+                        <div key={slot} className="w-40 flex-shrink-0 border-r min-h-[80px] p-1">
+                          {events.map((event: any, idx: number) => (
+                            <div
+                              key={`${event.ID}-${idx}`}
+                              className="mb-1 p-2 rounded text-white cursor-pointer hover:opacity-80 transition-opacity text-xs overflow-hidden"
+                              style={{ backgroundColor: getGenreColor(event.GENRE), minHeight: '60px' }}
+                              onClick={() => { setSelectedEvent(event); setModalOpen(true); }}
+                            >
+                              <div className="flex items-start gap-1 mb-1">
+                                {getPremiereIcon(event.PREMIERE)}
+                                <div className="font-semibold truncate flex-1">{event.PROGRAMME}</div>
+                              </div>
+                              <div className="text-[10px] opacity-90">{event.START_TIME.substring(0, 5)}</div>
+                              <div className="text-[10px] opacity-75 truncate">{event.GENRE}</div>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </Card>
         )}
 
-        <Card className="p-6 bg-card border-border">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-          ) : (
-            <div style={{ height: '700px' }}>
-              <Calendar
-                localizer={localizer}
-                events={events}
-                startAccessor="start"
-                endAccessor="end"
-                view={view}
-                onView={setView}
-                date={date}
-                onNavigate={setDate}
-                eventPropGetter={eventStyleGetter}
-                onDoubleClickEvent={handleDoubleClickEvent}
-                views={['month', 'week', 'day']}
-                step={timeStep}
-                timeslots={1}
-                components={{
-                  event: EventComponent,
-                }}
-                messages={{
-                  next: "Próximo",
-                  previous: "Anterior",
-                  today: "Hoje",
-                  month: "Mês",
-                  week: "Semana",
-                  day: "Dia",
-                  agenda: "Agenda",
-                  date: "Data",
-                  time: "Hora",
-                  event: "Evento",
-                  noEventsInRange: "Não há eventos neste período",
-                  showMore: (total) => `+ ${total} mais`,
-                }}
-                formats={{
-                  dayHeaderFormat: (date) => moment(date).format('dddd, DD/MM'),
-                  dayRangeHeaderFormat: ({ start, end }) =>
-                    `${moment(start).format('DD/MM')} - ${moment(end).format('DD/MM')}`,
-                  agendaHeaderFormat: ({ start, end }) =>
-                    `${moment(start).format('DD/MM/YYYY')} - ${moment(end).format('DD/MM/YYYY')}`,
-                }}
-              />
-            </div>
-          )}
-        </Card>
+        {selectedEvent && (
+          <ScheduleEventModal event={selectedEvent} open={modalOpen} onOpenChange={setModalOpen} />
+        )}
       </main>
-
-      <ScheduleEventModal
-        event={selectedEvent}
-        open={modalOpen}
-        onOpenChange={setModalOpen}
-      />
     </div>
   );
 }
