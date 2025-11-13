@@ -41,28 +41,13 @@ Deno.serve(async (req) => {
       { "OPERATOR": "NL", "VALUE": null, "ATTR_NM": "TECHSLOT" }
     ];
 
-    // Add optional filters
+    // Add week filter if provided
     if (week) {
       filters.push({ "OPERATOR": "=", "VALUE": week.toString(), "ATTR_NM": "TXSCHED_ID.TXWEEK_ID.WEEK" });
     }
-    if (channel) {
-      // Handle channel filter - if it's an array with one item, use the string directly
-      // If it's an array with multiple items, we need to add multiple filters with OR logic
-      if (Array.isArray(channel)) {
-        if (channel.length === 1) {
-          filters.push({ "OPERATOR": "=", "VALUE": channel[0], "ATTR_NM": "TXSCHED_ID.TXWEEK_ID.CHANNEL_RF" });
-        } else if (channel.length > 1) {
-          // For multiple channels, add them as separate filters
-          // Provys API will treat multiple filters on the same attribute as OR conditions
-          channel.forEach((ch: string) => {
-            filters.push({ "OPERATOR": "=", "VALUE": ch, "ATTR_NM": "TXSCHED_ID.TXWEEK_ID.CHANNEL_RF" });
-          });
-        }
-      } else {
-        // If it's already a string, use it directly
-        filters.push({ "OPERATOR": "=", "VALUE": channel, "ATTR_NM": "TXSCHED_ID.TXWEEK_ID.CHANNEL_RF" });
-      }
-    }
+    
+    // Note: Channel filter is handled on the client side to avoid API issues
+    // The API returns all channels and the frontend filters them
     
     console.log('Applied filters:', JSON.stringify(filters, null, 2));
 
