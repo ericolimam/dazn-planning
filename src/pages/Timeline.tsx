@@ -14,25 +14,65 @@ import { Button } from "@/components/ui/button";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
+// Paleta expandida com cores únicas e bem distintas
+const GENRE_COLOR_PALETTE = [
+  '#10b981', '#f59e0b', '#3b82f6', '#ef4444', '#8b5cf6',
+  '#e11d48', '#06b6d4', '#fb923c', '#0284c7', '#16a34a',
+  '#6366f1', '#14b8a6', '#ec4899', '#facc15', '#64748b',
+  '#f43f5e', '#84cc16', '#06b6d4', '#f97316', '#a855f7',
+  '#0ea5e9', '#22c55e', '#eab308', '#d946ef', '#14b8a6',
+  '#f59e0b', '#6366f1', '#10b981', '#fb7185', '#4ade80',
+  '#fbbf24', '#c084fc', '#38bdf8', '#fb923c', '#a3e635',
+  '#34d399', '#fcd34d', '#818cf8', '#f472b6', '#fdba74',
+];
+
+const genreColorMap = new Map<string, string>();
+
 const getGenreColor = (genre: string) => {
-  const colors: Record<string, string> = {
-    'FUTEBOL': '#10b981',        // Verde esmeralda
-    'BASQUETEBOL': '#f59e0b',    // Laranja âmbar
-    'ATLETISMO': '#3b82f6',      // Azul royal
-    'BOXE': '#ef4444',           // Vermelho forte
-    'PROGRAMAS': '#8b5cf6',      // Roxo violeta
-    'MMA': '#e11d48',            // Rosa vermelho
-    'TÉNIS': '#06b6d4',          // Ciano
-    'DARDOS': '#fb923c',         // Laranja claro
-    'HÓQUEI': '#0284c7',         // Azul céu
-    'RÂGUEBI': '#16a34a',        // Verde grama
-    'ANDEBOL': '#6366f1',        // Índigo
-    'TÉNIS DE MESA': '#14b8a6',  // Teal
-    'VOLEIBOL': '#ec4899',       // Rosa pink
-    'CICLISMO': '#facc15',       // Amarelo limão
-    'AUTOMOBILISMO': '#64748b',  // Cinza ardósia
+  if (!genre) return '#6b7280';
+  
+  // Se já temos uma cor para este gênero, retorna ela
+  if (genreColorMap.has(genre)) {
+    return genreColorMap.get(genre)!;
+  }
+  
+  // Cores fixas para gêneros principais
+  const fixedColors: Record<string, string> = {
+    'FUTEBOL': '#10b981',
+    'BASQUETEBOL': '#f59e0b',
+    'ATLETISMO': '#3b82f6',
+    'BOXE': '#ef4444',
+    'PROGRAMAS': '#8b5cf6',
+    'MMA': '#e11d48',
+    'TÉNIS': '#06b6d4',
+    'DARDOS': '#fb923c',
+    'HÓQUEI': '#0284c7',
+    'RÂGUEBI': '#16a34a',
+    'ANDEBOL': '#6366f1',
+    'TÉNIS DE MESA': '#14b8a6',
+    'VOLEIBOL': '#ec4899',
+    'CICLISMO': '#facc15',
+    'AUTOMOBILISMO': '#64748b',
+    'FUTEBOL AMERICANO': '#f43f5e',
+    'GOLFE': '#84cc16',
+    'NATAÇÃO': '#0ea5e9',
+    'GINÁSTICA': '#a855f7',
+    'SURF': '#22c55e',
   };
-  return colors[genre] || '#6b7280';
+  
+  if (fixedColors[genre]) {
+    genreColorMap.set(genre, fixedColors[genre]);
+    return fixedColors[genre];
+  }
+  
+  // Para novos gêneros, pega uma cor da paleta que ainda não foi usada
+  const usedColors = new Set(genreColorMap.values());
+  const availableColor = GENRE_COLOR_PALETTE.find(color => !usedColors.has(color));
+  
+  const color = availableColor || `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`;
+  genreColorMap.set(genre, color);
+  
+  return color;
 };
 
 const getEventColor = (event: ScheduleEvent) => {
