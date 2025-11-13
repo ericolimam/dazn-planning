@@ -445,8 +445,9 @@ export default function Timeline() {
           didParseCell: (data) => {
             // Color code genre column
             if (data.column.index === 2 && data.section === 'body') {
-              const genre = data.cell.text[0];
-              const color = getGenreColor(genre);
+              const rowIndex = data.row.index;
+              const event = channelGroup.events[rowIndex];
+              const color = getEventColor(event);
               const [r, g, b] = hexToRgb(color);
               data.cell.styles.fillColor = [r, g, b];
               data.cell.styles.textColor = [255, 255, 255];
