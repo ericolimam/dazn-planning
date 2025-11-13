@@ -14,29 +14,32 @@ import { Button } from "@/components/ui/button";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-// Paleta expandida com cores únicas e bem distintas
-const GENRE_COLOR_PALETTE = [
-  '#10b981', '#f59e0b', '#3b82f6', '#ef4444', '#8b5cf6',
-  '#e11d48', '#06b6d4', '#fb923c', '#0284c7', '#16a34a',
-  '#6366f1', '#14b8a6', '#ec4899', '#facc15', '#64748b',
-  '#f43f5e', '#84cc16', '#06b6d4', '#f97316', '#a855f7',
-  '#0ea5e9', '#22c55e', '#eab308', '#d946ef', '#14b8a6',
-  '#f59e0b', '#6366f1', '#10b981', '#fb7185', '#4ade80',
-  '#fbbf24', '#c084fc', '#38bdf8', '#fb923c', '#a3e635',
-  '#34d399', '#fcd34d', '#818cf8', '#f472b6', '#fdba74',
-];
-
-const genreColorMap = new Map<string, string>();
+// Função para gerar cor consistente baseada no nome do gênero
+const stringToColor = (str: string): string => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  
+  // Paleta de cores bem distintas
+  const colors = [
+    '#10b981', '#f59e0b', '#3b82f6', '#ef4444', '#8b5cf6',
+    '#e11d48', '#06b6d4', '#fb923c', '#0284c7', '#16a34a',
+    '#6366f1', '#14b8a6', '#ec4899', '#facc15', '#64748b',
+    '#f43f5e', '#84cc16', '#22c55e', '#f97316', '#a855f7',
+    '#0ea5e9', '#eab308', '#d946ef', '#fb7185', '#4ade80',
+    '#fbbf24', '#c084fc', '#38bdf8', '#a3e635', '#34d399',
+    '#fcd34d', '#818cf8', '#f472b6', '#fdba74', '#2dd4bf',
+  ];
+  
+  const index = Math.abs(hash) % colors.length;
+  return colors[index];
+};
 
 const getGenreColor = (genre: string) => {
   if (!genre) return '#6b7280';
   
-  // Se já temos uma cor para este gênero, retorna ela
-  if (genreColorMap.has(genre)) {
-    return genreColorMap.get(genre)!;
-  }
-  
-  // Cores fixas para gêneros principais
+  // Cores fixas e únicas para cada gênero principal
   const fixedColors: Record<string, string> = {
     'FUTEBOL': '#10b981',
     'BASQUETEBOL': '#f59e0b',
@@ -45,6 +48,7 @@ const getGenreColor = (genre: string) => {
     'PROGRAMAS': '#8b5cf6',
     'MMA': '#e11d48',
     'TÉNIS': '#06b6d4',
+    'TENNIS': '#06b6d4', // Mesmo que TÉNIS
     'DARDOS': '#fb923c',
     'HÓQUEI': '#0284c7',
     'RÂGUEBI': '#16a34a',
@@ -55,24 +59,33 @@ const getGenreColor = (genre: string) => {
     'AUTOMOBILISMO': '#64748b',
     'FUTEBOL AMERICANO': '#f43f5e',
     'GOLFE': '#84cc16',
-    'NATAÇÃO': '#0ea5e9',
+    'NATAÇÃO': '#22c55e',
     'GINÁSTICA': '#a855f7',
-    'SURF': '#22c55e',
+    'SURF': '#0ea5e9',
+    'ESGRIMA': '#eab308',
+    'JUDO': '#d946ef',
+    'KARATE': '#fb7185',
+    'TAEKWONDO': '#4ade80',
+    'WRESTLE': '#fbbf24',
+    'LUTAS': '#c084fc',
+    'MOTOCICLISMO': '#38bdf8',
+    'RALLY': '#a3e635',
+    'F1': '#34d399',
+    'CRÍQUETE': '#fcd34d',
+    'BASEBALL': '#818cf8',
+    'SOFTBALL': '#f472b6',
+    'HÓQUEI NO GELO': '#fdba74',
+    'PATINAGEM': '#2dd4bf',
   };
   
+  // Se tem cor fixa, usa ela
   if (fixedColors[genre]) {
-    genreColorMap.set(genre, fixedColors[genre]);
     return fixedColors[genre];
   }
   
-  // Para novos gêneros, pega uma cor da paleta que ainda não foi usada
-  const usedColors = new Set(genreColorMap.values());
-  const availableColor = GENRE_COLOR_PALETTE.find(color => !usedColors.has(color));
-  
-  const color = availableColor || `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`;
-  genreColorMap.set(genre, color);
-  
-  return color;
+  // Para gêneros desconhecidos, gera cor baseada no hash do nome
+  // Isso garante que o mesmo gênero sempre terá a mesma cor
+  return stringToColor(genre);
 };
 
 const getEventColor = (event: ScheduleEvent) => {
