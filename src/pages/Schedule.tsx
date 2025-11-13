@@ -132,28 +132,43 @@ export default function Schedule() {
     staleTime: 5 * 60 * 1000,
   });
 
+  // Generate time slots from 05:00 to 05:00 next day (every 30 min)
   const generateTimeSlots = () => {
     const slots: string[] = [];
     for (let hour = 5; hour < 29; hour++) {
-      slots.push(`${String(hour >= 24 ? hour - 24 : hour).padStart(2, '0')}:00`);
+      const displayHour = hour >= 24 ? hour - 24 : hour;
+      slots.push(`${String(displayHour).padStart(2, '0')}:00`);
+      slots.push(`${String(displayHour).padStart(2, '0')}:30`);
     }
     return slots;
   };
 
   const timeSlots = generateTimeSlots();
 
-  const groupedEvents = scheduleData?.ROWS?.reduce((acc: any, event: ScheduleEvent) => {
+  // Process events by channel
+  const eventsByChannel = scheduleData?.ROWS?.reduce((acc: any, event: ScheduleEvent) => {
     if (!selectedChannels.includes(event.CHANNEL)) return acc;
-    if (!acc[event.CHANNEL]) acc[event.CHANNEL] = {};
+    if (!acc[event.CHANNEL]) acc[event.CHANNEL] = [];
     
     const startTime = parseDateTime(event.DATE, event.START_TIME);
-    let adjustedHour = startTime.getHours();
-    if (adjustedHour < 5) adjustedHour += 24;
+    const duration = parseDuration(event.DURATION);
     
-    const timeKey = `${String(adjustedHour).padStart(2, '0')}:00`;
-    if (!acc[event.CHANNEL][timeKey]) acc[event.CHANNEL][timeKey] = [];
+    // Calculate position in minutes from 5:00 AM
+    let hour = startTime.getHours();
+    const minutes = startTime.getMinutes();
     
-    acc[event.CHANNEL][timeKey].push({ ...event, startTime, duration: parseDuration(event.DURATION) });
+    // Adjust for 5am start
+    if (hour < 5) hour += 24;
+    const positionMinutes = (hour - 5) * 60 + minutes;
+    
+    acc[event.CHANNEL].push({
+      ...event,
+      startTime,
+      duration,
+      positionMinutes,
+      durationMinutes: duration / (1000 * 60)
+    });
+    
     return acc;
   }, {}) || {};
 
@@ -196,39 +211,71 @@ export default function Schedule() {
         ) : (
           <Card className="p-4">
             <ScrollArea className="w-full h-[calc(100vh-320px)]">
-              <div className="min-w-max">
-                <div className="flex border-b sticky top-0 bg-background z-10">
-                  <div className="w-32 flex-shrink-0 p-2 font-semibold border-r">Canal</div>
+              <div className="flex">
+                {/* Time column */}
+                <div className="flex-shrink-0 w-20 border-r">
+                  <div className="h-12 border-b sticky top-0 bg-background z-20 flex items-center justify-center font-semibold text-sm">
+                    Hora
+                  </div>
                   {timeSlots.map((slot) => (
-                    <div key={slot} className="w-40 flex-shrink-0 p-2 text-center font-semibold border-r text-xs">{slot}</div>
+                    <div key={slot} className="h-16 border-b flex items-center justify-center text-xs font-medium">
+                      {slot}
+                    </div>
                   ))}
                 </div>
 
+                {/* Channels columns */}
                 {selectedChannels.map((channel) => (
-                  <div key={channel} className="flex border-b hover:bg-muted/50">
-                    <div className="w-32 flex-shrink-0 p-2 font-medium border-r flex items-center">{channel}</div>
-                    {timeSlots.map((slot) => {
-                      const events = groupedEvents[channel]?.[slot] || [];
-                      return (
-                        <div key={slot} className="w-40 flex-shrink-0 border-r min-h-[80px] p-1">
-                          {events.map((event: any, idx: number) => (
-                            <div
-                              key={`${event.ID}-${idx}`}
-                              className="mb-1 p-2 rounded text-white cursor-pointer hover:opacity-80 transition-opacity text-xs overflow-hidden"
-                              style={{ backgroundColor: getGenreColor(event.GENRE), minHeight: '60px' }}
-                              onClick={() => { setSelectedEvent(event); setModalOpen(true); }}
-                            >
-                              <div className="flex items-start gap-1 mb-1">
-                                {getPremiereIcon(event.PREMIERE)}
-                                <div className="font-semibold truncate flex-1">{event.PROGRAMME}</div>
+                  <div key={channel} className="flex-1 min-w-[300px] border-r relative">
+                    {/* Channel header */}
+                    <div className="h-12 border-b sticky top-0 bg-background z-10 flex items-center justify-center font-semibold text-sm px-2">
+                      {channel}
+                    </div>
+                    
+                    {/* Time grid */}
+                    <div className="relative">
+                      {timeSlots.map((slot) => (
+                        <div key={slot} className="h-16 border-b" />
+                      ))}
+                      
+                      {/* Programs positioned absolutely */}
+                      {eventsByChannel[channel]?.map((event: any, idx: number) => {
+                        const color = getGenreColor(event.GENRE);
+                        const topPosition = (event.positionMinutes / 30) * 64; // 64px = h-16
+                        const height = Math.max((event.durationMinutes / 30) * 64, 32); // Minimum 32px
+                        
+                        return (
+                          <div
+                            key={`${event.ID}-${idx}`}
+                            className="absolute left-0 right-0 mx-1 p-2 rounded text-white cursor-pointer hover:opacity-90 transition-opacity overflow-hidden shadow-sm"
+                            style={{
+                              backgroundColor: color,
+                              top: `${topPosition}px`,
+                              height: `${height}px`,
+                            }}
+                            onClick={() => {
+                              setSelectedEvent(event);
+                              setModalOpen(true);
+                            }}
+                          >
+                            <div className="flex items-start gap-1 mb-1">
+                              {getPremiereIcon(event.PREMIERE)}
+                              <div className="font-semibold text-xs truncate flex-1">
+                                {event.PROGRAMME}
                               </div>
-                              <div className="text-[10px] opacity-90">{event.START_TIME.substring(0, 5)}</div>
-                              <div className="text-[10px] opacity-75 truncate">{event.GENRE}</div>
                             </div>
-                          ))}
-                        </div>
-                      );
-                    })}
+                            <div className="text-[10px] opacity-90">
+                              {event.START_TIME.substring(0, 5)} - {Math.round(event.durationMinutes)}min
+                            </div>
+                            {height > 50 && (
+                              <div className="text-[10px] opacity-75 truncate mt-1">
+                                {event.GENRE}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 ))}
               </div>
