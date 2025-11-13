@@ -16,21 +16,21 @@ import autoTable from "jspdf-autotable";
 
 const getGenreColor = (genre: string) => {
   const colors: Record<string, string> = {
-    'FUTEBOL': '#10b981',
-    'BASQUETEBOL': '#f59e0b',
-    'ATLETISMO': '#3b82f6',
-    'BOXE': '#ef4444',
-    'PROGRAMAS': '#8b5cf6',
-    'MMA': '#dc2626',
-    'TÉNIS': '#06b6d4',
-    'DARDOS': '#f97316',
-    'HÓQUEI': '#0ea5e9',
-    'RÂGUEBI': '#059669',
-    'ANDEBOL': '#6366f1',
-    'TÉNIS DE MESA': '#14b8a6',
-    'VOLEIBOL': '#ec4899',
-    'CICLISMO': '#eab308',
-    'AUTOMOBILISMO': '#64748b',
+    'FUTEBOL': '#10b981',        // Verde esmeralda
+    'BASQUETEBOL': '#f59e0b',    // Laranja âmbar
+    'ATLETISMO': '#3b82f6',      // Azul royal
+    'BOXE': '#ef4444',           // Vermelho forte
+    'PROGRAMAS': '#8b5cf6',      // Roxo violeta
+    'MMA': '#e11d48',            // Rosa vermelho
+    'TÉNIS': '#06b6d4',          // Ciano
+    'DARDOS': '#fb923c',         // Laranja claro
+    'HÓQUEI': '#0284c7',         // Azul céu
+    'RÂGUEBI': '#16a34a',        // Verde grama
+    'ANDEBOL': '#6366f1',        // Índigo
+    'TÉNIS DE MESA': '#14b8a6',  // Teal
+    'VOLEIBOL': '#ec4899',       // Rosa pink
+    'CICLISMO': '#facc15',       // Amarelo limão
+    'AUTOMOBILISMO': '#64748b',  // Cinza ardósia
   };
   return colors[genre] || '#6b7280';
 };
