@@ -42,9 +42,12 @@ const formatTime = (timeStr: string) => {
 };
 
 const formatDuration = (duration: string) => {
-  // Duration format: HH:MM:SS with colons
-  const [hours, minutes, seconds] = duration.split(':');
-  return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
+  // Duration format: HH:MM:SS or HH:MM
+  const parts = duration.split(':');
+  const hours = parts[0]?.padStart(2, '0') || '00';
+  const minutes = parts[1]?.padStart(2, '0') || '00';
+  const seconds = parts[2]?.padStart(2, '0') || '00';
+  return `${hours}:${minutes}:${seconds}`;
 };
 
 const getPremiereBadge = (premiere: string | undefined) => {
