@@ -4,12 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { ScheduleFilters } from "@/components/ScheduleFilters";
 import { ScheduleEventModal } from "@/components/ScheduleEventModal";
-import { Loader2 } from "lucide-react";
+import { Loader2, FileDown } from "lucide-react";
 import daznLogo from "@/assets/dazn-logo.png";
 import { NavLink } from "@/components/NavLink";
 import { ScheduleEvent } from "./Schedule";
 import { Star, Sparkles, TrendingUp } from "lucide-react";
 import { UserMenu } from "@/components/UserMenu";
+import { Button } from "@/components/ui/button";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const getGenreColor = (genre: string) => {
   const colors: Record<string, string> = {
@@ -225,6 +228,92 @@ export default function Timeline() {
   const hourRange = timelineData.maxTime - timelineData.minTime;
   const hourWidth = 120; // pixels per hour
 
+  const exportToPDF = () => {
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    // Title
+    doc.setFontSize(16);
+    doc.text('Timeline de Programação', 14, 15);
+
+    // Filters info
+    doc.setFontSize(10);
+    let filterText = 'Filtros aplicados: ';
+    if (selectedWeek) {
+      filterText += `Semana ${selectedWeek}`;
+    } else {
+      filterText += `Data ${new Date(selectedDate).toLocaleDateString('pt-BR')}`;
+    }
+    if (selectedYear) {
+      filterText += `, Ano ${selectedYear}`;
+    }
+    if (selectedChannels.length > 0) {
+      filterText += `, Canais: ${selectedChannels.join(', ')}`;
+    }
+    doc.text(filterText, 14, 22);
+
+    let yPosition = 30;
+
+    // Export each day
+    timelineData.days.forEach((day, dayIndex) => {
+      if (dayIndex > 0) {
+        doc.addPage();
+        yPosition = 15;
+      }
+
+      // Day header
+      doc.setFontSize(12);
+      doc.setFont(undefined, 'bold');
+      doc.text(day.dateFormatted, 14, yPosition);
+      yPosition += 7;
+
+      // For each channel in the day
+      day.channels.forEach((channelGroup) => {
+        // Channel name
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'bold');
+        doc.text(channelGroup.channel, 14, yPosition);
+        yPosition += 5;
+
+        // Events table
+        const tableData = channelGroup.events.map(event => [
+          formatTime(event.startDate) + ' - ' + formatTime(event.endDate),
+          event.PROGRAMME || event.SERIES || event.TXSLOT_NAME || 'Sem programação',
+          event.GENRE || '-',
+          event.PREMIERE || '-'
+        ]);
+
+        autoTable(doc, {
+          startY: yPosition,
+          head: [['Horário', 'Programa', 'Gênero', 'Premiere']],
+          body: tableData,
+          theme: 'striped',
+          styles: { fontSize: 8 },
+          headStyles: { fillColor: [41, 128, 185] },
+          margin: { left: 14 },
+          tableWidth: 'auto'
+        });
+
+        yPosition = (doc as any).lastAutoTable.finalY + 7;
+
+        // Check if need new page
+        if (yPosition > 180 && channelGroup !== day.channels[day.channels.length - 1]) {
+          doc.addPage();
+          yPosition = 15;
+        }
+      });
+    });
+
+    // Save PDF
+    const fileName = selectedWeek 
+      ? `timeline_semana_${selectedWeek}_${selectedYear || ''}.pdf`
+      : `timeline_${selectedDate}.pdf`;
+    doc.save(fileName);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
@@ -266,17 +355,28 @@ export default function Timeline() {
           </div>
         )}
 
-        <ScheduleFilters
-          selectedWeek={selectedWeek}
-          selectedChannels={selectedChannels}
-          selectedYear={selectedYear}
-          onWeekChange={setSelectedWeek}
-          onChannelsChange={setSelectedChannels}
-          onYearChange={setSelectedYear}
-          weeks={weeks}
-          channels={channels}
-          years={years}
-        />
+        <div className="space-y-4">
+          <ScheduleFilters
+            selectedWeek={selectedWeek}
+            selectedChannels={selectedChannels}
+            selectedYear={selectedYear}
+            onWeekChange={setSelectedWeek}
+            onChannelsChange={setSelectedChannels}
+            onYearChange={setSelectedYear}
+            weeks={weeks}
+            channels={channels}
+            years={years}
+          />
+          
+          {timelineData.days.length > 0 && (
+            <div className="flex justify-end">
+              <Button onClick={exportToPDF} variant="outline" size="sm">
+                <FileDown className="h-4 w-4 mr-2" />
+                Exportar PDF
+              </Button>
+            </div>
+          )}
+        </div>
 
         <Card className="p-6 bg-card border-border">
           {isLoading ? (
