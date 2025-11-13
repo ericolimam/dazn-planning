@@ -148,6 +148,7 @@ export default function Schedule() {
   // Process events by channel
   const eventsByChannel = scheduleData?.ROWS?.reduce((acc: any, event: ScheduleEvent) => {
     if (!selectedChannels.includes(event.CHANNEL)) return acc;
+    if (event.PROG_REQTYPE !== "PROGRAMA") return acc; // Only show PROGRAMA type
     if (!acc[event.CHANNEL]) acc[event.CHANNEL] = [];
     
     const startTime = parseDateTime(event.DATE, event.START_TIME);
