@@ -35,26 +35,78 @@ export interface ScheduleEvent {
   PREMIERE?: string;
 }
 
+// Função para gerar cor consistente baseada no nome do gênero
+const stringToColor = (str: string): string => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  
+  // Paleta de cores bem distintas
+  const colors = [
+    '#10b981', '#f59e0b', '#3b82f6', '#ef4444', '#8b5cf6',
+    '#e11d48', '#06b6d4', '#fb923c', '#0284c7', '#16a34a',
+    '#6366f1', '#14b8a6', '#ec4899', '#facc15', '#64748b',
+    '#f43f5e', '#84cc16', '#22c55e', '#f97316', '#a855f7',
+    '#0ea5e9', '#eab308', '#d946ef', '#fb7185', '#4ade80',
+    '#fbbf24', '#c084fc', '#38bdf8', '#a3e635', '#34d399',
+    '#fcd34d', '#818cf8', '#f472b6', '#fdba74', '#2dd4bf',
+  ];
+  
+  const index = Math.abs(hash) % colors.length;
+  return colors[index];
+};
+
 const getGenreColor = (genre: string) => {
-  const colors: Record<string, string> = {
-    'FUTEBOL': '#10b981',        // Green
-    'BASQUETEBOL': '#f59e0b',    // Orange
-    'ATLETISMO': '#3b82f6',      // Blue
-    'BOXE': '#ef4444',           // Red
-    'PROGRAMAS': '#8b5cf6',      // Purple
-    'MMA': '#dc2626',            // Dark Red
-    'TÉNIS': '#06b6d4',          // Cyan
-    'DARDOS': '#f97316',         // Orange-Red
-    'HÓQUEI': '#0ea5e9',         // Sky Blue
-    'RÂGUEBI': '#059669',        // Emerald
-    'ANDEBOL': '#6366f1',        // Indigo
-    'TÉNIS DE MESA': '#14b8a6',  // Teal
-    'VOLEIBOL': '#ec4899',       // Pink
-    'CICLISMO': '#eab308',       // Yellow
-    'AUTOMOBILISMO': '#64748b',  // Slate
+  if (!genre) return '#6b7280';
+  
+  // Cores fixas e únicas para cada gênero principal
+  const fixedColors: Record<string, string> = {
+    'FUTEBOL': '#10b981',
+    'BASQUETEBOL': '#f59e0b',
+    'ATLETISMO': '#3b82f6',
+    'BOXE': '#ef4444',
+    'PROGRAMAS': '#8b5cf6',
+    'MMA': '#e11d48',
+    'TÉNIS': '#06b6d4',
+    'TENNIS': '#06b6d4', // Mesmo que TÉNIS
+    'DARDOS': '#fb923c',
+    'HÓQUEI': '#0284c7',
+    'RÂGUEBI': '#16a34a',
+    'ANDEBOL': '#6366f1',
+    'TÉNIS DE MESA': '#14b8a6',
+    'VOLEIBOL': '#ec4899',
+    'CICLISMO': '#facc15',
+    'AUTOMOBILISMO': '#64748b',
+    'FUTEBOL AMERICANO': '#f43f5e',
+    'GOLFE': '#84cc16',
+    'NATAÇÃO': '#22c55e',
+    'GINÁSTICA': '#a855f7',
+    'SURF': '#0ea5e9',
+    'ESGRIMA': '#eab308',
+    'JUDO': '#d946ef',
+    'KARATE': '#fb7185',
+    'TAEKWONDO': '#4ade80',
+    'WRESTLE': '#fbbf24',
+    'LUTAS': '#c084fc',
+    'MOTOCICLISMO': '#38bdf8',
+    'RALLY': '#a3e635',
+    'F1': '#34d399',
+    'CRÍQUETE': '#fcd34d',
+    'BASEBALL': '#818cf8',
+    'SOFTBALL': '#f472b6',
+    'HÓQUEI NO GELO': '#fdba74',
+    'PATINAGEM': '#2dd4bf',
   };
   
-  return colors[genre] || '#6b7280';
+  // Se tem cor fixa, usa ela
+  if (fixedColors[genre]) {
+    return fixedColors[genre];
+  }
+  
+  // Para gêneros desconhecidos, gera cor baseada no hash do nome
+  // Isso garante que o mesmo gênero sempre terá a mesma cor
+  return stringToColor(genre);
 };
 
 const getPremiereIcon = (premiere: string | undefined) => {
