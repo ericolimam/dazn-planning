@@ -11,6 +11,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Pagination,
@@ -23,6 +24,9 @@ import {
 } from "@/components/ui/pagination";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { FileDown } from "lucide-react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const getGenreColor = (genre: string) => {
   const colors: Record<string, string> = {
@@ -275,6 +279,93 @@ export function ProgramTable({
     }
     
     return pages;
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    doc.setFontSize(16);
+    doc.text('Catálogo de Programas', 14, 15);
+    
+    doc.setFontSize(10);
+    doc.text(`Total de programas: ${sortedPrograms.length}`, 14, 22);
+    doc.text(`Data de exportação: ${new Date().toLocaleString('pt-BR')}`, 14, 27);
+
+    const tableData = sortedPrograms.map(program => [
+      program.EPISODE || '-',
+      program.X_TXDAY_DATE || '-',
+      program.TITLE || '-',
+      program.SERIE_TITLE || '-',
+      program.GENRE || '-',
+      program.YEAR || '-',
+      program.TIME_BEFORE || '-',
+      program.TIME_ENDING || '-',
+      program.CABINE || '-',
+      program.NARRATOR || '-',
+      program.COMMENTATOR || '-',
+      program.COMMTYPE || '-',
+      program.BT || '-',
+      program.MATCHHIGH || '-',
+      program.TOPCONTENT_RF || '-'
+    ]);
+
+    autoTable(doc, {
+      startY: 32,
+      head: [[
+        'Episódio',
+        'Tx. Date',
+        'Título',
+        'Série',
+        'Gênero',
+        'Ano',
+        'Time Before',
+        'Time Ending',
+        'Broadcast',
+        'Narrador',
+        'Comentador',
+        'Comm. Type',
+        'BT',
+        'Match High',
+        'Top Content'
+      ]],
+      body: tableData,
+      styles: {
+        fontSize: 7,
+        cellPadding: 2,
+      },
+      headStyles: {
+        fillColor: [71, 85, 105],
+        textColor: 255,
+        fontStyle: 'bold',
+        halign: 'center'
+      },
+      columnStyles: {
+        0: { cellWidth: 15 },
+        1: { cellWidth: 20 },
+        2: { cellWidth: 40 },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 20 },
+        5: { cellWidth: 12 },
+        6: { cellWidth: 15 },
+        7: { cellWidth: 15 },
+        8: { cellWidth: 20 },
+        9: { cellWidth: 25 },
+        10: { cellWidth: 25 },
+        11: { cellWidth: 20 },
+        12: { cellWidth: 15 },
+        13: { cellWidth: 15 },
+        14: { cellWidth: 20 }
+      },
+      margin: { top: 32, left: 14, right: 14 },
+      theme: 'grid'
+    });
+
+    doc.save(`programas_${new Date().toISOString().split('T')[0]}.pdf`);
+    toast.success('PDF exportado com sucesso!');
   };
 
   if (isLoading) {
@@ -685,19 +776,30 @@ export function ProgramTable({
       {sortedPrograms.length > 0 && (
         <div className="border-t border-border p-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            {/* Items per page selector */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Linhas por página:</span>
-              <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                <SelectTrigger className="w-[70px] h-8">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="20">20</SelectItem>
-                  <SelectItem value="30">30</SelectItem>
-                </SelectContent>
-              </Select>
+            {/* Items per page selector and Export button */}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Linhas por página:</span>
+                <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+                  <SelectTrigger className="w-[70px] h-8">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="30">30</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button
+                onClick={exportToPDF}
+                variant="outline"
+                size="sm"
+                className="h-8 gap-2"
+              >
+                <FileDown className="h-4 w-4" />
+                Exportar PDF
+              </Button>
             </div>
 
             {/* Page info */}
