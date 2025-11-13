@@ -122,8 +122,8 @@ export default function Schedule() {
     queryFn: async () => {
       const filters: any = {};
       if (selectedWeek !== null) filters.week = selectedWeek;
-      if (selectedChannels.length > 0) filters.channel = selectedChannels;
       if (selectedYear !== null) filters.year = selectedYear;
+      // Channel filtering is done on the frontend, not sent to backend
       const { data, error } = await supabase.functions.invoke("list-schedule", { body: filters });
       if (error) throw error;
       return data;
