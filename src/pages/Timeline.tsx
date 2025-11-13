@@ -240,7 +240,7 @@ export default function Timeline() {
     img.src = daznLogo;
     
     // Helper function to draw header on each page
-    const drawHeader = (pageYPosition: number) => {
+    const drawHeader = (pageYPosition: number, showFilters: boolean = true) => {
       // Add logo
       doc.addImage(img, 'PNG', 14, 6, 12, 12);
       
@@ -250,21 +250,23 @@ export default function Timeline() {
       doc.text('Timeline de Programação', 30, 12);
 
       // Filters info
-      doc.setFontSize(8);
-      doc.setFont(undefined, 'normal');
-      let filterText = 'Filtros: ';
-      if (selectedWeek) {
-        filterText += `Semana ${selectedWeek}`;
-      } else {
-        filterText += `Data ${new Date(selectedDate).toLocaleDateString('pt-BR')}`;
+      if (showFilters) {
+        doc.setFontSize(8);
+        doc.setFont(undefined, 'normal');
+        let filterText = 'Filtros: ';
+        if (selectedWeek) {
+          filterText += `Semana ${selectedWeek}`;
+        } else {
+          filterText += `Data ${new Date(selectedDate).toLocaleDateString('pt-BR')}`;
+        }
+        if (selectedYear) {
+          filterText += `, Ano ${selectedYear}`;
+        }
+        if (selectedChannels.length > 0) {
+          filterText += `, Canais: ${selectedChannels.join(', ')}`;
+        }
+        doc.text(filterText, 30, 16);
       }
-      if (selectedYear) {
-        filterText += `, Ano ${selectedYear}`;
-      }
-      if (selectedChannels.length > 0) {
-        filterText += `, Canais: ${selectedChannels.join(', ')}`;
-      }
-      doc.text(filterText, 30, 16);
       
       return pageYPosition;
     };
@@ -279,81 +281,143 @@ export default function Timeline() {
       ] : [107, 114, 128];
     };
 
-    let isFirstPage = true;
+    // Helper to draw a timeline visualization
+    const drawTimeline = (
+      events: any[],
+      x: number,
+      y: number,
+      width: number,
+      height: number,
+      showLabels: boolean = true
+    ) => {
+      // Timeline background
+      doc.setFillColor(240, 240, 240);
+      doc.rect(x, y, width, height, 'F');
 
-    // Export each day and channel combination
+      // Draw time markers
+      if (showLabels) {
+        doc.setFontSize(6);
+        doc.setTextColor(100, 100, 100);
+      }
+      const totalHours = hourRange;
+      const pixelsPerHour = width / totalHours;
+
+      for (let i = 0; i <= totalHours; i += 2) {
+        const hour = timelineData.minTime + i;
+        const displayHour = hour >= 24 ? hour - 24 : hour;
+        const tickX = x + (i * pixelsPerHour);
+        
+        // Draw tick mark
+        doc.setDrawColor(180, 180, 180);
+        doc.line(tickX, y, tickX, y + height);
+        
+        // Draw hour label
+        if (showLabels) {
+          doc.text(`${displayHour.toString().padStart(2, '0')}:00`, tickX, y - 0.5);
+        }
+      }
+
+      // Draw events as colored blocks
+      events.forEach((event) => {
+        const startOffset = (event.startHour - timelineData.minTime) / totalHours;
+        const duration = (event.endHour - event.startHour) / totalHours;
+        
+        const blockX = x + (startOffset * width);
+        const blockWidth = duration * width;
+        
+        // Get color for genre
+        const color = getGenreColor(event.GENRE);
+        const [r, g, b] = hexToRgb(color);
+        
+        // Draw event block
+        doc.setFillColor(r, g, b);
+        doc.rect(blockX, y + 2, blockWidth, height - 4, 'F');
+        
+        // Add white border
+        doc.setDrawColor(255, 255, 255);
+        doc.setLineWidth(0.2);
+        doc.rect(blockX, y + 2, blockWidth, height - 4, 'S');
+      });
+    };
+
+    // PAGE 1: Overview with all timelines
+    let yPosition = drawHeader(24, true);
+
+    // Title for overview
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(0, 0, 0);
+    
+    // Group all events by day and channel for overview
+    const overviewData: { date: string; dateFormatted: string; channels: any[] }[] = [];
+    timelineData.days.forEach(day => {
+      const dayData = {
+        date: day.date,
+        dateFormatted: day.dateFormatted,
+        channels: day.channels
+      };
+      overviewData.push(dayData);
+    });
+
+    // Draw overview timelines
+    overviewData.forEach((day) => {
+      // Day header
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'bold');
+      doc.text(day.dateFormatted, 14, yPosition);
+      yPosition += 5;
+
+      // Draw each channel timeline
+      day.channels.forEach((channelGroup) => {
+        // Check if we need a new page
+        if (yPosition > 180) {
+          doc.addPage();
+          yPosition = drawHeader(24, false);
+        }
+
+        // Channel name
+        doc.setFontSize(8);
+        doc.setFont(undefined, 'normal');
+        doc.text(channelGroup.channel, 14, yPosition + 3);
+
+        // Draw timeline
+        const timelineHeight = 8;
+        const timelineWidth = 250;
+        const timelineX = 45;
+        
+        drawTimeline(channelGroup.events, timelineX, yPosition, timelineWidth, timelineHeight, false);
+        
+        yPosition += timelineHeight + 3;
+      });
+
+      yPosition += 3; // Extra space between days
+    });
+
+    // DETAILED PAGES: One page per channel with timeline and table
     timelineData.days.forEach((day) => {
       day.channels.forEach((channelGroup) => {
-        if (!isFirstPage) {
-          doc.addPage();
-        }
-        isFirstPage = false;
+        doc.addPage();
 
-        let yPosition = drawHeader(24);
+        let detailYPosition = drawHeader(24, true);
 
         // Day and Channel header
         doc.setFontSize(11);
         doc.setFont(undefined, 'bold');
-        doc.text(`${day.dateFormatted} - ${channelGroup.channel}`, 14, yPosition);
-        yPosition += 6;
+        doc.text(`${day.dateFormatted} - ${channelGroup.channel}`, 14, detailYPosition);
+        detailYPosition += 6;
 
         // Draw timeline visualization
         const timelineHeight = 12;
         const timelineWidth = 260;
         const timelineX = 14;
-        const timelineY = yPosition;
+        
+        drawTimeline(channelGroup.events, timelineX, detailYPosition, timelineWidth, timelineHeight, true);
 
-        // Timeline background
-        doc.setFillColor(240, 240, 240);
-        doc.rect(timelineX, timelineY, timelineWidth, timelineHeight, 'F');
-
-        // Draw time markers
-        doc.setFontSize(6);
-        doc.setTextColor(100, 100, 100);
-        const totalHours = hourRange;
-        const pixelsPerHour = timelineWidth / totalHours;
-
-        for (let i = 0; i <= totalHours; i += 2) {
-          const hour = timelineData.minTime + i;
-          const displayHour = hour >= 24 ? hour - 24 : hour;
-          const x = timelineX + (i * pixelsPerHour);
-          
-          // Draw tick mark
-          doc.setDrawColor(180, 180, 180);
-          doc.line(x, timelineY, x, timelineY + timelineHeight);
-          
-          // Draw hour label
-          doc.text(`${displayHour.toString().padStart(2, '0')}:00`, x, timelineY - 0.5);
-        }
-
-        // Draw events as colored blocks
-        channelGroup.events.forEach((event) => {
-          const startOffset = (event.startHour - timelineData.minTime) / totalHours;
-          const duration = (event.endHour - event.startHour) / totalHours;
-          
-          const blockX = timelineX + (startOffset * timelineWidth);
-          const blockWidth = duration * timelineWidth;
-          
-          // Get color for genre
-          const color = getGenreColor(event.GENRE);
-          const [r, g, b] = hexToRgb(color);
-          
-          // Draw event block
-          doc.setFillColor(r, g, b);
-          doc.rect(blockX, timelineY + 2, blockWidth, timelineHeight - 4, 'F');
-          
-          // Add white border
-          doc.setDrawColor(255, 255, 255);
-          doc.setLineWidth(0.2);
-          doc.rect(blockX, timelineY + 2, blockWidth, timelineHeight - 4, 'S');
-        });
-
-        yPosition += timelineHeight + 5;
+        detailYPosition += timelineHeight + 5;
 
         // Events table
         doc.setTextColor(0, 0, 0);
         const tableData = channelGroup.events.map(event => {
-          const genreColor = getGenreColor(event.GENRE);
           return [
             formatTime(event.startDate) + ' - ' + formatTime(event.endDate),
             event.PROGRAMME || event.SERIES || event.TXSLOT_NAME || 'Sem programação',
@@ -363,7 +427,7 @@ export default function Timeline() {
         });
 
         autoTable(doc, {
-          startY: yPosition,
+          startY: detailYPosition,
           head: [['Horário', 'Programa', 'Gênero', 'Premiere']],
           body: tableData,
           theme: 'striped',
