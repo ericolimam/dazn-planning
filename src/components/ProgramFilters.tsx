@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Search, X, CalendarIcon } from "lucide-react";
+import { Search, X, CalendarIcon, FileDown } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -25,9 +25,11 @@ interface ProgramFiltersProps {
   onFilter: (filters: { genre: string; year: string; serie: string; narrator: string; dateFrom: string; dateTo: string }) => void;
   onClear: () => void;
   isLoading?: boolean;
+  onExportPDF?: () => void;
+  hasPrograms?: boolean;
 }
 
-export function ProgramFilters({ genres, years, series, narrators, onFilter, onClear, isLoading }: ProgramFiltersProps) {
+export function ProgramFilters({ genres, years, series, narrators, onFilter, onClear, isLoading, onExportPDF, hasPrograms }: ProgramFiltersProps) {
   const [selectedGenre, setSelectedGenre] = useState<string>("all");
   const [selectedYear, setSelectedYear] = useState<string>("all");
   const [selectedSerie, setSelectedSerie] = useState<string>("all");
@@ -235,6 +237,17 @@ export function ProgramFilters({ genres, years, series, narrators, onFilter, onC
               <Search className="mr-1.5 h-3 w-3" />
               Buscar
             </Button>
+            {onExportPDF && hasPrograms && (
+              <Button
+                onClick={onExportPDF}
+                variant="secondary"
+                disabled={isLoading}
+                className="min-w-[120px] h-8 text-xs"
+              >
+                <FileDown className="mr-1.5 h-3 w-3" />
+                Exportar PDF
+              </Button>
+            )}
             <Button
               onClick={handleClear}
               variant="outline"

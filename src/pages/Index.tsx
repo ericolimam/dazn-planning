@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import daznLogo from "@/assets/dazn-logo.png";
 import { NavLink } from "@/components/NavLink";
 import { UserMenu } from "@/components/UserMenu";
+import jsPDF from "jspdf";
 
 const Index = () => {
   const [programs, setPrograms] = useState<Program[]>([]);
@@ -212,6 +213,154 @@ const Index = () => {
     setCurrentFilters({ genre: "", year: "", serie: "", narrator: "", dateFrom: "", dateTo: "" });
   };
 
+  const exportToPDF = async () => {
+    if (programs.length === 0) {
+      toast.error("Nenhum programa para exportar");
+      return;
+    }
+
+    try {
+      // Convert logo to base64
+      const logoBase64 = await fetch(daznLogo)
+        .then(res => res.blob())
+        .then(blob => new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(blob);
+        }));
+
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      programs.forEach((program, index) => {
+        if (index > 0) {
+          doc.addPage();
+        }
+
+        // Header with logo
+        doc.addImage(logoBase64, 'PNG', 14, 10, 20, 20);
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Ficha Cadastral de Programa', 105, 20, { align: 'center' });
+        
+        let yPos = 40;
+        const leftCol = 14;
+        const rightCol = 110;
+        const lineHeight = 7;
+
+        // Helper function to add field
+        const addField = (label: string, value: any, col: number = leftCol) => {
+          doc.setFontSize(9);
+          doc.setFont('helvetica', 'bold');
+          doc.text(`${label}:`, col, yPos);
+          doc.setFont('helvetica', 'normal');
+          const text = value !== null && value !== undefined ? String(value) : '-';
+          doc.text(text, col, yPos + 4);
+          return lineHeight;
+        };
+
+        // Seção Produção
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.setFillColor(71, 85, 105);
+        doc.rect(leftCol, yPos, 182, 8, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.text('PRODUÇÃO', leftCol + 2, yPos + 5);
+        doc.setTextColor(0, 0, 0);
+        yPos += 12;
+
+        // Left column
+        yPos += addField('ID', program.ID, leftCol);
+        yPos += addField('Episódio', program.EPISODE, leftCol);
+        yPos += addField('Data TX', program.X_TXDAY_DATE, leftCol);
+        yPos += addField('Título', program.TITLE, leftCol);
+        yPos = 52 + (lineHeight * 4);
+        
+        yPos += addField('Série', program.SERIE_TITLE, rightCol);
+        yPos += addField('Gênero', program.GENRE, rightCol);
+        yPos += addField('Tipo Programa', program.PROG_TYPE, rightCol);
+        yPos += addField('Tipo Requisição', program.REQ_TYPE, rightCol);
+
+        yPos = Math.max(yPos, 52 + (lineHeight * 8)) + 3;
+        yPos += addField('Categoria', program.PROG_CATEGORY, leftCol);
+        yPos += addField('Tipo Aquisição', program.ACQ_TYPE, leftCol);
+        yPos += addField('Cabine', program.CABINE, leftCol);
+        yPos += addField('Narrador', program.NARRATOR, leftCol);
+        
+        yPos = 52 + (lineHeight * 8) + 3;
+        yPos += addField('Comentador', program.COMMENTATOR, rightCol);
+        yPos += addField('Time Before', program.TIME_BEFORE, rightCol);
+        yPos += addField('Time Ending', program.TIME_ENDING, rightCol);
+        yPos += addField('Ano', program.YEAR, rightCol);
+
+        yPos = Math.max(yPos, 52 + (lineHeight * 16)) + 5;
+
+        // Seção Planning
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.setFillColor(71, 85, 105);
+        doc.rect(leftCol, yPos, 182, 8, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.text('PLANNING', leftCol + 2, yPos + 5);
+        doc.setTextColor(0, 0, 0);
+        yPos += 12;
+
+        yPos += addField('State Event', program.STATE_EVENT, leftCol);
+        yPos += addField('Comm Type', program.COMMTYPE, leftCol);
+        yPos += addField('BT', program.BT, leftCol);
+        
+        yPos = 52 + (lineHeight * 16) + 5 + 12;
+        yPos += addField('Prod. Add Info', program.PRODADDINFO, rightCol);
+        yPos += addField('Match High', program.MATCHHIGH, rightCol);
+
+        yPos = Math.max(yPos, 52 + (lineHeight * 21)) + 5;
+
+        // Seção Promoção
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.setFillColor(71, 85, 105);
+        doc.rect(leftCol, yPos, 182, 8, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.text('PROMOÇÃO', leftCol + 2, yPos + 5);
+        doc.setTextColor(0, 0, 0);
+        yPos += 12;
+
+        yPos += addField('Resumo', program.RESUMO ? 'Sim' : 'Não', leftCol);
+        yPos += addField('Destaque Semana', program.DESTAQUE_SEMANA ? 'Sim' : 'Não', leftCol);
+        yPos += addField('Promo DAZN', program.PROMO_DAZN ? 'Sim' : 'Não', leftCol);
+        yPos += addField('Top Content', program.TOPCONTENT_RF, leftCol);
+        yPos += addField('Classic Derbi', program.CLASSICDERBI ? 'Sim' : 'Não', leftCol);
+        yPos += addField('Content Detail', program.CONTENTDETAIL, leftCol);
+        yPos += addField('Platform Banners', program.PLATAFORMBANNERS ? 'Sim' : 'Não', leftCol);
+        
+        yPos = 52 + (lineHeight * 21) + 5 + 12;
+        yPos += addField('Promo Individual', program.PROMOINDIVIDUAL ? 'Sim' : 'Não', rightCol);
+        yPos += addField('Promo Conjunta', program.PROMOCONJUNTA ? 'Sim' : 'Não', rightCol);
+        yPos += addField('Promo Genérica', program.PROMOGENERICA ? 'Sim' : 'Não', rightCol);
+        yPos += addField('Promo 10s', program.PROMO10S ? 'Sim' : 'Não', rightCol);
+        yPos += addField('Detalhes Promo', program.DETALHESPROMO, rightCol);
+        yPos += addField('Telcos', program.TELCOS ? 'Sim' : 'Não', rightCol);
+        yPos += addField('CRM', program.CRM ? 'Sim' : 'Não', rightCol);
+        yPos += addField('Social', program.SOCIAL ? 'Sim' : 'Não', rightCol);
+
+        // Footer
+        doc.setFontSize(8);
+        doc.setTextColor(128, 128, 128);
+        doc.text(`Página ${index + 1} de ${programs.length}`, 105, 285, { align: 'center' });
+        doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 105, 290, { align: 'center' });
+      });
+
+      doc.save(`fichas_programas_${new Date().toISOString().split('T')[0]}.pdf`);
+      toast.success('PDF exportado com sucesso!');
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      toast.error('Erro ao exportar PDF');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -269,6 +418,8 @@ const Index = () => {
                 onFilter={fetchPrograms}
                 onClear={handleClearFilters}
                 isLoading={isLoading}
+                onExportPDF={exportToPDF}
+                hasPrograms={programs.length > 0}
               />
 
               <div>
