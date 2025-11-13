@@ -235,75 +235,154 @@ export default function Timeline() {
       format: 'a4'
     });
 
-    // Title
-    doc.setFontSize(16);
-    doc.text('Timeline de Programação', 14, 15);
-
-    // Filters info
-    doc.setFontSize(10);
-    let filterText = 'Filtros aplicados: ';
-    if (selectedWeek) {
-      filterText += `Semana ${selectedWeek}`;
-    } else {
-      filterText += `Data ${new Date(selectedDate).toLocaleDateString('pt-BR')}`;
-    }
-    if (selectedYear) {
-      filterText += `, Ano ${selectedYear}`;
-    }
-    if (selectedChannels.length > 0) {
-      filterText += `, Canais: ${selectedChannels.join(', ')}`;
-    }
-    doc.text(filterText, 14, 22);
-
-    let yPosition = 30;
-
-    // Export each day
-    timelineData.days.forEach((day, dayIndex) => {
-      if (dayIndex > 0) {
-        doc.addPage();
-        yPosition = 15;
-      }
-
-      // Day header
-      doc.setFontSize(12);
+    // Convert DAZN logo to base64 and add to PDF
+    const img = new Image();
+    img.src = daznLogo;
+    
+    // Helper function to draw header on each page
+    const drawHeader = (pageYPosition: number) => {
+      // Add logo
+      doc.addImage(img, 'PNG', 14, 8, 15, 15);
+      
+      // Title
+      doc.setFontSize(16);
       doc.setFont(undefined, 'bold');
-      doc.text(day.dateFormatted, 14, yPosition);
-      yPosition += 7;
+      doc.text('Timeline de Programação', 35, 15);
 
-      // For each channel in the day
+      // Filters info
+      doc.setFontSize(9);
+      doc.setFont(undefined, 'normal');
+      let filterText = 'Filtros: ';
+      if (selectedWeek) {
+        filterText += `Semana ${selectedWeek}`;
+      } else {
+        filterText += `Data ${new Date(selectedDate).toLocaleDateString('pt-BR')}`;
+      }
+      if (selectedYear) {
+        filterText += `, Ano ${selectedYear}`;
+      }
+      if (selectedChannels.length > 0) {
+        filterText += `, Canais: ${selectedChannels.join(', ')}`;
+      }
+      doc.text(filterText, 35, 20);
+      
+      return pageYPosition;
+    };
+
+    // Helper to convert genre color hex to RGB
+    const hexToRgb = (hex: string): [number, number, number] => {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? [
+        parseInt(result[1], 16),
+        parseInt(result[2], 16),
+        parseInt(result[3], 16)
+      ] : [107, 114, 128];
+    };
+
+    let isFirstPage = true;
+
+    // Export each day and channel combination
+    timelineData.days.forEach((day) => {
       day.channels.forEach((channelGroup) => {
-        // Channel name
-        doc.setFontSize(10);
+        if (!isFirstPage) {
+          doc.addPage();
+        }
+        isFirstPage = false;
+
+        let yPosition = drawHeader(30);
+
+        // Day and Channel header
+        doc.setFontSize(12);
         doc.setFont(undefined, 'bold');
-        doc.text(channelGroup.channel, 14, yPosition);
-        yPosition += 5;
+        doc.text(`${day.dateFormatted} - ${channelGroup.channel}`, 14, yPosition);
+        yPosition += 8;
+
+        // Draw timeline visualization
+        const timelineHeight = 15;
+        const timelineWidth = 260;
+        const timelineX = 14;
+        const timelineY = yPosition;
+
+        // Timeline background
+        doc.setFillColor(240, 240, 240);
+        doc.rect(timelineX, timelineY, timelineWidth, timelineHeight, 'F');
+
+        // Draw time markers
+        doc.setFontSize(7);
+        doc.setTextColor(100, 100, 100);
+        const totalHours = hourRange;
+        const pixelsPerHour = timelineWidth / totalHours;
+
+        for (let i = 0; i <= totalHours; i += 2) {
+          const hour = timelineData.minTime + i;
+          const displayHour = hour >= 24 ? hour - 24 : hour;
+          const x = timelineX + (i * pixelsPerHour);
+          
+          // Draw tick mark
+          doc.setDrawColor(180, 180, 180);
+          doc.line(x, timelineY, x, timelineY + timelineHeight);
+          
+          // Draw hour label
+          doc.text(`${displayHour.toString().padStart(2, '0')}:00`, x, timelineY - 1);
+        }
+
+        // Draw events as colored blocks
+        channelGroup.events.forEach((event) => {
+          const startOffset = (event.startHour - timelineData.minTime) / totalHours;
+          const duration = (event.endHour - event.startHour) / totalHours;
+          
+          const blockX = timelineX + (startOffset * timelineWidth);
+          const blockWidth = duration * timelineWidth;
+          
+          // Get color for genre
+          const color = getGenreColor(event.GENRE);
+          const [r, g, b] = hexToRgb(color);
+          
+          // Draw event block
+          doc.setFillColor(r, g, b);
+          doc.rect(blockX, timelineY + 2, blockWidth, timelineHeight - 4, 'F');
+          
+          // Add white border
+          doc.setDrawColor(255, 255, 255);
+          doc.setLineWidth(0.2);
+          doc.rect(blockX, timelineY + 2, blockWidth, timelineHeight - 4, 'S');
+        });
+
+        yPosition += timelineHeight + 10;
 
         // Events table
-        const tableData = channelGroup.events.map(event => [
-          formatTime(event.startDate) + ' - ' + formatTime(event.endDate),
-          event.PROGRAMME || event.SERIES || event.TXSLOT_NAME || 'Sem programação',
-          event.GENRE || '-',
-          event.PREMIERE || '-'
-        ]);
+        doc.setTextColor(0, 0, 0);
+        const tableData = channelGroup.events.map(event => {
+          const genreColor = getGenreColor(event.GENRE);
+          return [
+            formatTime(event.startDate) + ' - ' + formatTime(event.endDate),
+            event.PROGRAMME || event.SERIES || event.TXSLOT_NAME || 'Sem programação',
+            event.GENRE || '-',
+            event.PREMIERE || '-'
+          ];
+        });
 
         autoTable(doc, {
           startY: yPosition,
           head: [['Horário', 'Programa', 'Gênero', 'Premiere']],
           body: tableData,
           theme: 'striped',
-          styles: { fontSize: 8 },
-          headStyles: { fillColor: [41, 128, 185] },
-          margin: { left: 14 },
-          tableWidth: 'auto'
+          styles: { fontSize: 8, cellPadding: 2 },
+          headStyles: { fillColor: [41, 128, 185], fontSize: 9, fontStyle: 'bold' },
+          margin: { left: 14, right: 14 },
+          tableWidth: 'auto',
+          didParseCell: (data) => {
+            // Color code genre column
+            if (data.column.index === 2 && data.section === 'body') {
+              const genre = data.cell.text[0];
+              const color = getGenreColor(genre);
+              const [r, g, b] = hexToRgb(color);
+              data.cell.styles.fillColor = [r, g, b];
+              data.cell.styles.textColor = [255, 255, 255];
+              data.cell.styles.fontStyle = 'bold';
+            }
+          }
         });
-
-        yPosition = (doc as any).lastAutoTable.finalY + 7;
-
-        // Check if need new page
-        if (yPosition > 180 && channelGroup !== day.channels[day.channels.length - 1]) {
-          doc.addPage();
-          yPosition = 15;
-        }
       });
     });
 
