@@ -242,15 +242,15 @@ export default function Timeline() {
     // Helper function to draw header on each page
     const drawHeader = (pageYPosition: number) => {
       // Add logo
-      doc.addImage(img, 'PNG', 14, 8, 15, 15);
+      doc.addImage(img, 'PNG', 14, 6, 12, 12);
       
       // Title
-      doc.setFontSize(16);
+      doc.setFontSize(14);
       doc.setFont(undefined, 'bold');
-      doc.text('Timeline de Programação', 35, 15);
+      doc.text('Timeline de Programação', 30, 12);
 
       // Filters info
-      doc.setFontSize(9);
+      doc.setFontSize(8);
       doc.setFont(undefined, 'normal');
       let filterText = 'Filtros: ';
       if (selectedWeek) {
@@ -264,7 +264,7 @@ export default function Timeline() {
       if (selectedChannels.length > 0) {
         filterText += `, Canais: ${selectedChannels.join(', ')}`;
       }
-      doc.text(filterText, 35, 20);
+      doc.text(filterText, 30, 16);
       
       return pageYPosition;
     };
@@ -289,16 +289,16 @@ export default function Timeline() {
         }
         isFirstPage = false;
 
-        let yPosition = drawHeader(30);
+        let yPosition = drawHeader(24);
 
         // Day and Channel header
-        doc.setFontSize(12);
+        doc.setFontSize(11);
         doc.setFont(undefined, 'bold');
         doc.text(`${day.dateFormatted} - ${channelGroup.channel}`, 14, yPosition);
-        yPosition += 8;
+        yPosition += 6;
 
         // Draw timeline visualization
-        const timelineHeight = 15;
+        const timelineHeight = 12;
         const timelineWidth = 260;
         const timelineX = 14;
         const timelineY = yPosition;
@@ -308,7 +308,7 @@ export default function Timeline() {
         doc.rect(timelineX, timelineY, timelineWidth, timelineHeight, 'F');
 
         // Draw time markers
-        doc.setFontSize(7);
+        doc.setFontSize(6);
         doc.setTextColor(100, 100, 100);
         const totalHours = hourRange;
         const pixelsPerHour = timelineWidth / totalHours;
@@ -323,7 +323,7 @@ export default function Timeline() {
           doc.line(x, timelineY, x, timelineY + timelineHeight);
           
           // Draw hour label
-          doc.text(`${displayHour.toString().padStart(2, '0')}:00`, x, timelineY - 1);
+          doc.text(`${displayHour.toString().padStart(2, '0')}:00`, x, timelineY - 0.5);
         }
 
         // Draw events as colored blocks
@@ -348,7 +348,7 @@ export default function Timeline() {
           doc.rect(blockX, timelineY + 2, blockWidth, timelineHeight - 4, 'S');
         });
 
-        yPosition += timelineHeight + 10;
+        yPosition += timelineHeight + 5;
 
         // Events table
         doc.setTextColor(0, 0, 0);
@@ -367,8 +367,8 @@ export default function Timeline() {
           head: [['Horário', 'Programa', 'Gênero', 'Premiere']],
           body: tableData,
           theme: 'striped',
-          styles: { fontSize: 8, cellPadding: 2 },
-          headStyles: { fillColor: [41, 128, 185], fontSize: 9, fontStyle: 'bold' },
+          styles: { fontSize: 7, cellPadding: 1.5 },
+          headStyles: { fillColor: [41, 128, 185], fontSize: 8, fontStyle: 'bold', cellPadding: 2 },
           margin: { left: 14, right: 14 },
           tableWidth: 'auto',
           didParseCell: (data) => {
