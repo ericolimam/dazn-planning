@@ -76,8 +76,32 @@ const getPremiereIcon = (premiere: string | undefined) => {
 
 const parseDateTime = (dateStr: string, timeStr: string): Date => {
   const [month, day, year] = dateStr.split('/');
-  const [hours, minutes, seconds] = timeStr.split(':').map(s => parseInt(s));
-  return new Date(parseInt(year), parseInt(month) - 1, parseInt(day), hours, minutes, seconds || 0);
+  
+  // Extract time from timeStr - it could be in format "HH:MM:SS" or "MM/DD/YYYY HH:MM:SS AM/PM"
+  let hours = 0, minutes = 0, seconds = 0;
+  
+  if (timeStr.includes('/')) {
+    // Format: "12/30/1899 1:00:53 AM" - extract only the time part
+    const timePart = timeStr.split(' ').slice(1).join(' '); // Get "1:00:53 AM"
+    const isPM = timePart.includes('PM');
+    const isAM = timePart.includes('AM');
+    const timeOnly = timePart.replace(/AM|PM/g, '').trim();
+    const [h, m, s] = timeOnly.split(':').map(t => parseInt(t));
+    
+    hours = h;
+    if (isPM && hours !== 12) hours += 12;
+    if (isAM && hours === 12) hours = 0;
+    minutes = m;
+    seconds = s || 0;
+  } else {
+    // Format: "HH:MM:SS"
+    const parts = timeStr.split(':').map(s => parseInt(s));
+    hours = parts[0] || 0;
+    minutes = parts[1] || 0;
+    seconds = parts[2] || 0;
+  }
+  
+  return new Date(parseInt(year), parseInt(month) - 1, parseInt(day), hours, minutes, seconds);
 };
 
 const parseDuration = (duration: string) => {
