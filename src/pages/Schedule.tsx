@@ -26,6 +26,9 @@ export interface ScheduleEvent {
   GENRE: string;
   PROGCATEGORY: string;
   PREMIERE?: string;
+  TXDAY_DATE?: string;
+  START_TC?: string;
+  DURATION_TC?: string;
 }
 
 const stringToColor = (str: string): string => {
@@ -151,8 +154,13 @@ export default function Schedule() {
     if (event.PROG_REQTYPE !== "PROGRAMA") return acc; // Only show PROGRAMA type
     if (!acc[event.CHANNEL]) acc[event.CHANNEL] = [];
     
-    const startTime = parseDateTime(event.DATE, event.START_TIME);
-    const duration = parseDuration(event.DURATION);
+    // Use TXDAY_DATE and START_TC if available, fallback to DATE and START_TIME
+    const dateStr = event.TXDAY_DATE || event.DATE;
+    const timeStr = event.START_TC || event.START_TIME;
+    const durationStr = event.DURATION_TC || event.DURATION;
+    
+    const startTime = parseDateTime(dateStr, timeStr);
+    const duration = parseDuration(durationStr);
     
     // Calculate position in minutes from 5:00 AM
     let hour = startTime.getHours();
@@ -229,9 +237,10 @@ export default function Schedule() {
                 {selectedChannels.map((channel) => {
                   // Get the first event's date for this channel
                   const firstEvent = eventsByChannel[channel]?.[0];
-                  const dateFormatted = firstEvent?.DATE 
+                  const dateStr = firstEvent?.TXDAY_DATE || firstEvent?.DATE;
+                  const dateFormatted = dateStr 
                     ? (() => {
-                        const [month, day, year] = firstEvent.DATE.split('/');
+                        const [month, day, year] = dateStr.split('/');
                         return `${day}/${month}/${year}`;
                       })()
                     : '';
