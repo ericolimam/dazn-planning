@@ -573,7 +573,34 @@ export default function Timeline() {
           />
           
           {timelineData.days.length > 0 && (
-            <div className="flex justify-end">
+            <div className="flex justify-between items-center gap-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="text-sm font-medium text-foreground">Legenda:</span>
+                <div className="flex items-center gap-1">
+                  <div className="w-4 h-4 rounded" style={{ backgroundColor: '#10b981' }}></div>
+                  <span className="text-xs text-muted-foreground">Futebol</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-4 h-4 rounded" style={{ backgroundColor: '#f59e0b' }}></div>
+                  <span className="text-xs text-muted-foreground">Basquetebol</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-4 h-4 rounded" style={{ backgroundColor: '#3b82f6' }}></div>
+                  <span className="text-xs text-muted-foreground">Atletismo</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-4 h-4 rounded" style={{ backgroundColor: '#ef4444' }}></div>
+                  <span className="text-xs text-muted-foreground">Boxe</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-4 h-4 rounded" style={{ backgroundColor: '#8b5cf6' }}></div>
+                  <span className="text-xs text-muted-foreground">Programas</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-4 h-4 rounded" style={{ backgroundColor: '#000000' }}></div>
+                  <span className="text-xs text-muted-foreground">Sem Emissão</span>
+                </div>
+              </div>
               <Button onClick={exportToPDF} variant="outline" size="sm">
                 <FileDown className="h-4 w-4 mr-2" />
                 Exportar PDF
