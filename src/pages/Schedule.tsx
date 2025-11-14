@@ -175,7 +175,8 @@ export default function Schedule() {
   // Process events by channel - group by date first
   const eventsByChannelAndDate = scheduleData?.ROWS?.reduce((acc: any, event: ScheduleEvent) => {
     if (!selectedChannels.includes(event.CHANNEL)) return acc;
-    if (event.PROG_REQTYPE !== "PROGRAMA") return acc; // Only show PROGRAMA type
+    // Show PROGRAMA type or events named "SEM EMISSÃO"
+    if (event.PROG_REQTYPE !== "PROGRAMA" && event.PROGRAMME !== "SEM EMISSÃO") return acc;
     
     // Use TXDAY_DATE and START_TC if available, fallback to DATE and START_TIME
     const dateStr = event.TXDAY_DATE || event.DATE;
