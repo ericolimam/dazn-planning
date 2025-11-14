@@ -64,6 +64,13 @@ const getGenreColor = (genre: string) => {
   return fixedColors[genre] || stringToColor(genre);
 };
 
+const getEventColor = (event: ScheduleEvent) => {
+  if (event.TXSLOT_NAME === 'SEM EMISSÃO') {
+    return '#000000';
+  }
+  return getGenreColor(event.GENRE);
+};
+
 const getPremiereIcon = (premiere: string | undefined) => {
   if (!premiere) return null;
   const icons: Record<string, JSX.Element> = {
@@ -175,8 +182,8 @@ export default function Schedule() {
   // Process events by channel - group by date first
   const eventsByChannelAndDate = scheduleData?.ROWS?.reduce((acc: any, event: ScheduleEvent) => {
     if (!selectedChannels.includes(event.CHANNEL)) return acc;
-    // Show PROGRAMA type or events named "SEM EMISSÃO"
-    if (event.PROG_REQTYPE !== "PROGRAMA" && event.PROGRAMME !== "SEM EMISSÃO") return acc;
+    // Show PROGRAMA type or events with TXSLOT_NAME = "SEM EMISSÃO"
+    if (event.PROG_REQTYPE !== "PROGRAMA" && event.TXSLOT_NAME !== "SEM EMISSÃO") return acc;
     
     // Use TXDAY_DATE and START_TC if available, fallback to DATE and START_TIME
     const dateStr = event.TXDAY_DATE || event.DATE;
@@ -311,7 +318,7 @@ export default function Schedule() {
                       
                       {/* Programs positioned absolutely */}
                       {eventsByChannel[channel]?.map((event: any, idx: number) => {
-                        const color = getGenreColor(event.GENRE);
+                        const color = getEventColor(event);
                         const topPosition = (event.positionMinutes / 30) * 64; // 64px = h-16
                         const height = Math.max((event.durationMinutes / 30) * 64, 32); // Minimum 32px
                         
