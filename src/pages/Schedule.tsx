@@ -294,7 +294,7 @@ export default function Schedule() {
                     : '';
                   
                   return (
-                    <div key={channel} className="flex-1 min-w-[300px] border-r relative">
+                    <div key={channel} className="flex-1 min-w-[180px] border-r relative">
                       {/* Channel header */}
                       <div className="h-16 border-b sticky top-0 bg-background z-10 flex flex-col items-center justify-center px-2">
                         <div className="font-semibold text-sm">{channel}</div>
