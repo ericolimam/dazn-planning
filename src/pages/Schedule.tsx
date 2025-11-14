@@ -4,11 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { ScheduleFilters } from "@/components/ScheduleFilters";
 import { ScheduleEventModal } from "@/components/ScheduleEventModal";
-import { Loader2, Star, Sparkles, TrendingUp } from "lucide-react";
+import { Loader2, Star, Sparkles, TrendingUp, FileDown } from "lucide-react";
 import daznLogo from "@/assets/dazn-logo.png";
 import { NavLink } from "@/components/NavLink";
 import { UserMenu } from "@/components/UserMenu";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export interface ScheduleEvent {
   ID: number;
@@ -179,6 +182,79 @@ export default function Schedule() {
 
   const timeSlots = generateTimeSlots();
 
+  const exportToPDF = () => {
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    const img = new Image();
+    img.src = daznLogo;
+    
+    const imgWidth = 20;
+    const imgHeight = 8;
+    doc.addImage(img, 'PNG', 14, 10, imgWidth, imgHeight);
+
+    doc.setFontSize(16);
+    doc.setFont(undefined, 'bold');
+    doc.text('Guia de Programação', 40, 15);
+
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    const filterText = `Semana ${selectedWeek} | ${selectedChannels.join(', ')}`;
+    doc.text(filterText, 14, 24);
+
+    let yPosition = 30;
+
+    selectedChannels.forEach((channel, channelIndex) => {
+      if (channelIndex > 0) {
+        doc.addPage();
+        yPosition = 30;
+      }
+
+      doc.setFontSize(12);
+      doc.setFont(undefined, 'bold');
+      doc.text(`Canal: ${channel}`, 14, yPosition);
+      yPosition += 6;
+
+      const events = eventsByChannel[channel] || [];
+      const tableData = events.map((event: any) => {
+        const startTime = event.START_TIME.substring(0, 5);
+        const title = event.TXSLOT_NAME === 'SEM EMISSÃO' ? 'SEM EMISSÃO' : event.PROGRAMME;
+        const duration = `${Math.round(event.durationMinutes)}min`;
+        const genre = event.GENRE || '-';
+        const premiere = event.PREMIERE || '-';
+        
+        return [startTime, title, duration, genre, premiere];
+      });
+
+      autoTable(doc, {
+        startY: yPosition,
+        head: [['Horário', 'Programa', 'Duração', 'Gênero', 'Premiere']],
+        body: tableData,
+        theme: 'striped',
+        styles: { fontSize: 8, cellPadding: 2 },
+        headStyles: { fillColor: [41, 128, 185], fontSize: 9, fontStyle: 'bold' },
+        margin: { left: 14, right: 14 },
+        didParseCell: (data) => {
+          if (data.column.index === 3 && data.section === 'body') {
+            const genre = tableData[data.row.index][3];
+            const color = getGenreColor(genre);
+            const rgb = parseInt(color.slice(1), 16);
+            const r = (rgb >> 16) & 255;
+            const g = (rgb >> 8) & 255;
+            const b = rgb & 255;
+            data.cell.styles.fillColor = [r, g, b];
+            data.cell.styles.textColor = [255, 255, 255];
+          }
+        }
+      });
+    });
+
+    doc.save(`grade-programacao-semana-${selectedWeek}.pdf`);
+  };
+
   // Process events by channel - group by date first
   const eventsByChannelAndDate = scheduleData?.ROWS?.reduce((acc: any, event: ScheduleEvent) => {
     if (!selectedChannels.includes(event.CHANNEL)) return acc;
@@ -266,6 +342,14 @@ export default function Schedule() {
             onWeekChange={setSelectedWeek}
             onChannelsChange={setSelectedChannels}
           />
+          {!isLoading && eventsByChannel && Object.keys(eventsByChannel).length > 0 && (
+            <div className="flex justify-end mt-4">
+              <Button onClick={exportToPDF} variant="outline" size="sm">
+                <FileDown className="h-4 w-4 mr-2" />
+                Exportar PDF
+              </Button>
+            </div>
+          )}
         </Card>
 
         {isLoading ? (
@@ -339,7 +423,7 @@ export default function Schedule() {
                             <div className="flex items-start gap-1 mb-1">
                               {getPremiereIcon(event.PREMIERE)}
                               <div className="font-semibold text-xs truncate flex-1">
-                                {event.PROGRAMME}
+                                {event.TXSLOT_NAME === 'SEM EMISSÃO' ? 'SEM EMISSÃO' : event.PROGRAMME}
                               </div>
                             </div>
                             <div className="text-[10px] opacity-90">
