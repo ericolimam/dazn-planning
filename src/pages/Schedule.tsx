@@ -215,7 +215,7 @@ export default function Schedule() {
               <div className="flex">
                 {/* Time column */}
                 <div className="flex-shrink-0 w-20 border-r">
-                  <div className="h-12 border-b sticky top-0 bg-background z-20 flex items-center justify-center font-semibold text-sm">
+                  <div className="h-16 border-b sticky top-0 bg-background z-20 flex items-center justify-center font-semibold text-sm">
                     Hora
                   </div>
                   {timeSlots.map((slot) => (
@@ -226,12 +226,25 @@ export default function Schedule() {
                 </div>
 
                 {/* Channels columns */}
-                {selectedChannels.map((channel) => (
-                  <div key={channel} className="flex-1 min-w-[300px] border-r relative">
-                    {/* Channel header */}
-                    <div className="h-12 border-b sticky top-0 bg-background z-10 flex items-center justify-center font-semibold text-sm px-2">
-                      {channel}
-                    </div>
+                {selectedChannels.map((channel) => {
+                  // Get the first event's date for this channel
+                  const firstEvent = eventsByChannel[channel]?.[0];
+                  const dateFormatted = firstEvent?.DATE 
+                    ? (() => {
+                        const [month, day, year] = firstEvent.DATE.split('/');
+                        return `${day}/${month}/${year}`;
+                      })()
+                    : '';
+                  
+                  return (
+                    <div key={channel} className="flex-1 min-w-[300px] border-r relative">
+                      {/* Channel header */}
+                      <div className="h-16 border-b sticky top-0 bg-background z-10 flex flex-col items-center justify-center px-2">
+                        <div className="font-semibold text-sm">{channel}</div>
+                        {dateFormatted && (
+                          <div className="text-xs text-muted-foreground">{dateFormatted}</div>
+                        )}
+                      </div>
                     
                     {/* Time grid */}
                     <div className="relative">
@@ -278,7 +291,8 @@ export default function Schedule() {
                       })}
                     </div>
                   </div>
-                ))}
+                );
+                })}
               </div>
             </ScrollArea>
           </Card>
