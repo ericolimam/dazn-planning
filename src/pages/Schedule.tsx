@@ -172,19 +172,33 @@ export default function Schedule() {
 
   const timeSlots = generateTimeSlots();
 
-  // Process events by channel
-  const eventsByChannel = scheduleData?.ROWS?.reduce((acc: any, event: ScheduleEvent) => {
+  // Process events by channel - group by date first
+  const eventsByChannelAndDate = scheduleData?.ROWS?.reduce((acc: any, event: ScheduleEvent) => {
     if (!selectedChannels.includes(event.CHANNEL)) return acc;
     if (event.PROG_REQTYPE !== "PROGRAMA") return acc; // Only show PROGRAMA type
-    if (!acc[event.CHANNEL]) acc[event.CHANNEL] = [];
     
     // Use TXDAY_DATE and START_TC if available, fallback to DATE and START_TIME
     const dateStr = event.TXDAY_DATE || event.DATE;
     const timeStr = event.START_TC || event.START_TIME;
     const durationStr = event.DURATION_TC || event.DURATION;
     
+    // Skip events without valid data
+    if (!dateStr || !timeStr || !durationStr) return acc;
+    
     const startTime = parseDateTime(dateStr, timeStr);
     const duration = parseDuration(durationStr);
+    
+    // Create a key combining channel and date
+    const dateKey = dateStr; // Use the actual date as key
+    const channelDateKey = `${event.CHANNEL}_${dateKey}`;
+    
+    if (!acc[channelDateKey]) {
+      acc[channelDateKey] = {
+        channel: event.CHANNEL,
+        date: dateStr,
+        events: []
+      };
+    }
     
     // Calculate position in minutes from 5:00 AM
     let hour = startTime.getHours();
@@ -194,7 +208,7 @@ export default function Schedule() {
     if (hour < 5) hour += 24;
     const positionMinutes = (hour - 5) * 60 + minutes;
     
-    acc[event.CHANNEL].push({
+    acc[channelDateKey].events.push({
       ...event,
       startTime,
       duration,
@@ -204,6 +218,15 @@ export default function Schedule() {
     
     return acc;
   }, {}) || {};
+
+  // For display, we need to show one date per channel - use the first event's date
+  const eventsByChannel = Object.values(eventsByChannelAndDate).reduce((acc: any, channelData: any) => {
+    const channel = channelData.channel;
+    if (!acc[channel]) {
+      acc[channel] = channelData.events;
+    }
+    return acc;
+  }, {});
 
   return (
     <div className="min-h-screen bg-background">
