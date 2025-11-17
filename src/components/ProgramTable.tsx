@@ -126,6 +126,7 @@ interface ProgramTableProps {
   commtypes?: Array<{id: string; name: string}>;
   bts?: Array<{id: string; name: string}>;
   topcontents?: Array<{id: string; name: string}>;
+  viewMode?: 'TODOS' | 'PLANNING' | 'PROMOTION';
 }
 
 export function ProgramTable({ 
@@ -138,7 +139,8 @@ export function ProgramTable({
   narrators = [],
   commtypes = [],
   bts = [],
-  topcontents = []
+  topcontents = [],
+  viewMode = 'TODOS'
 }: ProgramTableProps) {
   const [sortColumn, setSortColumn] = useState<keyof Program | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
@@ -328,30 +330,42 @@ export function ProgramTable({
               <TableHead onClick={() => handleSort('YEAR')} className="cursor-pointer hover:bg-muted transition-colors min-w-[60px] h-8 py-1 text-xs">
                 Ano {sortColumn === 'YEAR' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableHead>
-              {/* Produção Fields */}
-              <TableHead className="min-w-[100px] h-8 py-1 text-xs">Time Before</TableHead>
-              <TableHead className="min-w-[100px] h-8 py-1 text-xs">Time Ending</TableHead>
-              <TableHead className="min-w-[120px] h-8 py-1 text-xs">Broadcast Type</TableHead>
-              <TableHead className="min-w-[150px] h-8 py-1 text-xs">Narrador</TableHead>
-              <TableHead className="min-w-[150px] h-8 py-1 text-xs">Comentador(es)</TableHead>
+              {/* Produção Fields - sempre visíveis */}
+              {viewMode === 'TODOS' && (
+                <>
+                  <TableHead className="min-w-[100px] h-8 py-1 text-xs">Time Before</TableHead>
+                  <TableHead className="min-w-[100px] h-8 py-1 text-xs">Time Ending</TableHead>
+                  <TableHead className="min-w-[120px] h-8 py-1 text-xs">Broadcast Type</TableHead>
+                  <TableHead className="min-w-[150px] h-8 py-1 text-xs">Narrador</TableHead>
+                  <TableHead className="min-w-[150px] h-8 py-1 text-xs">Comentador(es)</TableHead>
+                </>
+              )}
               {/* Planning Fields */}
-              <TableHead className="min-w-[150px] h-8 py-1 text-xs">Commercial Type</TableHead>
-              <TableHead className="min-w-[100px] h-8 py-1 text-xs">BT</TableHead>
-              <TableHead className="min-w-[200px] h-8 py-1 text-xs">Info Adicional</TableHead>
-              <TableHead className="min-w-[100px] h-8 py-1 text-xs">Match High</TableHead>
+              {(viewMode === 'TODOS' || viewMode === 'PLANNING') && (
+                <>
+                  <TableHead className="min-w-[150px] h-8 py-1 text-xs">Commercial Type</TableHead>
+                  <TableHead className="min-w-[100px] h-8 py-1 text-xs">BT</TableHead>
+                  <TableHead className="min-w-[200px] h-8 py-1 text-xs">Info Adicional</TableHead>
+                  <TableHead className="min-w-[100px] h-8 py-1 text-xs">Match High</TableHead>
+                </>
+              )}
               {/* Promoção Fields */}
-              <TableHead className="min-w-[150px] h-8 py-1 text-xs">Top Content</TableHead>
-              <TableHead className="min-w-[120px] h-8 py-1 text-xs">Clássico/Dérbi</TableHead>
-              <TableHead className="min-w-[200px] h-8 py-1 text-xs">Detalhe Conteúdo</TableHead>
-              <TableHead className="min-w-[120px] h-8 py-1 text-xs">Banners Plat.</TableHead>
-              <TableHead className="min-w-[120px] h-8 py-1 text-xs">Promo Individual</TableHead>
-              <TableHead className="min-w-[120px] h-8 py-1 text-xs">Promo Conjunta</TableHead>
-              <TableHead className="min-w-[120px] h-8 py-1 text-xs">Promo Genérica</TableHead>
-              <TableHead className="min-w-[100px] h-8 py-1 text-xs">Promo 10s</TableHead>
-              <TableHead className="min-w-[200px] h-8 py-1 text-xs">Detalhes Promo</TableHead>
-              <TableHead className="min-w-[80px] h-8 py-1 text-xs">Telcos</TableHead>
-              <TableHead className="min-w-[80px] h-8 py-1 text-xs">CRM</TableHead>
-              <TableHead className="min-w-[80px] h-8 py-1 text-xs">Social</TableHead>
+              {(viewMode === 'TODOS' || viewMode === 'PROMOTION') && (
+                <>
+                  <TableHead className="min-w-[150px] h-8 py-1 text-xs">Top Content</TableHead>
+                  <TableHead className="min-w-[120px] h-8 py-1 text-xs">Clássico/Dérbi</TableHead>
+                  <TableHead className="min-w-[200px] h-8 py-1 text-xs">Detalhe Conteúdo</TableHead>
+                  <TableHead className="min-w-[120px] h-8 py-1 text-xs">Banners Plat.</TableHead>
+                  <TableHead className="min-w-[120px] h-8 py-1 text-xs">Promo Individual</TableHead>
+                  <TableHead className="min-w-[120px] h-8 py-1 text-xs">Promo Conjunta</TableHead>
+                  <TableHead className="min-w-[120px] h-8 py-1 text-xs">Promo Genérica</TableHead>
+                  <TableHead className="min-w-[100px] h-8 py-1 text-xs">Promo 10s</TableHead>
+                  <TableHead className="min-w-[200px] h-8 py-1 text-xs">Detalhes Promo</TableHead>
+                  <TableHead className="min-w-[80px] h-8 py-1 text-xs">Telcos</TableHead>
+                  <TableHead className="min-w-[80px] h-8 py-1 text-xs">CRM</TableHead>
+                  <TableHead className="min-w-[80px] h-8 py-1 text-xs">Social</TableHead>
+                </>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -411,89 +425,95 @@ export function ProgramTable({
                   </TableCell>
                   <TableCell className="text-xs py-1">{program.YEAR || '-'}</TableCell>
                   
-                  {/* Produção Fields */}
-                  <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
-                    <Input
-                      value={getEditingValue('TIME_BEFORE', program.TIME_BEFORE)}
-                      onChange={(e) => handleInputChange('TIME_BEFORE', e.target.value)}
-                      onBlur={() => handleInputBlur('TIME_BEFORE', program.TIME_BEFORE)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.currentTarget.blur();
-                        }
-                      }}
-                      className="h-7 text-[11px]"
-                      disabled={isSaving('TIME_BEFORE')}
-                      placeholder="HH:MM"
-                    />
-                  </TableCell>
-                  
-                  <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
-                    <Input
-                      value={getEditingValue('TIME_ENDING', program.TIME_ENDING)}
-                      onChange={(e) => handleInputChange('TIME_ENDING', e.target.value)}
-                      onBlur={() => handleInputBlur('TIME_ENDING', program.TIME_ENDING)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.currentTarget.blur();
-                        }
-                      }}
-                      className="h-7 text-[11px]"
-                      disabled={isSaving('TIME_ENDING')}
-                      placeholder="HH:MM"
-                    />
-                  </TableCell>
-                  
-                  <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
-                    <Select
-                      value={program.STATE_EVENT_ID || ''}
-                      onValueChange={(value) => handleCellUpdate(program, 'STATE_EVENT_ID', value)}
-                      disabled={isSaving('STATE_EVENT_ID')}
-                    >
-                      <SelectTrigger className="h-7 text-[11px]">
-                        <SelectValue placeholder="-" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {stateEvents.map((se) => (
-                          <SelectItem key={se.id} value={se.id}>{se.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  
-                  <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
-                    <Select
-                      value={program.NARRATOR_ID || ''}
-                      onValueChange={(value) => handleCellUpdate(program, 'NARRATOR_ID', value)}
-                      disabled={isSaving('NARRATOR_ID')}
-                    >
-                      <SelectTrigger className="h-7 text-[11px]">
-                        <SelectValue placeholder="-" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {narrators.map((n) => (
-                          <SelectItem key={n.id} value={n.id}>{n.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  
-                  <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
-                    <Input
-                      value={getEditingValue('COMMENTATOR', program.COMMENTATOR)}
-                      onChange={(e) => handleInputChange('COMMENTATOR', e.target.value)}
-                      onBlur={() => handleInputBlur('COMMENTATOR', program.COMMENTATOR)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.currentTarget.blur();
-                        }
-                      }}
-                      className="h-7 text-[11px]"
-                      disabled={isSaving('COMMENTATOR')}
-                    />
-                  </TableCell>
+                  {/* Produção Fields - apenas no modo TODOS */}
+                  {viewMode === 'TODOS' && (
+                    <>
+                      <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
+                        <Input
+                          value={getEditingValue('TIME_BEFORE', program.TIME_BEFORE)}
+                          onChange={(e) => handleInputChange('TIME_BEFORE', e.target.value)}
+                          onBlur={() => handleInputBlur('TIME_BEFORE', program.TIME_BEFORE)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.currentTarget.blur();
+                            }
+                          }}
+                          className="h-7 text-[11px]"
+                          disabled={isSaving('TIME_BEFORE')}
+                          placeholder="HH:MM"
+                        />
+                      </TableCell>
+                      
+                      <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
+                        <Input
+                          value={getEditingValue('TIME_ENDING', program.TIME_ENDING)}
+                          onChange={(e) => handleInputChange('TIME_ENDING', e.target.value)}
+                          onBlur={() => handleInputBlur('TIME_ENDING', program.TIME_ENDING)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.currentTarget.blur();
+                            }
+                          }}
+                          className="h-7 text-[11px]"
+                          disabled={isSaving('TIME_ENDING')}
+                          placeholder="HH:MM"
+                        />
+                      </TableCell>
+                      
+                      <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
+                        <Select
+                          value={program.STATE_EVENT_ID || ''}
+                          onValueChange={(value) => handleCellUpdate(program, 'STATE_EVENT_ID', value)}
+                          disabled={isSaving('STATE_EVENT_ID')}
+                        >
+                          <SelectTrigger className="h-7 text-[11px]">
+                            <SelectValue placeholder="-" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {stateEvents.map((se) => (
+                              <SelectItem key={se.id} value={se.id}>{se.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      
+                      <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
+                        <Select
+                          value={program.NARRATOR_ID || ''}
+                          onValueChange={(value) => handleCellUpdate(program, 'NARRATOR_ID', value)}
+                          disabled={isSaving('NARRATOR_ID')}
+                        >
+                          <SelectTrigger className="h-7 text-[11px]">
+                            <SelectValue placeholder="-" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {narrators.map((n) => (
+                              <SelectItem key={n.id} value={n.id}>{n.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      
+                      <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
+                        <Input
+                          value={getEditingValue('COMMENTATOR', program.COMMENTATOR)}
+                          onChange={(e) => handleInputChange('COMMENTATOR', e.target.value)}
+                          onBlur={() => handleInputBlur('COMMENTATOR', program.COMMENTATOR)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.currentTarget.blur();
+                            }
+                          }}
+                          className="h-7 text-[11px]"
+                          disabled={isSaving('COMMENTATOR')}
+                        />
+                      </TableCell>
+                    </>
+                  )}
                   
                   {/* Planning Fields */}
+                  {(viewMode === 'TODOS' || viewMode === 'PLANNING') && (
+                    <>
                   <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
                     <Select
                       value={program.COMMTYPE_ID || ''}
@@ -551,8 +571,12 @@ export function ProgramTable({
                       className="scale-75"
                     />
                   </TableCell>
+                    </>
+                  )}
                   
                   {/* Promoção Fields */}
+                  {(viewMode === 'TODOS' || viewMode === 'PROMOTION') && (
+                    <>
                   <TableCell onClick={(e) => e.stopPropagation()} className="py-1">
                     <Select
                       value={program.TOPCONTENT_RF_ID || ''}
@@ -680,6 +704,8 @@ export function ProgramTable({
                       className="scale-75"
                     />
                   </TableCell>
+                    </>
+                  )}
                 </TableRow>
               );
             })}
