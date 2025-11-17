@@ -9,6 +9,8 @@ import daznLogo from "@/assets/dazn-logo.png";
 import { NavLink } from "@/components/NavLink";
 import { UserMenu } from "@/components/UserMenu";
 import jsPDF from "jspdf";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 const Index = () => {
   const [programs, setPrograms] = useState<Program[]>([]);
@@ -34,6 +36,7 @@ const Index = () => {
     dateFrom: '',
     dateTo: '',
   });
+  const [viewMode, setViewMode] = useState<'TODOS' | 'PLANNING' | 'PROMOTION'>('TODOS');
 
   // Load filter options on mount, but don't show programs in table
   useEffect(() => {
@@ -431,9 +434,24 @@ const Index = () => {
                   </div>
                 ) : (
                   <div className="mb-4 flex items-center justify-between">
-                    <p className="text-sm text-muted-foreground">
-                      {isLoading ? 'Filtrando...' : `${programs.length} programas encontrados`}
-                    </p>
+                    <div className="flex items-center gap-4">
+                      <p className="text-sm text-muted-foreground">
+                        {isLoading ? 'Filtrando...' : `${programs.length} programas encontrados`}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <Label htmlFor="view-mode" className="text-xs text-muted-foreground">Visualização:</Label>
+                        <Select value={viewMode} onValueChange={(value: 'TODOS' | 'PLANNING' | 'PROMOTION') => setViewMode(value)}>
+                          <SelectTrigger id="view-mode" className="h-8 w-[130px] text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="TODOS">Todos</SelectItem>
+                            <SelectItem value="PLANNING">Planning</SelectItem>
+                            <SelectItem value="PROMOTION">Promotion</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
                     <p className="text-xs text-muted-foreground">
                       Clique duas vezes em uma linha para ver detalhes
                     </p>
@@ -451,6 +469,7 @@ const Index = () => {
                   commtypes={commtypes}
                   bts={bts}
                   topcontents={topcontents}
+                  viewMode={viewMode}
                 />
               </div>
             </>
