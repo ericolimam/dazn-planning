@@ -205,41 +205,67 @@ export default function Schedule() {
     const filterText = `Semana ${selectedWeek} | ${selectedChannels.join(', ')}`;
     doc.text(filterText, 14, 24);
 
-    // Create table with time slots as rows and channels as columns
-    const tableHead = [['Hora', ...selectedChannels]];
+    // Create channel headers with dates
+    const channelHeaders = selectedChannels.map(channel => {
+      const firstEvent = eventsByChannel[channel]?.[0];
+      const dateStr = firstEvent?.TXDAY_DATE || firstEvent?.DATE;
+      const dateFormatted = dateStr 
+        ? (() => {
+            const [month, day, year] = dateStr.split('/');
+            return `${day}/${month}/${year}`;
+          })()
+        : '';
+      return `${channel}\n${dateFormatted}`;
+    });
+
+    const tableHead = [['Hora', ...channelHeaders]];
     const tableBody: any[] = [];
 
+    // Track which events have been added to avoid duplicates
+    const addedEvents = new Map<string, Set<number>>();
+    selectedChannels.forEach(channel => {
+      addedEvents.set(channel, new Set());
+    });
+
     // For each time slot, create a row
-    timeSlots.forEach((timeSlot) => {
+    timeSlots.forEach((timeSlot, slotIndex) => {
       const row = [timeSlot];
       
-      // For each channel, find events that overlap with this time slot
+      const slotStartMinutes = (() => {
+        const [hours, minutes] = timeSlot.split(':').map(Number);
+        let adjustedHours = hours;
+        if (hours < 5) adjustedHours += 24;
+        return (adjustedHours - 5) * 60 + minutes;
+      })();
+      const slotEndMinutes = slotStartMinutes + 30;
+
+      // For each channel, find the event that starts in this time slot
       selectedChannels.forEach((channel) => {
         const events = eventsByChannel[channel] || [];
-        const slotStartMinutes = (() => {
-          const [hours, minutes] = timeSlot.split(':').map(Number);
-          let adjustedHours = hours;
-          if (hours < 5) adjustedHours += 24;
-          return (adjustedHours - 5) * 60 + minutes;
-        })();
-        const slotEndMinutes = slotStartMinutes + 30;
-
-        // Find events that overlap with this time slot
-        const overlappingEvents = events.filter((event: any) => {
+        const channelAdded = addedEvents.get(channel)!;
+        
+        // Find event that starts at this time slot
+        const eventStartingHere = events.find((event: any) => {
           const eventStart = event.positionMinutes;
-          const eventEnd = eventStart + event.durationMinutes;
-          return eventStart < slotEndMinutes && eventEnd > slotStartMinutes;
+          return eventStart >= slotStartMinutes && eventStart < slotEndMinutes && !channelAdded.has(event.ID);
         });
 
-        if (overlappingEvents.length > 0) {
-          // Show the first overlapping event
-          const event = overlappingEvents[0];
-          const title = event.TXSLOT_NAME === 'SEM EMISSÃO' ? 'SEM EMISSÃO' : event.PROGRAMME;
-          const startTime = event.START_TC || event.START_TIME;
-          const genre = event.GENRE || '';
-          row.push(`${startTime.substring(0, 5)} - ${title}\n${genre}`);
+        if (eventStartingHere) {
+          channelAdded.add(eventStartingHere.ID);
+          const title = eventStartingHere.TXSLOT_NAME === 'SEM EMISSÃO' ? 'SEM EMISSÃO' : eventStartingHere.PROGRAMME;
+          const startTime = (eventStartingHere.START_TC || eventStartingHere.START_TIME).substring(0, 5);
+          const duration = Math.round(eventStartingHere.durationMinutes);
+          const genre = eventStartingHere.GENRE || '';
+          row.push(`${title}\n${startTime} - ${duration}min\n${genre}`);
         } else {
-          row.push('');
+          // Check if this slot is part of a previous event
+          const ongoingEvent = events.find((event: any) => {
+            const eventStart = event.positionMinutes;
+            const eventEnd = eventStart + event.durationMinutes;
+            return eventStart < slotStartMinutes && eventEnd > slotStartMinutes && channelAdded.has(event.ID);
+          });
+          
+          row.push(ongoingEvent ? '' : '');
         }
       });
       
@@ -253,37 +279,87 @@ export default function Schedule() {
       theme: 'grid',
       styles: { 
         fontSize: 6, 
-        cellPadding: 1,
+        cellPadding: 2,
         overflow: 'linebreak',
-        cellWidth: 'wrap'
+        cellWidth: 'wrap',
+        valign: 'top'
       },
       headStyles: { 
         fillColor: [41, 128, 185], 
         fontSize: 7, 
         fontStyle: 'bold',
-        halign: 'center'
+        halign: 'center',
+        valign: 'middle'
       },
       columnStyles: {
-        0: { cellWidth: 15, halign: 'center', fontStyle: 'bold' }
+        0: { cellWidth: 15, halign: 'center', fontStyle: 'bold', valign: 'middle' }
       },
       margin: { left: 10, right: 10 },
       didParseCell: (data) => {
-        // Color cells based on genre for data cells (not header or time column)
+        // Color cells based on content
         if (data.section === 'body' && data.column.index > 0) {
-          const cellText = String(data.cell.text);
-          if (cellText && cellText !== '') {
-            // Extract genre from cell text (after the newline)
+          const cellText = String(data.cell.text.join('\n'));
+          
+          if (cellText && cellText.trim() !== '') {
+            const channel = selectedChannels[data.column.index - 1];
+            const events = eventsByChannel[channel] || [];
+            
+            // Find the event that corresponds to this cell
             const lines = cellText.split('\n');
-            if (lines.length > 1) {
-              const genre = lines[1];
-              const color = getGenreColor(genre);
-              if (color !== '#6b7280') { // Only color if not default gray
-                const rgb = parseInt(color.slice(1), 16);
-                const r = (rgb >> 16) & 255;
-                const g = (rgb >> 8) & 255;
-                const b = rgb & 255;
-                data.cell.styles.fillColor = [r, g, b];
+            if (lines.length >= 3) {
+              const title = lines[0];
+              const genre = lines[2];
+              
+              // Check if it's "SEM EMISSÃO"
+              if (title === 'SEM EMISSÃO') {
+                data.cell.styles.fillColor = [0, 0, 0];
                 data.cell.styles.textColor = [255, 255, 255];
+              } else {
+                // Apply genre color
+                const color = getGenreColor(genre);
+                if (color !== '#6b7280') {
+                  const rgb = parseInt(color.slice(1), 16);
+                  const r = (rgb >> 16) & 255;
+                  const g = (rgb >> 8) & 255;
+                  const b = rgb & 255;
+                  data.cell.styles.fillColor = [r, g, b];
+                  data.cell.styles.textColor = [255, 255, 255];
+                }
+              }
+            }
+          }
+        }
+      },
+      didDrawCell: (data) => {
+        // Merge cells vertically for events that span multiple time slots
+        if (data.section === 'body' && data.column.index > 0) {
+          const cellText = String(data.cell.text.join('\n'));
+          
+          if (cellText && cellText.trim() !== '') {
+            const channel = selectedChannels[data.column.index - 1];
+            const events = eventsByChannel[channel] || [];
+            const rowIndex = data.row.index;
+            
+            const slotStartMinutes = (() => {
+              const timeSlot = timeSlots[rowIndex];
+              const [hours, minutes] = timeSlot.split(':').map(Number);
+              let adjustedHours = hours;
+              if (hours < 5) adjustedHours += 24;
+              return (adjustedHours - 5) * 60 + minutes;
+            })();
+            
+            const event = events.find((e: any) => {
+              const eventStart = e.positionMinutes;
+              return eventStart >= slotStartMinutes && eventStart < slotStartMinutes + 30;
+            });
+            
+            if (event) {
+              const slotsToSpan = Math.ceil(event.durationMinutes / 30);
+              if (slotsToSpan > 1) {
+                const cellHeight = data.cell.height;
+                const totalHeight = cellHeight * slotsToSpan;
+                // Update cell height to span multiple rows
+                data.cell.height = totalHeight;
               }
             }
           }
