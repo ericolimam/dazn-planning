@@ -205,51 +205,90 @@ export default function Schedule() {
     const filterText = `Semana ${selectedWeek} | ${selectedChannels.join(', ')}`;
     doc.text(filterText, 14, 24);
 
-    let yPosition = 30;
+    // Create table with time slots as rows and channels as columns
+    const tableHead = [['Hora', ...selectedChannels]];
+    const tableBody: any[] = [];
 
-    selectedChannels.forEach((channel, channelIndex) => {
-      if (channelIndex > 0) {
-        doc.addPage();
-        yPosition = 30;
-      }
+    // For each time slot, create a row
+    timeSlots.forEach((timeSlot) => {
+      const row = [timeSlot];
+      
+      // For each channel, find events that overlap with this time slot
+      selectedChannels.forEach((channel) => {
+        const events = eventsByChannel[channel] || [];
+        const slotStartMinutes = (() => {
+          const [hours, minutes] = timeSlot.split(':').map(Number);
+          let adjustedHours = hours;
+          if (hours < 5) adjustedHours += 24;
+          return (adjustedHours - 5) * 60 + minutes;
+        })();
+        const slotEndMinutes = slotStartMinutes + 30;
 
-      doc.setFontSize(12);
-      doc.setFont(undefined, 'bold');
-      doc.text(`Canal: ${channel}`, 14, yPosition);
-      yPosition += 6;
+        // Find events that overlap with this time slot
+        const overlappingEvents = events.filter((event: any) => {
+          const eventStart = event.positionMinutes;
+          const eventEnd = eventStart + event.durationMinutes;
+          return eventStart < slotEndMinutes && eventEnd > slotStartMinutes;
+        });
 
-      const events = eventsByChannel[channel] || [];
-      const tableData = events.map((event: any) => {
-        const startTime = event.START_TIME.substring(0, 5);
-        const title = event.TXSLOT_NAME === 'SEM EMISSÃO' ? 'SEM EMISSÃO' : event.PROGRAMME;
-        const duration = `${Math.round(event.durationMinutes)}min`;
-        const genre = event.GENRE || '-';
-        const premiere = event.PREMIERE || '-';
-        
-        return [startTime, title, duration, genre, premiere];
-      });
-
-      autoTable(doc, {
-        startY: yPosition,
-        head: [['Horário', 'Programa', 'Duração', 'Gênero', 'Premiere']],
-        body: tableData,
-        theme: 'striped',
-        styles: { fontSize: 8, cellPadding: 2 },
-        headStyles: { fillColor: [41, 128, 185], fontSize: 9, fontStyle: 'bold' },
-        margin: { left: 14, right: 14 },
-        didParseCell: (data) => {
-          if (data.column.index === 3 && data.section === 'body') {
-            const genre = tableData[data.row.index][3];
-            const color = getGenreColor(genre);
-            const rgb = parseInt(color.slice(1), 16);
-            const r = (rgb >> 16) & 255;
-            const g = (rgb >> 8) & 255;
-            const b = rgb & 255;
-            data.cell.styles.fillColor = [r, g, b];
-            data.cell.styles.textColor = [255, 255, 255];
-          }
+        if (overlappingEvents.length > 0) {
+          // Show the first overlapping event
+          const event = overlappingEvents[0];
+          const title = event.TXSLOT_NAME === 'SEM EMISSÃO' ? 'SEM EMISSÃO' : event.PROGRAMME;
+          const startTime = event.START_TC || event.START_TIME;
+          const genre = event.GENRE || '';
+          row.push(`${startTime.substring(0, 5)} - ${title}\n${genre}`);
+        } else {
+          row.push('');
         }
       });
+      
+      tableBody.push(row);
+    });
+
+    autoTable(doc, {
+      startY: 30,
+      head: tableHead,
+      body: tableBody,
+      theme: 'grid',
+      styles: { 
+        fontSize: 6, 
+        cellPadding: 1,
+        overflow: 'linebreak',
+        cellWidth: 'wrap'
+      },
+      headStyles: { 
+        fillColor: [41, 128, 185], 
+        fontSize: 7, 
+        fontStyle: 'bold',
+        halign: 'center'
+      },
+      columnStyles: {
+        0: { cellWidth: 15, halign: 'center', fontStyle: 'bold' }
+      },
+      margin: { left: 10, right: 10 },
+      didParseCell: (data) => {
+        // Color cells based on genre for data cells (not header or time column)
+        if (data.section === 'body' && data.column.index > 0) {
+          const cellText = String(data.cell.text);
+          if (cellText && cellText !== '') {
+            // Extract genre from cell text (after the newline)
+            const lines = cellText.split('\n');
+            if (lines.length > 1) {
+              const genre = lines[1];
+              const color = getGenreColor(genre);
+              if (color !== '#6b7280') { // Only color if not default gray
+                const rgb = parseInt(color.slice(1), 16);
+                const r = (rgb >> 16) & 255;
+                const g = (rgb >> 8) & 255;
+                const b = rgb & 255;
+                data.cell.styles.fillColor = [r, g, b];
+                data.cell.styles.textColor = [255, 255, 255];
+              }
+            }
+          }
+        }
+      }
     });
 
     doc.save(`grade-programacao-semana-${selectedWeek}.pdf`);
