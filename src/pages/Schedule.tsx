@@ -536,20 +536,22 @@ export default function Schedule() {
                               setModalOpen(true);
                             }}
                           >
-                            <div className="flex items-start gap-1 mb-0.5">
+                            <div className="flex items-start gap-1.5 mb-0.5">
                               {getPremiereIcon(event.PREMIERE)}
-                              {getTeamLogo(event.PROGRAMME, 20) && (
-                                <img 
-                                  src={getTeamLogo(event.PROGRAMME, 20)!} 
-                                  alt="" 
-                                  className="w-4 h-4 flex-shrink-0 bg-white rounded-sm p-0.5"
-                                  onError={(e) => {
-                                    e.currentTarget.style.display = 'none';
-                                  }}
-                                />
-                              )}
-                              <div className="font-semibold text-[11px] truncate flex-1 leading-tight">
-                                {event.TXSLOT_NAME === 'SEM EMISSÃO' ? 'SEM EMISSÃO' : event.PROGRAMME}
+                              <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                                {getTeamLogo(event.PROGRAMME, 24) && (
+                                  <img 
+                                    src={getTeamLogo(event.PROGRAMME, 24)!} 
+                                    alt="" 
+                                    className="w-5 h-5 flex-shrink-0 bg-white rounded p-0.5"
+                                    onError={(e) => {
+                                      e.currentTarget.style.display = 'none';
+                                    }}
+                                  />
+                                )}
+                                <div className="font-semibold text-[11px] truncate leading-tight">
+                                  {event.TXSLOT_NAME === 'SEM EMISSÃO' ? 'SEM EMISSÃO' : event.PROGRAMME}
+                                </div>
                               </div>
                             </div>
                             <div className="text-[9px] opacity-90">
