@@ -112,8 +112,59 @@ const bundesligaLogoIds: Record<string, string> = {
   'hsv': 'DFL-CLU-00000C',
 };
 
+// Mapping of team names to La Liga club slugs
+const laLigaClubSlugs: Record<string, string> = {
+  'athletic': 'athletic-club',
+  'athletic club': 'athletic-club',
+  'athletic bilbao': 'athletic-club',
+  'atletico': 'atletico-de-madrid',
+  'atleti': 'atletico-de-madrid',
+  'atletico madrid': 'atletico-de-madrid',
+  'atletico de madrid': 'atletico-de-madrid',
+  'osasuna': 'c-a-osasuna',
+  'celta': 'rc-celta',
+  'celta vigo': 'rc-celta',
+  'alaves': 'd-alaves',
+  'alavés': 'd-alaves',
+  'deportivo alaves': 'd-alaves',
+  'elche': 'elche-c-f',
+  'barcelona': 'fc-barcelona',
+  'barça': 'fc-barcelona',
+  'fc barcelona': 'fc-barcelona',
+  'getafe': 'getafe-cf',
+  'girona': 'girona-fc',
+  'levante': 'levante-ud',
+  'rayo': 'rayo-vallecano',
+  'rayo vallecano': 'rayo-vallecano',
+  'espanyol': 'rcd-espanyol',
+  'rcd espanyol': 'rcd-espanyol',
+  'mallorca': 'rcd-mallorca',
+  'rcd mallorca': 'rcd-mallorca',
+  'betis': 'real-betis',
+  'real betis': 'real-betis',
+  'real madrid': 'real-madrid',
+  'madrid': 'real-madrid',
+  'oviedo': 'real-oviedo',
+  'real oviedo': 'real-oviedo',
+  'sociedad': 'real-sociedad',
+  'real sociedad': 'real-sociedad',
+  'valladolid': 'real-valladolid',
+  'real valladolid': 'real-valladolid',
+  'sevilla': 'sevilla-fc',
+  'sevilla fc': 'sevilla-fc',
+  'valencia': 'valencia-cf',
+  'valencia cf': 'valencia-cf',
+  'villarreal': 'villarreal-cf',
+  'villarreal cf': 'villarreal-cf',
+  'las palmas': 'ud-las-palmas',
+  'ud las palmas': 'ud-las-palmas',
+  'leganes': 'cd-leganes',
+  'leganés': 'cd-leganes',
+  'cd leganes': 'cd-leganes',
+};
+
 /**
- * Get the team logo URL based on the program name (supports UEFA and Bundesliga)
+ * Get the team logo URL based on the program name (supports UEFA, Bundesliga, and La Liga)
  * @param programName - The name of the program/event
  * @param size - Logo size (default: 24x24)
  * @returns The logo URL or null if no match found
@@ -123,7 +174,14 @@ export const getTeamLogo = (programName: string, size: number = 24): string | nu
   
   const normalizedName = programName.toLowerCase();
   
-  // Try to find a matching team in Bundesliga first (more specific matches)
+  // Try to find a matching team in La Liga first
+  for (const [teamName, slug] of Object.entries(laLigaClubSlugs)) {
+    if (normalizedName.includes(teamName)) {
+      return `https://assets.laliga.com/squad-logos/club-${slug}.png`;
+    }
+  }
+  
+  // Try to find a matching team in Bundesliga
   for (const [teamName, logoId] of Object.entries(bundesligaLogoIds)) {
     if (normalizedName.includes(teamName)) {
       return `https://www.bundesliga.com/assets/clublogo/${logoId}.svg`;
