@@ -12,6 +12,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { getTeamLogo } from "@/utils/teamLogos";
 
 export interface ScheduleEvent {
   ID: number;
@@ -524,7 +525,7 @@ export default function Schedule() {
                         return (
                           <div
                             key={`${event.ID}-${idx}`}
-                            className="absolute left-0 right-0 mx-1 p-2 rounded text-white cursor-pointer hover:opacity-90 transition-opacity overflow-hidden shadow-sm"
+                            className="absolute left-0 right-0 mx-1 p-1.5 rounded text-white cursor-pointer hover:opacity-90 transition-opacity overflow-hidden shadow-sm"
                             style={{
                               backgroundColor: color,
                               top: `${topPosition}px`,
@@ -535,17 +536,27 @@ export default function Schedule() {
                               setModalOpen(true);
                             }}
                           >
-                            <div className="flex items-start gap-1 mb-1">
+                            <div className="flex items-start gap-1 mb-0.5">
                               {getPremiereIcon(event.PREMIERE)}
-                              <div className="font-semibold text-xs truncate flex-1">
+                              {getTeamLogo(event.PROGRAMME, 20) && (
+                                <img 
+                                  src={getTeamLogo(event.PROGRAMME, 20)!} 
+                                  alt="" 
+                                  className="w-4 h-4 flex-shrink-0 bg-white rounded-sm p-0.5"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                  }}
+                                />
+                              )}
+                              <div className="font-semibold text-[11px] truncate flex-1 leading-tight">
                                 {event.TXSLOT_NAME === 'SEM EMISSÃO' ? 'SEM EMISSÃO' : event.PROGRAMME}
                               </div>
                             </div>
-                            <div className="text-[10px] opacity-90">
+                            <div className="text-[9px] opacity-90">
                               {event.START_TIME.substring(0, 5)} - {Math.round(event.durationMinutes)}min
                             </div>
                             {height > 50 && (
-                              <div className="text-[10px] opacity-75 truncate mt-1">
+                              <div className="text-[9px] opacity-75 truncate mt-0.5">
                                 {event.GENRE}
                               </div>
                             )}
