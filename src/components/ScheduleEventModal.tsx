@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScheduleEvent } from "@/pages/Schedule";
 import { Star, Sparkles, TrendingUp } from "lucide-react";
+import { getTeamLogo } from "@/utils/teamLogos";
+import { extractTeamNames } from "@/utils/extractTeamNames";
 
 const getGenreColor = (genre: string) => {
   const colors: Record<string, string> = {
@@ -93,12 +95,52 @@ interface ScheduleEventModalProps {
 export function ScheduleEventModal({ event, open, onOpenChange }: ScheduleEventModalProps) {
   if (!event) return null;
 
+  const programName = event.PROGRAMME || event.SERIES || event.TXSLOT_NAME;
+  const teamNames = extractTeamNames(programName);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-foreground">
-            {event.PROGRAMME || event.SERIES || event.TXSLOT_NAME}
+            {teamNames && teamNames.length === 2 ? (
+              <div className="flex items-center gap-3 flex-wrap">
+                {/* First Team */}
+                <div className="flex items-center gap-2">
+                  {getTeamLogo(teamNames[0], 32) && (
+                    <img 
+                      src={getTeamLogo(teamNames[0], 32)!} 
+                      alt={teamNames[0]} 
+                      className="w-8 h-8 bg-white rounded p-1"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  )}
+                  <span>{teamNames[0]}</span>
+                </div>
+                
+                {/* VS separator */}
+                <span className="text-muted-foreground font-normal">vs</span>
+                
+                {/* Second Team */}
+                <div className="flex items-center gap-2">
+                  {getTeamLogo(teamNames[1], 32) && (
+                    <img 
+                      src={getTeamLogo(teamNames[1], 32)!} 
+                      alt={teamNames[1]} 
+                      className="w-8 h-8 bg-white rounded p-1"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  )}
+                  <span>{teamNames[1]}</span>
+                </div>
+              </div>
+            ) : (
+              programName
+            )}
           </DialogTitle>
           <DialogDescription className="text-base">
             {event.SERIES && event.PROGRAMME && `Série: ${event.SERIES}`}
