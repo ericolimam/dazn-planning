@@ -2,66 +2,121 @@
 const uefaLogoIds: Record<string, string> = {
   // Fase da Liga
   'ajax': '50143',
+  'afc ajax': '50143',
   'arsenal': '52280',
+  'arsenal fc': '52280',
   'atalanta': '52816',
+  'atalanta bc': '52816',
   'athletic': '50125',
+  'athletic club': '50125',
+  'athletic bilbao': '50125',
   'atletico': '50124',
   'atleti': '50124',
+  'atletico madrid': '50124',
+  'atletico de madrid': '50124',
   'dortmund': '52758',
+  'borussia dortmund': '52758',
+  'bvb': '52758',
   'barcelona': '50080',
   'barça': '50080',
+  'barca': '50080',
+  'fc barcelona': '50080',
   'bayern': '50037',
+  'bayern munich': '50037',
+  'bayern munchen': '50037',
+  'bayern münchen': '50037',
+  'fc bayern': '50037',
   'benfica': '50147',
+  'sl benfica': '50147',
   'bodo': '59333',
   'glimt': '59333',
+  'bodo/glimt': '59333',
   'chelsea': '52914',
+  'chelsea fc': '52914',
   'brugge': '50043',
+  'club brugge': '50043',
   'copenhagen': '52709',
+  'fc copenhagen': '52709',
   'frankfurt': '50072',
+  'eintracht frankfurt': '50072',
   'galatasaray': '50067',
   'inter': '50138',
+  'inter milan': '50138',
   'internazionale': '50138',
+  'fc internazionale': '50138',
   'juventus': '50139',
   'juve': '50139',
   'leverkusen': '50109',
+  'bayer leverkusen': '50109',
   'liverpool': '7889',
+  'liverpool fc': '7889',
   'manchester city': '52919',
   'man city': '52919',
   'city': '52919',
   'marseille': '52748',
+  'om': '52748',
+  'olympique marseille': '52748',
   'monaco': '50023',
+  'as monaco': '50023',
   'napoli': '50136',
+  'ssc napoli': '50136',
   'newcastle': '59324',
+  'newcastle united': '59324',
   'olympiacos': '2610',
   'pafos': '2609532',
+  'pafos fc': '2609532',
   'paris': '52747',
   'psg': '52747',
+  'paris saint-germain': '52747',
+  'paris sg': '52747',
   'psv': '50062',
+  'psv eindhoven': '50062',
   'qarabag': '60609',
   'real madrid': '50051',
   'madrid': '50051',
+  'real': '50051',
   'slavia': '52498',
+  'slavia praha': '52498',
+  'slavia prague': '52498',
   'sporting': '50149',
+  'sporting cp': '50149',
+  'sporting lisbon': '50149',
   'tottenham': '1652',
   'spurs': '1652',
+  'tottenham hotspur': '1652',
   'union': '64125',
+  'union sg': '64125',
+  'union saint-gilloise': '64125',
   'villarreal': '70691',
+  'villarreal cf': '70691',
   // Play-off
   'basel': '59856',
+  'fc basel': '59856',
   'celtic': '50050',
+  'celtic fc': '50050',
   'crvena': '50069',
+  'crvena zvezda': '50069',
+  'red star': '50069',
   'estrela vermelha': '50069',
   'fenerbahce': '52692',
+  'fenerbahçe': '52692',
   'ferencvaros': '52298',
+  'ferencváros': '52298',
   'rangers': '50121',
+  'rangers fc': '50121',
   'sturm': '50111',
+  'sturm graz': '50111',
   // Outras
   'dynamo': '52723',
+  'dynamo kyiv': '52723',
+  'dynamo kiev': '52723',
   'feyenoord': '52749',
   'milan': '50058',
   'ac milan': '50058',
   'shakhtar': '52707',
+  'shakhtar donetsk': '52707',
   'girona': '2603406',
+  'girona fc': '2603406',
 };
 
 // Mapping of team names to Bundesliga logo IDs
@@ -122,18 +177,26 @@ const laLigaClubSlugs: Record<string, string> = {
   'atletico madrid': 'atletico-de-madrid',
   'atletico de madrid': 'atletico-de-madrid',
   'osasuna': 'c-a-osasuna',
+  'ca osasuna': 'c-a-osasuna',
   'celta': 'rc-celta',
   'celta vigo': 'rc-celta',
+  'rc celta': 'rc-celta',
   'alaves': 'd-alaves',
   'alavés': 'd-alaves',
   'deportivo alaves': 'd-alaves',
+  'deportivo alavés': 'd-alaves',
   'elche': 'elche-c-f',
+  'elche cf': 'elche-c-f',
   'barcelona': 'fc-barcelona',
   'barça': 'fc-barcelona',
+  'barca': 'fc-barcelona',
   'fc barcelona': 'fc-barcelona',
   'getafe': 'getafe-cf',
+  'getafe cf': 'getafe-cf',
   'girona': 'girona-fc',
+  'girona fc': 'girona-fc',
   'levante': 'levante-ud',
+  'levante ud': 'levante-ud',
   'rayo': 'rayo-vallecano',
   'rayo vallecano': 'rayo-vallecano',
   'espanyol': 'rcd-espanyol',
@@ -148,6 +211,7 @@ const laLigaClubSlugs: Record<string, string> = {
   'real oviedo': 'real-oviedo',
   'sociedad': 'real-sociedad',
   'real sociedad': 'real-sociedad',
+  'la real': 'real-sociedad',
   'valladolid': 'real-valladolid',
   'real valladolid': 'real-valladolid',
   'sevilla': 'sevilla-fc',
@@ -161,6 +225,7 @@ const laLigaClubSlugs: Record<string, string> = {
   'leganes': 'cd-leganes',
   'leganés': 'cd-leganes',
   'cd leganes': 'cd-leganes',
+  'cd leganés': 'cd-leganes',
 };
 
 /**
@@ -172,25 +237,33 @@ const laLigaClubSlugs: Record<string, string> = {
 export const getTeamLogo = (programName: string, size: number = 24): string | null => {
   if (!programName) return null;
   
-  const normalizedName = programName.toLowerCase();
+  const normalizedName = programName.toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Remove accents for better matching
+  
+  // Sort team names by length (longest first) to match more specific names first
+  const sortByLength = (entries: [string, string][]) => 
+    entries.sort((a, b) => b[0].length - a[0].length);
   
   // Try to find a matching team in La Liga first
-  for (const [teamName, slug] of Object.entries(laLigaClubSlugs)) {
-    if (normalizedName.includes(teamName)) {
+  for (const [teamName, slug] of sortByLength(Object.entries(laLigaClubSlugs))) {
+    const normalizedTeamName = teamName.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (normalizedName.includes(normalizedTeamName)) {
       return `https://assets.laliga.com/squad-logos/club-${slug}.png`;
     }
   }
   
   // Try to find a matching team in Bundesliga
-  for (const [teamName, logoId] of Object.entries(bundesligaLogoIds)) {
-    if (normalizedName.includes(teamName)) {
+  for (const [teamName, logoId] of sortByLength(Object.entries(bundesligaLogoIds))) {
+    const normalizedTeamName = teamName.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (normalizedName.includes(normalizedTeamName)) {
       return `https://www.bundesliga.com/assets/clublogo/${logoId}.svg`;
     }
   }
   
   // Try to find a matching team in UEFA Champions League
-  for (const [teamName, logoId] of Object.entries(uefaLogoIds)) {
-    if (normalizedName.includes(teamName)) {
+  for (const [teamName, logoId] of sortByLength(Object.entries(uefaLogoIds))) {
+    const normalizedTeamName = teamName.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (normalizedName.includes(normalizedTeamName)) {
       return `https://img.uefa.com/imgml/TP/teams/logos/${size}x${size}/${logoId}.png`;
     }
   }
