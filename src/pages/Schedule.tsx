@@ -484,14 +484,14 @@ export default function Schedule() {
     return acc;
   }, {}) || {};
 
-  // Convert to array and sort by date then channel for display
+  // Convert to array and sort by channel then date for display
   const channelDateColumns = Object.values(eventsByChannelAndDate)
     .sort((a: any, b: any) => {
-      // First sort by date
-      const dateCompare = a.date.localeCompare(b.date);
-      if (dateCompare !== 0) return dateCompare;
-      // Then by channel
-      return a.channel.localeCompare(b.channel);
+      // First sort by channel (DAZN 1, DAZN 2, etc.)
+      const channelCompare = a.channel.localeCompare(b.channel, undefined, { numeric: true });
+      if (channelCompare !== 0) return channelCompare;
+      // Then by date
+      return a.date.localeCompare(b.date);
     });
 
   // Pagination for columns
