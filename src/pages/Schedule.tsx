@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { ScheduleFilters } from "@/components/ScheduleFilters";
 import { ScheduleEventModal } from "@/components/ScheduleEventModal";
-import { Loader2, Star, Sparkles, TrendingUp, FileDown, Clock } from "lucide-react";
+import { Loader2, Star, Sparkles, TrendingUp, FileDown, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import daznLogo from "@/assets/dazn-logo.png";
 import { NavLink } from "@/components/NavLink";
 import { UserMenu } from "@/components/UserMenu";
@@ -138,6 +138,8 @@ export default function Schedule() {
   const [selectedYear, setSelectedYear] = useState<number | null>(new Date().getFullYear());
   const [selectedEvent, setSelectedEvent] = useState<ScheduleEvent | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const columnsPerPage = 3; // Show 3 channel+date columns at a time
   const { currentPositionMinutes, isEventCurrentlyAiring } = useCurrentTimeIndicator();
 
   const { data: allScheduleData } = useQuery({
@@ -492,6 +494,29 @@ export default function Schedule() {
       return a.channel.localeCompare(b.channel);
     });
 
+  // Pagination for columns
+  const totalPages = Math.ceil(channelDateColumns.length / columnsPerPage);
+  const startIndex = currentPage * columnsPerPage;
+  const endIndex = startIndex + columnsPerPage;
+  const visibleColumns = channelDateColumns.slice(startIndex, endIndex);
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [selectedWeek, selectedChannels, selectedYear]);
+
   // For PDF export compatibility - keep the old structure
   const eventsByChannel = channelDateColumns.reduce((acc: any, col: any) => {
     if (!acc[col.channel]) {
@@ -547,8 +572,32 @@ export default function Schedule() {
           </div>
         ) : (
           <Card className="p-4">
-            <ScrollArea className="w-full h-[calc(100vh-320px)]">
-              <div className="flex min-w-max overflow-x-auto">
+            <div className="flex items-center justify-between mb-4">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={goToPreviousPage}
+                disabled={currentPage === 0}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              
+              <div className="text-sm text-muted-foreground">
+                Página {currentPage + 1} de {totalPages} ({visibleColumns.length} colunas visíveis)
+              </div>
+              
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={goToNextPage}
+                disabled={currentPage >= totalPages - 1}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <ScrollArea className="w-full h-[calc(100vh-380px)]">
+              <div className="flex min-w-max">
                 {/* Time column */}
                 <div className="flex-shrink-0 w-20 border-r sticky left-0 bg-background z-30">
                   <div className="h-10 border-b sticky top-0 bg-background z-40 flex items-center justify-center font-semibold text-xs">
@@ -562,7 +611,7 @@ export default function Schedule() {
                 </div>
 
                 {/* Channel+Date columns */}
-                {channelDateColumns.map((col: any) => {
+                {visibleColumns.map((col: any) => {
                   const dateStr = col.date;
                   const dateFormatted = dateStr 
                     ? (() => {
