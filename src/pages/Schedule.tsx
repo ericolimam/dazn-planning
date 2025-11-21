@@ -195,191 +195,208 @@ export default function Schedule() {
     const img = new Image();
     img.src = daznLogo;
     
-    const imgWidth = 20;
-    const imgHeight = 8;
-    doc.addImage(img, 'PNG', 14, 10, imgWidth, imgHeight);
-
-    doc.setFontSize(16);
-    doc.setFont(undefined, 'bold');
-    doc.text('Guia de Programação', 40, 15);
-
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
-    const filterText = `Semana ${selectedWeek} | ${selectedChannels.join(', ')}`;
-    doc.text(filterText, 14, 24);
-
-    // Create channel headers with dates from channelDateColumns
-    const channelHeaders = channelDateColumns.map((col: any) => {
-      const dateStr = col.date;
-      const dateFormatted = dateStr 
-        ? (() => {
-            const [month, day, year] = dateStr.split('/');
-            return `${day}/${month}/${year}`;
-          })()
-        : '';
-      
-      // Get weekday abbreviation in Portuguese
-      const weekdayAbbr = dateStr 
-        ? (() => {
-            const [month, day, year] = dateStr.split('/');
-            const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-            const days = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
-            return days[date.getDay()];
-          })()
-        : '';
-      
-      return `${col.channel}\n${weekdayAbbr} ${dateFormatted}`;
-    });
-
-    const tableHead = [['Hora', ...channelHeaders]];
-    const tableBody: any[] = [];
-
-    // Track which events have been added to avoid duplicates
-    const addedEvents = new Map<string, Set<number>>();
+    // Group events by channel
+    const eventsByChannel: Record<string, any[]> = {};
     channelDateColumns.forEach((col: any) => {
-      const key = `${col.channel}_${col.date}`;
-      addedEvents.set(key, new Set());
+      if (!eventsByChannel[col.channel]) {
+        eventsByChannel[col.channel] = [];
+      }
+      eventsByChannel[col.channel].push(col);
     });
 
-    // For each time slot, create a row
-    timeSlots.forEach((timeSlot, slotIndex) => {
-      const row = [timeSlot];
-      
-      const slotStartMinutes = (() => {
-        const [hours, minutes] = timeSlot.split(':').map(Number);
-        let adjustedHours = hours;
-        if (hours < 5) adjustedHours += 24;
-        return (adjustedHours - 5) * 60 + minutes;
-      })();
-      const slotEndMinutes = slotStartMinutes + 30;
+    // Generate one page per channel
+    const channelNames = Object.keys(eventsByChannel).sort();
+    
+    channelNames.forEach((channelName, channelIndex) => {
+      if (channelIndex > 0) {
+        doc.addPage();
+      }
 
-      // For each channel+date column, find the event that starts in this time slot
-      channelDateColumns.forEach((col: any) => {
-        const key = `${col.channel}_${col.date}`;
-        const events = col.events || [];
-        const channelAdded = addedEvents.get(key)!;
+      // Add logo
+      const imgWidth = 20;
+      const imgHeight = 8;
+      doc.addImage(img, 'PNG', 14, 10, imgWidth, imgHeight);
+
+      // Title
+      doc.setFontSize(16);
+      doc.setFont(undefined, 'bold');
+      doc.text('Guia de Programação', 40, 15);
+
+      // Channel and week info
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      const filterText = `Canal: ${channelName} | Semana ${selectedWeek}`;
+      doc.text(filterText, 14, 24);
+
+      // Get all date columns for this channel
+      const channelDates = eventsByChannel[channelName];
+      
+      // Create headers with dates
+      const dateHeaders = channelDates.map((col: any) => {
+        const dateStr = col.date;
+        const dateFormatted = dateStr 
+          ? (() => {
+              const [month, day, year] = dateStr.split('/');
+              return `${day}/${month}/${year}`;
+            })()
+          : '';
         
-        // Find event that starts at this time slot
-        const eventStartingHere = events.find((event: any) => {
-          const eventStart = event.positionMinutes;
-          return eventStart >= slotStartMinutes && eventStart < slotEndMinutes && !channelAdded.has(event.ID);
-        });
-
-        if (eventStartingHere) {
-          channelAdded.add(eventStartingHere.ID);
-          const title = eventStartingHere.TXSLOT_NAME === 'SEM EMISSÃO' ? 'SEM EMISSÃO' : eventStartingHere.PROGRAMME;
-          const startTime = (eventStartingHere.START_TC || eventStartingHere.START_TIME).substring(0, 5);
-          const duration = Math.round(eventStartingHere.durationMinutes);
-          const genre = eventStartingHere.GENRE || '';
-          row.push(`${title}\n${startTime} - ${duration}min\n${genre}`);
-        } else {
-          // Check if this slot is part of a previous event
-          const ongoingEvent = events.find((event: any) => {
-            const eventStart = event.positionMinutes;
-            const eventEnd = eventStart + event.durationMinutes;
-            return eventStart < slotStartMinutes && eventEnd > slotStartMinutes && channelAdded.has(event.ID);
-          });
-          
-          row.push(ongoingEvent ? '' : '');
-        }
+        const weekdayAbbr = dateStr 
+          ? (() => {
+              const [month, day, year] = dateStr.split('/');
+              const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+              const days = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+              return days[date.getDay()];
+            })()
+          : '';
+        
+        return `${weekdayAbbr}\n${dateFormatted}`;
       });
-      
-      tableBody.push(row);
-    });
 
-    autoTable(doc, {
-      startY: 30,
-      head: tableHead,
-      body: tableBody,
-      theme: 'grid',
-      styles: { 
-        fontSize: 6, 
-        cellPadding: 2,
-        overflow: 'linebreak',
-        cellWidth: 'wrap',
-        valign: 'top'
-      },
-      headStyles: { 
-        fillColor: [41, 128, 185], 
-        fontSize: 7, 
-        fontStyle: 'bold',
-        halign: 'center',
-        valign: 'middle'
-      },
-      columnStyles: {
-        0: { cellWidth: 15, halign: 'center', fontStyle: 'bold', valign: 'middle' }
-      },
-      margin: { left: 10, right: 10 },
-      didParseCell: (data) => {
-        // Color cells based on content
-        if (data.section === 'body' && data.column.index > 0) {
-          const cellText = String(data.cell.text.join('\n'));
+      const tableHead = [['Hora', ...dateHeaders]];
+      const tableBody: any[] = [];
+
+      // Track which events have been added
+      const addedEvents = new Map<string, Set<number>>();
+      channelDates.forEach((col: any) => {
+        const key = `${col.channel}_${col.date}`;
+        addedEvents.set(key, new Set());
+      });
+
+      // For each time slot, create a row
+      timeSlots.forEach((timeSlot) => {
+        const row = [timeSlot];
+        
+        const slotStartMinutes = (() => {
+          const [hours, minutes] = timeSlot.split(':').map(Number);
+          let adjustedHours = hours;
+          if (hours < 5) adjustedHours += 24;
+          return (adjustedHours - 5) * 60 + minutes;
+        })();
+        const slotEndMinutes = slotStartMinutes + 30;
+
+        // For each date column, find the event
+        channelDates.forEach((col: any) => {
+          const key = `${col.channel}_${col.date}`;
+          const events = col.events || [];
+          const channelAdded = addedEvents.get(key)!;
           
-        if (cellText && cellText.trim() !== '') {
-            const col = channelDateColumns[data.column.index - 1] as any;
-            const events = col?.events || [];
+          const eventStartingHere = events.find((event: any) => {
+            const eventStart = event.positionMinutes;
+            return eventStart >= slotStartMinutes && eventStart < slotEndMinutes && !channelAdded.has(event.ID);
+          });
+
+          if (eventStartingHere) {
+            channelAdded.add(eventStartingHere.ID);
+            const title = eventStartingHere.TXSLOT_NAME === 'SEM EMISSÃO' ? 'SEM EMISSÃO' : eventStartingHere.PROGRAMME;
+            const startTime = (eventStartingHere.START_TC || eventStartingHere.START_TIME).substring(0, 5);
+            const duration = Math.round(eventStartingHere.durationMinutes);
+            const genre = eventStartingHere.GENRE || '';
+            row.push(`${title}\n${startTime} - ${duration}min\n${genre}`);
+          } else {
+            const ongoingEvent = events.find((event: any) => {
+              const eventStart = event.positionMinutes;
+              const eventEnd = eventStart + event.durationMinutes;
+              return eventStart < slotStartMinutes && eventEnd > slotStartMinutes && channelAdded.has(event.ID);
+            });
             
-            // Find the event that corresponds to this cell
-            const lines = cellText.split('\n');
-            if (lines.length >= 3) {
-              const title = lines[0];
-              const genre = lines[2];
+            row.push(ongoingEvent ? '' : '');
+          }
+        });
+        
+        tableBody.push(row);
+      });
+
+      autoTable(doc, {
+        startY: 30,
+        head: tableHead,
+        body: tableBody,
+        theme: 'grid',
+        styles: { 
+          fontSize: 6, 
+          cellPadding: 2,
+          overflow: 'linebreak',
+          cellWidth: 'wrap',
+          valign: 'top'
+        },
+        headStyles: { 
+          fillColor: [41, 128, 185], 
+          fontSize: 7, 
+          fontStyle: 'bold',
+          halign: 'center',
+          valign: 'middle'
+        },
+        columnStyles: {
+          0: { cellWidth: 15, halign: 'center', fontStyle: 'bold', valign: 'middle' }
+        },
+        margin: { left: 10, right: 10 },
+        didParseCell: (data) => {
+          if (data.section === 'body' && data.column.index > 0) {
+            const cellText = String(data.cell.text.join('\n'));
+            
+            if (cellText && cellText.trim() !== '') {
+              const dateIndex = data.column.index - 1;
+              const col = channelDates[dateIndex] as any;
+              const events = col?.events || [];
               
-              // Check if it's "SEM EMISSÃO"
-              if (title === 'SEM EMISSÃO') {
-                data.cell.styles.fillColor = [0, 0, 0];
-                data.cell.styles.textColor = [255, 255, 255];
-              } else {
-                // Apply genre color
-                const color = getGenreColor(genre);
-                if (color !== '#6b7280') {
-                  const rgb = parseInt(color.slice(1), 16);
-                  const r = (rgb >> 16) & 255;
-                  const g = (rgb >> 8) & 255;
-                  const b = rgb & 255;
-                  data.cell.styles.fillColor = [r, g, b];
+              const lines = cellText.split('\n');
+              if (lines.length >= 3) {
+                const title = lines[0];
+                const genre = lines[2];
+                
+                if (title === 'SEM EMISSÃO') {
+                  data.cell.styles.fillColor = [0, 0, 0];
                   data.cell.styles.textColor = [255, 255, 255];
+                } else {
+                  const color = getGenreColor(genre);
+                  if (color !== '#6b7280') {
+                    const rgb = parseInt(color.slice(1), 16);
+                    const r = (rgb >> 16) & 255;
+                    const g = (rgb >> 8) & 255;
+                    const b = rgb & 255;
+                    data.cell.styles.fillColor = [r, g, b];
+                    data.cell.styles.textColor = [255, 255, 255];
+                  }
+                }
+              }
+            }
+          }
+        },
+        didDrawCell: (data) => {
+          if (data.section === 'body' && data.column.index > 0) {
+            const cellText = String(data.cell.text.join('\n'));
+            
+            if (cellText && cellText.trim() !== '') {
+              const dateIndex = data.column.index - 1;
+              const col = channelDates[dateIndex] as any;
+              const events = col?.events || [];
+              const rowIndex = data.row.index;
+              
+              const slotStartMinutes = (() => {
+                const timeSlot = timeSlots[rowIndex];
+                const [hours, minutes] = timeSlot.split(':').map(Number);
+                let adjustedHours = hours;
+                if (hours < 5) adjustedHours += 24;
+                return (adjustedHours - 5) * 60 + minutes;
+              })();
+              
+              const event = events.find((e: any) => {
+                const eventStart = e.positionMinutes;
+                return eventStart >= slotStartMinutes && eventStart < slotStartMinutes + 30;
+              });
+              
+              if (event) {
+                const slotsToSpan = Math.ceil(event.durationMinutes / 30);
+                if (slotsToSpan > 1) {
+                  const cellHeight = data.cell.height;
+                  const totalHeight = cellHeight * slotsToSpan;
+                  data.cell.height = totalHeight;
                 }
               }
             }
           }
         }
-      },
-      didDrawCell: (data) => {
-        // Merge cells vertically for events that span multiple time slots
-        if (data.section === 'body' && data.column.index > 0) {
-          const cellText = String(data.cell.text.join('\n'));
-          
-        if (cellText && cellText.trim() !== '') {
-            const col = channelDateColumns[data.column.index - 1] as any;
-            const events = col?.events || [];
-            const rowIndex = data.row.index;
-            
-            const slotStartMinutes = (() => {
-              const timeSlot = timeSlots[rowIndex];
-              const [hours, minutes] = timeSlot.split(':').map(Number);
-              let adjustedHours = hours;
-              if (hours < 5) adjustedHours += 24;
-              return (adjustedHours - 5) * 60 + minutes;
-            })();
-            
-            const event = events.find((e: any) => {
-              const eventStart = e.positionMinutes;
-              return eventStart >= slotStartMinutes && eventStart < slotStartMinutes + 30;
-            });
-            
-            if (event) {
-              const slotsToSpan = Math.ceil(event.durationMinutes / 30);
-              if (slotsToSpan > 1) {
-                const cellHeight = data.cell.height;
-                const totalHeight = cellHeight * slotsToSpan;
-                // Update cell height to span multiple rows
-                data.cell.height = totalHeight;
-              }
-            }
-          }
-        }
-      }
+      });
     });
 
     doc.save(`grade-programacao-semana-${selectedWeek}.pdf`);
@@ -498,7 +515,7 @@ export default function Schedule() {
         ) : (
           <Card className="p-4">
             <ScrollArea className="w-full h-[calc(100vh-320px)]">
-              <div className="flex min-w-max">
+              <div className="flex min-w-max overflow-x-auto">
                 {/* Time column */}
                 <div className="flex-shrink-0 w-20 border-r sticky left-0 bg-background z-30">
                   <div className="h-10 border-b sticky top-0 bg-background z-40 flex items-center justify-center font-semibold text-xs">
