@@ -159,11 +159,12 @@ export default function Schedule() {
   const years: number[] = allScheduleData?.ROWS ? Array.from(new Set(allScheduleData.ROWS.map((row: any) => extractYearFromDate(row.DATE)).filter((y): y is number => y !== null))) as number[] : [];
   years.sort((a, b) => a - b);
 
-  // Auto-select all DAZN channels when they become available
+  // Auto-select only DAZN 1 by default
   useEffect(() => {
     if (channels.length > 0 && selectedChannels.length === 0) {
-      const daznChannels = channels.filter(ch => ch.startsWith('DAZN'));
-      setSelectedChannels(daznChannels);
+      if (channels.includes('DAZN 1')) {
+        setSelectedChannels(['DAZN 1']);
+      }
     }
   }, [channels]);
 
