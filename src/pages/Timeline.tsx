@@ -693,7 +693,7 @@ export default function Timeline() {
                               return (
                                  <div
                                    key={event.ID}
-                                   className={`absolute top-1 h-14 rounded border cursor-pointer hover:shadow-lg transition-all overflow-hidden ${
+                                   className={`absolute top-1 h-14 rounded border cursor-pointer hover:shadow-lg hover:scale-105 hover:z-10 transition-all overflow-hidden ${
                                      isCurrentlyAiring 
                                        ? 'border-red-500 border-2 ring-2 ring-red-500/50' 
                                        : 'border-white/20 hover:border-white/40'
