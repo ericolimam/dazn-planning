@@ -527,19 +527,32 @@ export default function Schedule() {
                       ))}
                       
                       {/* Current time indicator line */}
-                      {currentPositionMinutes >= 0 && currentPositionMinutes <= (24 * 60) && (
-                        <div
-                          className="absolute left-0 right-0 h-0.5 bg-red-500 z-20"
-                          style={{
-                            top: `${(currentPositionMinutes / 30) * 64}px`,
-                          }}
-                        >
-                          <div className="absolute -left-1 -top-2 bg-red-500 text-white text-[9px] px-1 rounded flex items-center gap-0.5">
-                            <Clock className="h-2.5 w-2.5" />
-                            AGORA
+                      {(() => {
+                        // Only show indicator if this column's date matches today
+                        const today = new Date().toLocaleDateString('en-US', { 
+                          month: '2-digit', 
+                          day: '2-digit', 
+                          year: 'numeric' 
+                        }).replace(/\//g, '/');
+                        const [todayMonth, todayDay, todayYear] = today.split('/');
+                        const todayFormatted = `${todayMonth}/${todayDay}/${todayYear}`;
+                        
+                        const isToday = col.date === todayFormatted;
+                        
+                        return isToday && currentPositionMinutes >= 0 && currentPositionMinutes <= (24 * 60) && (
+                          <div
+                            className="absolute left-0 right-0 h-0.5 bg-red-500 z-20"
+                            style={{
+                              top: `${(currentPositionMinutes / 30) * 64}px`,
+                            }}
+                          >
+                            <div className="absolute -left-1 -top-2 bg-red-500 text-white text-[9px] px-1 rounded flex items-center gap-0.5">
+                              <Clock className="h-2.5 w-2.5" />
+                              AGORA
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        );
+                      })()}
                       
                       {/* Programs positioned absolutely */}
                       {col.events?.map((event: any, idx: number) => {
