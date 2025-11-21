@@ -583,7 +583,7 @@ export default function Schedule() {
               </Button>
               
               <div className="text-sm text-muted-foreground">
-                Página {currentPage + 1} de {totalPages} ({visibleColumns.length} colunas visíveis)
+                Página {currentPage + 1} de {totalPages} | {visibleColumns.length} de {channelDateColumns.length} colunas
               </div>
               
               <Button
@@ -597,7 +597,7 @@ export default function Schedule() {
             </div>
 
             <ScrollArea className="w-full h-[calc(100vh-380px)]">
-              <div className="flex min-w-max">
+              <div className="flex">
                 {/* Time column */}
                 <div className="flex-shrink-0 w-20 border-r sticky left-0 bg-background z-30">
                   <div className="h-10 border-b sticky top-0 bg-background z-40 flex items-center justify-center font-semibold text-xs">
