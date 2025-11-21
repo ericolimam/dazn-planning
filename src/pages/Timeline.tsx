@@ -4,11 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { ScheduleFilters } from "@/components/ScheduleFilters";
 import { ScheduleEventModal } from "@/components/ScheduleEventModal";
-import { Loader2, FileDown, Clock } from "lucide-react";
+import { Loader2, FileDown, Clock, Star, Sparkles, TrendingUp } from "lucide-react";
 import daznLogo from "@/assets/dazn-logo.png";
 import { NavLink } from "@/components/NavLink";
 import { ScheduleEvent } from "./Schedule";
-import { Star, Sparkles, TrendingUp } from "lucide-react";
 import { UserMenu } from "@/components/UserMenu";
 import { Button } from "@/components/ui/button";
 import jsPDF from "jspdf";
@@ -731,6 +730,9 @@ export default function Timeline() {
                                           <div className="flex items-center justify-center w-4 h-4 rounded-full bg-black text-white text-[7px] font-bold flex-shrink-0">
                                             RC
                                           </div>
+                                        )}
+                                        {event.PREMIERE === 'Premiere' && (
+                                          <Star className="w-3 h-3 fill-yellow-400 text-yellow-400 flex-shrink-0" />
                                         )}
                                       </div>
                                    </div>
