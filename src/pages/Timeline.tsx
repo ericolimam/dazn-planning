@@ -718,8 +718,15 @@ export default function Timeline() {
                                       <div className="text-[10px] opacity-90">
                                         {formatTime(event.startDate)} - {formatTime(event.endDate)}
                                       </div>
-                                      <div className="text-[10px] text-white/80 mt-0.5 truncate">
-                                        {event.GENRE}
+                                      <div className="flex items-center gap-1 mt-0.5">
+                                        <span className="text-[10px] text-white/80 truncate">
+                                          {event.GENRE}
+                                        </span>
+                                        {event.PREMIERE === 'Replay' && (
+                                          <div className="flex items-center justify-center w-4 h-4 rounded-full bg-black text-white text-[7px] font-bold flex-shrink-0">
+                                            RY
+                                          </div>
+                                        )}
                                       </div>
                                    </div>
                                  </div>
