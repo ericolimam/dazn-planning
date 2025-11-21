@@ -625,8 +625,15 @@ export default function Schedule() {
                               {event.START_TIME.substring(0, 5)} - {Math.round(event.durationMinutes)}min
                             </div>
                             {height > 50 && (
-                              <div className="text-[9px] opacity-75 truncate mt-0.5">
-                                {event.GENRE}
+                              <div className="flex items-center gap-1 mt-0.5">
+                                <div className="text-[9px] opacity-75 truncate">
+                                  {event.GENRE}
+                                </div>
+                                {event.PREMIERE === 'Replay' && (
+                                  <div className="flex items-center justify-center w-4 h-4 rounded-full bg-black text-white text-[7px] font-bold flex-shrink-0">
+                                    RY
+                                  </div>
+                                )}
                               </div>
                             )}
                           </div>
