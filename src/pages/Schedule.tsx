@@ -639,6 +639,9 @@ export default function Schedule() {
                                     RC
                                   </div>
                                 )}
+                                {event.PREMIERE === 'Premiere' && (
+                                  <Star className="w-3 h-3 fill-yellow-400 text-yellow-400 flex-shrink-0" />
+                                )}
                               </div>
                             )}
                           </div>
