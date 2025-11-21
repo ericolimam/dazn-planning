@@ -599,12 +599,12 @@ export default function Schedule() {
             <ScrollArea className="w-full h-[calc(100vh-380px)]">
               <div className="flex">
                 {/* Time column */}
-                <div className="flex-shrink-0 w-20 border-r sticky left-0 bg-background z-30">
-                  <div className="h-10 border-b sticky top-0 bg-background z-40 flex items-center justify-center font-semibold text-xs">
+                <div className="flex-shrink-0 w-14 border-r sticky left-0 bg-background z-30">
+                  <div className="h-10 border-b sticky top-0 bg-background z-40 flex items-center justify-center font-semibold text-[10px]">
                     Hora
                   </div>
                   {timeSlots.map((slot) => (
-                    <div key={slot} className="h-16 border-b flex items-center justify-center text-xs font-medium bg-background">
+                    <div key={slot} className="h-16 border-b flex items-center justify-center text-[10px] font-medium bg-background">
                       {slot}
                     </div>
                   ))}
@@ -631,7 +631,7 @@ export default function Schedule() {
                     : '';
                   
                   return (
-                    <div key={`${col.channel}_${col.date}`} className="w-[200px] flex-shrink-0 border-r relative">
+                    <div key={`${col.channel}_${col.date}`} className="w-[170px] flex-shrink-0 border-r relative">
                       {/* Channel header */}
                       <div className="h-10 border-b sticky top-0 bg-background z-30 flex flex-col items-center justify-center px-2">
                         <div className="font-semibold text-xs">{col.channel}</div>
