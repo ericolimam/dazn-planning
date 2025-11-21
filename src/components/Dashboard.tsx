@@ -15,10 +15,10 @@ const COLORS = [
 export const Dashboard = ({ programs }: DashboardProps) => {
   const currentYear = new Date().getFullYear();
   
-  // Filter programs from current year
+  // Filter programs from current year using YEAR field
   const currentYearPrograms = programs.filter(program => {
-    if (!program.X_TXDAY_DATE) return false;
-    const programYear = new Date(program.X_TXDAY_DATE).getFullYear();
+    if (!program.YEAR) return false;
+    const programYear = parseInt(program.YEAR.toString());
     return programYear === currentYear;
   });
 
@@ -71,51 +71,6 @@ export const Dashboard = ({ programs }: DashboardProps) => {
 
   return (
     <div className="space-y-6 mb-6">
-      {/* Header Statistics */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total de Programas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-primary">{programs.length.toLocaleString()}</div>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-blue-500/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Tipos</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-blue-600">
-              {new Set(programs.map(p => p.PROG_TYPE).filter(Boolean)).size}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Narradores</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-green-600">
-              {new Set(programs.map(p => p.NARRATOR).filter(Boolean)).size}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border-purple-500/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Séries</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-purple-600">
-              {new Set(programs.map(p => p.SERIE_TITLE).filter(Boolean)).size}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Chart: Jogos por Série e Narrador */}
       <Card className="bg-card/50 backdrop-blur-sm border-border">
         <CardHeader>
