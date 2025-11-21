@@ -501,7 +501,7 @@ export default function Schedule() {
               <div className="flex min-w-max">
                 {/* Time column */}
                 <div className="flex-shrink-0 w-20 border-r sticky left-0 bg-background z-30">
-                  <div className="h-16 border-b sticky top-0 bg-background z-40 flex items-center justify-center font-semibold text-sm">
+                  <div className="h-12 border-b sticky top-0 bg-background z-40 flex items-center justify-center font-semibold text-sm">
                     Hora
                   </div>
                   {timeSlots.map((slot) => (
@@ -534,7 +534,7 @@ export default function Schedule() {
                   return (
                     <div key={`${col.channel}_${col.date}`} className="flex-1 min-w-[180px] border-r relative">
                       {/* Channel header */}
-                      <div className="h-16 border-b sticky top-0 bg-background z-30 flex flex-col items-center justify-center px-2">
+                      <div className="h-12 border-b sticky top-0 bg-background z-30 flex flex-col items-center justify-center px-2">
                         <div className="font-semibold text-sm">{col.channel}</div>
                         {dateFormatted && (
                           <div className="text-xs text-muted-foreground">
