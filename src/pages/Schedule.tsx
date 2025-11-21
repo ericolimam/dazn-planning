@@ -134,7 +134,7 @@ const getCurrentWeek = () => {
 
 export default function Schedule() {
   const [selectedWeek, setSelectedWeek] = useState<number | null>(getCurrentWeek());
-  const [selectedChannels, setSelectedChannels] = useState<string[]>(["DAZN 1"]);
+  const [selectedChannels, setSelectedChannels] = useState<string[]>([]);
   const [selectedYear, setSelectedYear] = useState<number | null>(new Date().getFullYear());
   const [selectedEvent, setSelectedEvent] = useState<ScheduleEvent | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -155,9 +155,17 @@ export default function Schedule() {
   const weeks: number[] = allScheduleData?.ROWS ? Array.from(new Set(allScheduleData.ROWS.map((row: any) => row.WEEK).filter(Boolean))) as number[] : [];
   weeks.sort((a, b) => a - b);
   const channels: string[] = allScheduleData?.ROWS ? Array.from(new Set(allScheduleData.ROWS.map((row: any) => row.CHANNEL).filter(Boolean))) as string[] : [];
-  channels.sort();
+  channels.sort((a, b) => a.localeCompare(b, undefined, { numeric: true })); // Sort DAZN 1, DAZN 2, etc.
   const years: number[] = allScheduleData?.ROWS ? Array.from(new Set(allScheduleData.ROWS.map((row: any) => extractYearFromDate(row.DATE)).filter((y): y is number => y !== null))) as number[] : [];
   years.sort((a, b) => a - b);
+
+  // Auto-select all DAZN channels when they become available
+  useEffect(() => {
+    if (channels.length > 0 && selectedChannels.length === 0) {
+      const daznChannels = channels.filter(ch => ch.startsWith('DAZN'));
+      setSelectedChannels(daznChannels);
+    }
+  }, [channels]);
 
   const { data: scheduleData, isLoading } = useQuery({
     queryKey: ["schedule-filtered", selectedWeek, selectedChannels, selectedYear],
