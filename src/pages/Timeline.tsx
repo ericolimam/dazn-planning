@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { ScheduleFilters } from "@/components/ScheduleFilters";
 import { ScheduleEventModal } from "@/components/ScheduleEventModal";
-import { Loader2, FileDown } from "lucide-react";
+import { Loader2, FileDown, Clock } from "lucide-react";
 import daznLogo from "@/assets/dazn-logo.png";
 import { NavLink } from "@/components/NavLink";
 import { ScheduleEvent } from "./Schedule";
@@ -13,6 +13,7 @@ import { UserMenu } from "@/components/UserMenu";
 import { Button } from "@/components/ui/button";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { useCurrentTimeIndicator } from "@/hooks/useCurrentTimeIndicator";
 
 // Função para gerar cor consistente baseada no nome do gênero
 const stringToColor = (str: string): string => {
@@ -147,6 +148,7 @@ export default function Timeline() {
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [selectedEvent, setSelectedEvent] = useState<ScheduleEvent | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const { currentPositionMinutes, isEventCurrentlyAiring } = useCurrentTimeIndicator();
 
   const { data: allScheduleData } = useQuery({
     queryKey: ["schedule-all"],
@@ -668,15 +670,35 @@ export default function Timeline() {
                               ))}
                             </div>
 
+                            {/* Current time indicator */}
+                            {currentPositionMinutes >= 0 && currentPositionMinutes <= (hourRange * 60) && (
+                              <div
+                                className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-20"
+                                style={{
+                                  left: `${(currentPositionMinutes / 60) * hourWidth}px`,
+                                }}
+                              >
+                                <div className="absolute -top-2 -left-3 bg-red-500 text-white text-[10px] px-1 rounded flex items-center gap-1">
+                                  <Clock className="h-2.5 w-2.5" />
+                                  AGORA
+                                </div>
+                              </div>
+                            )}
+
                             {/* Events */}
                             {events.map((event) => {
                               const left = (event.startHour - timelineData.minTime) * hourWidth;
                               const width = (event.endHour - event.startHour) * hourWidth;
+                              const isCurrentlyAiring = isEventCurrentlyAiring(event.startDate, event.endDate);
                               
                               return (
                                  <div
                                    key={event.ID}
-                                   className="absolute top-1 h-14 rounded border border-white/20 cursor-pointer hover:border-white/40 hover:shadow-lg transition-all overflow-hidden"
+                                   className={`absolute top-1 h-14 rounded border cursor-pointer hover:shadow-lg transition-all overflow-hidden ${
+                                     isCurrentlyAiring 
+                                       ? 'border-red-500 border-2 ring-2 ring-red-500/50' 
+                                       : 'border-white/20 hover:border-white/40'
+                                   }`}
                                    style={{
                                      left: `${left}px`,
                                      width: `${width}px`,
@@ -688,7 +710,8 @@ export default function Timeline() {
                                    }}
                                  >
                                    <div className="px-2 py-1 text-white text-xs h-full flex flex-col justify-center">
-                                     <div className="font-semibold truncate flex items-center">
+                                     <div className="font-semibold truncate flex items-center gap-1">
+                                       {isCurrentlyAiring && <Clock className="h-3 w-3 animate-pulse" />}
                                        {getPremiereIcon(event.PREMIERE)}
                                        {event.PROGRAMME || event.SERIES || event.TXSLOT_NAME || 'Sem programação'}
                                      </div>

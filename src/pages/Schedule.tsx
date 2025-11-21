@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { ScheduleFilters } from "@/components/ScheduleFilters";
 import { ScheduleEventModal } from "@/components/ScheduleEventModal";
-import { Loader2, Star, Sparkles, TrendingUp, FileDown } from "lucide-react";
+import { Loader2, Star, Sparkles, TrendingUp, FileDown, Clock } from "lucide-react";
 import daznLogo from "@/assets/dazn-logo.png";
 import { NavLink } from "@/components/NavLink";
 import { UserMenu } from "@/components/UserMenu";
@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { getTeamLogo } from "@/utils/teamLogos";
+import { useCurrentTimeIndicator } from "@/hooks/useCurrentTimeIndicator";
 
 export interface ScheduleEvent {
   ID: number;
@@ -137,6 +138,7 @@ export default function Schedule() {
   const [selectedYear, setSelectedYear] = useState<number | null>(new Date().getFullYear());
   const [selectedEvent, setSelectedEvent] = useState<ScheduleEvent | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const { currentPositionMinutes, isEventCurrentlyAiring } = useCurrentTimeIndicator();
 
   const { data: allScheduleData } = useQuery({
     queryKey: ["schedule-all"],
@@ -516,16 +518,36 @@ export default function Schedule() {
                         <div key={slot} className="h-16 border-b" />
                       ))}
                       
+                      {/* Current time indicator line */}
+                      {currentPositionMinutes >= 0 && currentPositionMinutes <= (24 * 60) && (
+                        <div
+                          className="absolute left-0 right-0 h-0.5 bg-red-500 z-20"
+                          style={{
+                            top: `${(currentPositionMinutes / 30) * 64}px`,
+                          }}
+                        >
+                          <div className="absolute -left-1 -top-2 bg-red-500 text-white text-[9px] px-1 rounded flex items-center gap-0.5">
+                            <Clock className="h-2.5 w-2.5" />
+                            AGORA
+                          </div>
+                        </div>
+                      )}
+                      
                       {/* Programs positioned absolutely */}
                       {eventsByChannel[channel]?.map((event: any, idx: number) => {
                         const color = getEventColor(event);
                         const topPosition = (event.positionMinutes / 30) * 64; // 64px = h-16
                         const height = Math.max((event.durationMinutes / 30) * 64, 32); // Minimum 32px
+                        const isCurrentlyAiring = isEventCurrentlyAiring(event.startTime, new Date(event.startTime.getTime() + event.duration));
                         
                         return (
                           <div
                             key={`${event.ID}-${idx}`}
-                            className="absolute left-0 right-0 mx-1 p-1.5 rounded text-white cursor-pointer hover:opacity-90 transition-opacity overflow-hidden shadow-sm"
+                            className={`absolute left-0 right-0 mx-1 p-1.5 rounded text-white cursor-pointer hover:opacity-90 transition-opacity overflow-hidden shadow-sm ${
+                              isCurrentlyAiring 
+                                ? 'ring-2 ring-red-500 ring-offset-1 ring-offset-background border-2 border-red-500' 
+                                : ''
+                            }`}
                             style={{
                               backgroundColor: color,
                               top: `${topPosition}px`,
@@ -537,6 +559,7 @@ export default function Schedule() {
                             }}
                           >
                             <div className="flex items-start gap-1.5 mb-0.5">
+                              {isCurrentlyAiring && <Clock className="h-3 w-3 animate-pulse flex-shrink-0" />}
                               {getPremiereIcon(event.PREMIERE)}
                               <div className="flex items-center gap-1.5 flex-1 min-w-0">
                                 {getTeamLogo(event.PROGRAMME, 24) && (
