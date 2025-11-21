@@ -193,6 +193,13 @@ export function ScheduleEventModal({ event, open, onOpenChange }: ScheduleEventM
               <InfoRow label="Premiere">
                 {event.PREMIERE ? getPremiereBadge(event.PREMIERE) : <span className="text-sm font-semibold">-</span>}
               </InfoRow>
+              {event.VERSION === 'Live' && (
+                <InfoRow label="Transmissão">
+                  <Badge variant="secondary" className="bg-black text-white border-black">
+                    DIRETO
+                  </Badge>
+                </InfoRow>
+              )}
             </div>
           </div>
 

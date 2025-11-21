@@ -31,6 +31,7 @@ export interface ScheduleEvent {
   GENRE: string;
   PROGCATEGORY: string;
   PREMIERE?: string;
+  VERSION?: string;
   TXDAY_DATE?: string;
   START_TC?: string;
   DURATION_TC?: string;
@@ -625,8 +626,15 @@ export default function Schedule() {
                               {event.START_TIME.substring(0, 5)} - {Math.round(event.durationMinutes)}min
                             </div>
                             {height > 50 && (
-                              <div className="text-[9px] opacity-75 truncate mt-0.5">
-                                {event.GENRE}
+                              <div className="flex flex-wrap gap-1 mt-0.5">
+                                <div className="text-[9px] opacity-75 truncate">
+                                  {event.GENRE}
+                                </div>
+                                {event.VERSION === 'Live' && (
+                                  <div className="text-[9px] px-1 py-0.5 rounded bg-black text-white font-semibold">
+                                    DIRETO
+                                  </div>
+                                )}
                               </div>
                             )}
                           </div>

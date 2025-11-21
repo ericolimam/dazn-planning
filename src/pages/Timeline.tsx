@@ -715,9 +715,19 @@ export default function Timeline() {
                                        {getPremiereIcon(event.PREMIERE)}
                                        {event.PROGRAMME || event.SERIES || event.TXSLOT_NAME || 'Sem programação'}
                                      </div>
-                                     <div className="text-[10px] opacity-90">
-                                       {formatTime(event.startDate)} - {formatTime(event.endDate)}
-                                     </div>
+                                      <div className="text-[10px] opacity-90">
+                                        {formatTime(event.startDate)} - {formatTime(event.endDate)}
+                                      </div>
+                                      <div className="flex gap-1 mt-0.5 flex-wrap items-center">
+                                        <span className="text-[10px] text-white/80 truncate">
+                                          {event.GENRE}
+                                        </span>
+                                        {event.VERSION === 'Live' && (
+                                          <span className="text-[10px] px-1 py-0.5 rounded bg-black text-white font-semibold">
+                                            DIRETO
+                                          </span>
+                                        )}
+                                      </div>
                                    </div>
                                  </div>
                               );
