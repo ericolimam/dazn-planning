@@ -378,45 +378,46 @@ export default function Schedule() {
                   }
                 }
               }
-            }
-          }
-        },
-        didDrawCell: (data) => {
-          if (data.section === 'body' && data.column.index > 0) {
-            const cellText = String(data.cell.text.join('\n'));
-            
-            if (cellText && cellText.trim() !== '') {
+            } else {
+              // For empty cells that are part of ongoing events, apply same color
               const dateIndex = data.column.index - 1;
               const col = channelDates[dateIndex] as any;
               const events = col?.events || [];
               const rowIndex = data.row.index;
               
-              // Validate rowIndex is within bounds
-              if (rowIndex < 0 || rowIndex >= timeSlots.length) {
-                return;
-              }
-              
-              const slotStartMinutes = (() => {
-                const timeSlot = timeSlots[rowIndex];
-                if (!timeSlot) return 0;
+              if (rowIndex >= 0 && rowIndex < timeSlots.length) {
+                const slotStartMinutes = (() => {
+                  const timeSlot = timeSlots[rowIndex];
+                  if (!timeSlot) return 0;
+                  const [hours, minutes] = timeSlot.split(':').map(Number);
+                  let adjustedHours = hours;
+                  if (hours < 5) adjustedHours += 24;
+                  return (adjustedHours - 5) * 60 + minutes;
+                })();
                 
-                const [hours, minutes] = timeSlot.split(':').map(Number);
-                let adjustedHours = hours;
-                if (hours < 5) adjustedHours += 24;
-                return (adjustedHours - 5) * 60 + minutes;
-              })();
-              
-              const event = events.find((e: any) => {
-                const eventStart = e.positionMinutes;
-                return eventStart >= slotStartMinutes && eventStart < slotStartMinutes + 30;
-              });
-              
-              if (event) {
-                const slotsToSpan = Math.ceil(event.durationMinutes / 30);
-                if (slotsToSpan > 1) {
-                  const cellHeight = data.cell.height;
-                  const totalHeight = cellHeight * slotsToSpan;
-                  data.cell.height = totalHeight;
+                // Find ongoing event
+                const ongoingEvent = events.find((event: any) => {
+                  const eventStart = event.positionMinutes;
+                  const eventEnd = eventStart + event.durationMinutes;
+                  return eventStart < slotStartMinutes && eventEnd > slotStartMinutes;
+                });
+                
+                if (ongoingEvent) {
+                  const title = ongoingEvent.TXSLOT_NAME === 'SEM EMISSÃO' ? 'SEM EMISSÃO' : ongoingEvent.PROGRAMME;
+                  const genre = ongoingEvent.GENRE || '';
+                  
+                  if (title === 'SEM EMISSÃO') {
+                    data.cell.styles.fillColor = [0, 0, 0];
+                  } else {
+                    const color = getGenreColor(genre);
+                    if (color !== '#6b7280') {
+                      const rgb = parseInt(color.slice(1), 16);
+                      const r = (rgb >> 16) & 255;
+                      const g = (rgb >> 8) & 255;
+                      const b = rgb & 255;
+                      data.cell.styles.fillColor = [r, g, b];
+                    }
+                  }
                 }
               }
             }
