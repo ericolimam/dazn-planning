@@ -587,7 +587,7 @@ export default function Schedule() {
                         return (
                           <div
                             key={`${event.ID}-${idx}`}
-                            className={`absolute left-0 right-0 mx-1 p-1.5 rounded text-white cursor-pointer hover:opacity-90 transition-opacity overflow-hidden shadow-sm ${
+                            className={`absolute left-0 right-0 mx-1 p-1.5 rounded text-white cursor-pointer transition-all hover:scale-105 hover:z-10 overflow-hidden shadow-sm ${
                               isCurrentlyAiring 
                                 ? 'ring-2 ring-red-500 ring-offset-1 ring-offset-background border-2 border-red-500' 
                                 : ''
