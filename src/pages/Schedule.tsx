@@ -34,6 +34,8 @@ export interface ScheduleEvent {
   TXDAY_DATE?: string;
   START_TC?: string;
   DURATION_TC?: string;
+  NARRATOR?: string;
+  YEAR?: number;
 }
 
 const stringToColor = (str: string): string => {
