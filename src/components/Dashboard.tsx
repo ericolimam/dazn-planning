@@ -13,78 +13,56 @@ const COLORS = [
 ];
 
 export const Dashboard = ({ programs }: DashboardProps) => {
-  // 1. Quantidade total de programas x Broadcast Type (PROG_TYPE)
-  const programsByType = Object.entries(
-    programs.reduce((acc, program) => {
-      const type = program.PROG_TYPE || "Sem Tipo";
-      acc[type] = (acc[type] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>)
-  )
-    .map(([name, value]) => ({ name, value }))
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 10);
+  const currentYear = new Date().getFullYear();
+  
+  // Filter programs from current year
+  const currentYearPrograms = programs.filter(program => {
+    if (!program.X_TXDAY_DATE) return false;
+    const programYear = new Date(program.X_TXDAY_DATE).getFullYear();
+    return programYear === currentYear;
+  });
 
-  // 2. Quantidade total de programas x Narradores
-  const programsByNarrator = Object.entries(
-    programs.reduce((acc, program) => {
-      const narrator = program.NARRATOR || "Sem Narrador";
-      acc[narrator] = (acc[narrator] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>)
-  )
-    .map(([name, value]) => ({ name, value }))
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 10);
-
-  // 3. Séries x Broadcast Type (PROG_TYPE)
-  const seriesByType = Object.entries(
-    programs.reduce((acc, program) => {
-      const type = program.PROG_TYPE || "Sem Tipo";
-      const serie = program.SERIE_TITLE || "Sem Série";
-      const key = `${serie}`;
-      if (!acc[key]) {
-        acc[key] = { serie, types: {} };
-      }
-      acc[key].types[type] = (acc[key].types[type] || 0) + 1;
-      return acc;
-    }, {} as Record<string, { serie: string; types: Record<string, number> }>)
-  )
-    .map(([_, data]) => ({
-      name: data.serie,
-      value: Object.values(data.types).reduce((sum, v) => sum + v, 0)
-    }))
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 10);
-
-  // 4. Séries x Narradores
-  const seriesByNarrator = Object.entries(
-    programs.reduce((acc, program) => {
+  // Jogos por Serie e Narrador no ano corrente
+  const narratorSeriesData = Object.entries(
+    currentYearPrograms.reduce((acc, program) => {
       const narrator = program.NARRATOR || "Sem Narrador";
       const serie = program.SERIE_TITLE || "Sem Série";
-      const key = `${serie}`;
-      if (!acc[key]) {
-        acc[key] = { serie, narrators: {} };
+      
+      if (!acc[narrator]) {
+        acc[narrator] = {};
       }
-      acc[key].narrators[narrator] = (acc[key].narrators[narrator] || 0) + 1;
+      acc[narrator][serie] = (acc[narrator][serie] || 0) + 1;
       return acc;
-    }, {} as Record<string, { serie: string; narrators: Record<string, number> }>)
+    }, {} as Record<string, Record<string, number>>)
   )
-    .map(([_, data]) => ({
-      name: data.serie,
-      value: Object.values(data.narrators).reduce((sum, v) => sum + v, 0)
+    .map(([narrator, series]) => ({
+      narrator,
+      ...series,
+      total: Object.values(series).reduce((sum, count) => sum + count, 0)
     }))
-    .sort((a, b) => b.value - a.value)
+    .sort((a, b) => b.total - a.total)
     .slice(0, 10);
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  // Get all unique series for the chart
+  const allSeries = Array.from(
+    new Set(
+      currentYearPrograms
+        .map(p => p.SERIE_TITLE)
+        .filter(Boolean)
+    )
+  );
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
-          <p className="text-sm font-semibold text-foreground">{payload[0].payload.name}</p>
-          <p className="text-sm text-primary font-medium">
-            {payload[0].value} programas
-          </p>
+          <p className="text-sm font-semibold text-foreground mb-2">{label}</p>
+          {payload.map((entry: any, index: number) => (
+            <p key={index} className="text-xs text-muted-foreground">
+              <span style={{ color: entry.color }}>{entry.name}: </span>
+              <span className="font-medium">{entry.value} jogos</span>
+            </p>
+          ))}
         </div>
       );
     }
@@ -138,100 +116,46 @@ export const Dashboard = ({ programs }: DashboardProps) => {
         </Card>
       </div>
 
-      {/* Charts Grid */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* 1. Programas x Broadcast Type */}
-        <Card className="bg-card/50 backdrop-blur-sm border-border">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold">Programas por Tipo</CardTitle>
-            <p className="text-xs text-muted-foreground">Top 10 tipos com mais programas</p>
-          </CardHeader>
-          <CardContent className="h-[320px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={programsByType} layout="vertical" margin={{ left: 80, right: 20, top: 5, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                <YAxis dataKey="name" type="category" stroke="hsl(var(--muted-foreground))" fontSize={10} width={75} />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="value" radius={[0, 4, 4, 0]}>
-                  {programsByType.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* 2. Programas x Narradores */}
-        <Card className="bg-card/50 backdrop-blur-sm border-border">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold">Programas por Narrador</CardTitle>
-            <p className="text-xs text-muted-foreground">Top 10 narradores com mais programas</p>
-          </CardHeader>
-          <CardContent className="h-[320px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={programsByNarrator} layout="vertical" margin={{ left: 80, right: 20, top: 5, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                <YAxis dataKey="name" type="category" stroke="hsl(var(--muted-foreground))" fontSize={10} width={75} />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="value" radius={[0, 4, 4, 0]}>
-                  {programsByNarrator.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* 3. Séries x Broadcast Type */}
-        <Card className="bg-card/50 backdrop-blur-sm border-border">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold">Séries por Tipo</CardTitle>
-            <p className="text-xs text-muted-foreground">Top 10 séries com mais episódios</p>
-          </CardHeader>
-          <CardContent className="h-[320px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={seriesByType} layout="vertical" margin={{ left: 120, right: 20, top: 5, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                <YAxis dataKey="name" type="category" stroke="hsl(var(--muted-foreground))" fontSize={9} width={115} />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="value" radius={[0, 4, 4, 0]}>
-                  {seriesByType.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* 4. Séries x Narradores */}
-        <Card className="bg-card/50 backdrop-blur-sm border-border">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold">Séries por Narrador</CardTitle>
-            <p className="text-xs text-muted-foreground">Top 10 séries distribuídas por narradores</p>
-          </CardHeader>
-          <CardContent className="h-[320px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={seriesByNarrator} layout="vertical" margin={{ left: 120, right: 20, top: 5, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                <YAxis dataKey="name" type="category" stroke="hsl(var(--muted-foreground))" fontSize={9} width={115} />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="value" radius={[0, 4, 4, 0]}>
-                  {seriesByNarrator.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Chart: Jogos por Série e Narrador */}
+      <Card className="bg-card/50 backdrop-blur-sm border-border">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold">Jogos por Série - Narradores ({currentYear})</CardTitle>
+          <p className="text-xs text-muted-foreground">Top 10 narradores e suas participações por série no ano corrente</p>
+        </CardHeader>
+        <CardContent className="h-[500px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart 
+              data={narratorSeriesData} 
+              layout="vertical" 
+              margin={{ left: 100, right: 20, top: 5, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+              <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={11} />
+              <YAxis 
+                dataKey="narrator" 
+                type="category" 
+                stroke="hsl(var(--muted-foreground))" 
+                fontSize={10} 
+                width={95} 
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend 
+                wrapperStyle={{ fontSize: '11px' }}
+                iconType="circle"
+              />
+              {allSeries.slice(0, 15).map((serie, index) => (
+                <Bar 
+                  key={serie} 
+                  dataKey={serie} 
+                  stackId="a" 
+                  fill={COLORS[index % COLORS.length]}
+                  name={serie}
+                />
+              ))}
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
     </div>
   );
 };
