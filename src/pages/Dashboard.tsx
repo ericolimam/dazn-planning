@@ -7,10 +7,11 @@ import { NavLink } from "@/components/NavLink";
 import { UserMenu } from "@/components/UserMenu";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
-interface ScheduleEvent {
+interface Program {
+  ID: number;
   NARRATOR?: string;
-  SERIES: string;
-  YEAR?: number;
+  SERIE_TITLE: string;
+  YEAR?: string | number;
 }
 
 const COLORS = [
@@ -20,28 +21,41 @@ const COLORS = [
 ];
 
 const Dashboard = () => {
-  const [scheduleData, setScheduleData] = useState<ScheduleEvent[]>([]);
+  const [programs, setPrograms] = useState<Program[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    loadScheduleData();
+    loadPrograms();
   }, []);
 
-  const loadScheduleData = async () => {
+  const loadPrograms = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('list-schedule', {
+      console.log('Loading programs from list-programs...');
+      const { data, error } = await supabase.functions.invoke('list-programs', {
         body: {},
       });
 
       if (error) throw error;
 
-      if (data?.ROWS) {
-        setScheduleData(data.ROWS as ScheduleEvent[]);
-        console.log(`Loaded ${data.ROWS.length} schedule events for dashboard`);
+      if (data?.success && data?.data) {
+        setPrograms(data.data as Program[]);
+        console.log(`Loaded ${data.data.length} programs for dashboard`);
+        
+        // Log sample program with narrator
+        const programWithNarrator = data.data.find((p: Program) => p.NARRATOR);
+        if (programWithNarrator) {
+          console.log('Sample program with narrator:', programWithNarrator);
+        }
+        
+        // Log specific program ID 10617569074
+        const specificProgram = data.data.find((p: Program) => p.ID === 10617569074);
+        if (specificProgram) {
+          console.log('Program ID 10617569074:', specificProgram);
+        }
       }
     } catch (error: any) {
-      console.error('Error loading schedule:', error);
+      console.error('Error loading programs:', error);
       toast.error('Erro ao carregar dados: ' + (error.message || 'Erro desconhecido'));
     } finally {
       setIsLoading(false);
@@ -50,18 +64,20 @@ const Dashboard = () => {
 
   const currentYear = new Date().getFullYear();
   
-  // Filter events from current year with narrator
-  const currentYearEvents = scheduleData.filter(event => {
-    if (!event.YEAR || !event.NARRATOR) return false;
-    const eventYear = parseInt(event.YEAR.toString());
-    return eventYear === currentYear;
+  // Filter programs from current year with narrator
+  const currentYearPrograms = programs.filter(program => {
+    if (!program.YEAR || !program.NARRATOR) return false;
+    const programYear = parseInt(program.YEAR.toString());
+    return programYear === currentYear;
   });
+
+  console.log(`Current year programs with narrator: ${currentYearPrograms.length}`);
 
   // Build data: narrator -> series -> count
   const narratorSeriesData = Object.entries(
-    currentYearEvents.reduce((acc, event) => {
-      const narrator = event.NARRATOR || "Sem Narrador";
-      const series = event.SERIES || "Sem Série";
+    currentYearPrograms.reduce((acc, program) => {
+      const narrator = program.NARRATOR || "Sem Narrador";
+      const series = program.SERIE_TITLE || "Sem Série";
       
       if (!acc[narrator]) {
         acc[narrator] = {};
@@ -78,26 +94,31 @@ const Dashboard = () => {
     .sort((a, b) => b.total - a.total)
     .slice(0, 15); // Top 15 narrators
 
-  // Get all unique series for the chart
-  const allSeries = Array.from(
-    new Set(
-      currentYearEvents
-        .map(e => e.SERIES)
-        .filter(Boolean)
-    )
-  ).slice(0, 10); // Limit to top 10 series for readability
+  // Get all unique series for the chart, sorted by frequency
+  const seriesFrequency = currentYearPrograms.reduce((acc, program) => {
+    const series = program.SERIE_TITLE || "Sem Série";
+    acc[series] = (acc[series] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const allSeries = Object.entries(seriesFrequency)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([series]) => series);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
           <p className="text-sm font-semibold text-foreground mb-2">{label}</p>
-          {payload.map((entry: any, index: number) => (
-            <p key={index} className="text-xs text-muted-foreground">
-              <span style={{ color: entry.color }}>{entry.name}: </span>
-              <span className="font-medium">{entry.value} jogos</span>
-            </p>
-          ))}
+          {payload
+            .filter((entry: any) => entry.value > 0)
+            .map((entry: any, index: number) => (
+              <p key={index} className="text-xs text-muted-foreground">
+                <span style={{ color: entry.color }}>{entry.name}: </span>
+                <span className="font-medium">{entry.value} jogos</span>
+              </p>
+            ))}
         </div>
       );
     }
@@ -148,7 +169,13 @@ const Dashboard = () => {
                 Nenhum dado disponível para {currentYear}
               </p>
               <p className="text-sm text-muted-foreground mt-2">
-                Verifique se existem jogos com narradores associados na grade de programação
+                Total de programas carregados: {programs.length}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Programas com narrador: {programs.filter(p => p.NARRATOR).length}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Programas do ano {currentYear}: {programs.filter(p => p.YEAR && parseInt(p.YEAR.toString()) === currentYear).length}
               </p>
             </CardContent>
           </Card>
@@ -159,7 +186,7 @@ const Dashboard = () => {
                 Jogos por Série - Narradores ({currentYear})
               </CardTitle>
               <p className="text-xs text-muted-foreground">
-                Top 15 narradores e suas participações por série no ano corrente
+                Top 15 narradores e suas participações por série no ano corrente (Total: {currentYearPrograms.length} jogos)
               </p>
             </CardHeader>
             <CardContent className="h-[600px]">
