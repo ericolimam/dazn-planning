@@ -75,7 +75,7 @@ serve(async (req) => {
     const authHeader = 'Basic ' + btoa(`${apiUsername}:${apiPassword}`);
     console.log('Authorization header length:', authHeader.length);
 
-    const response = await fetch('https://i00598.myprovys.com/api/objects/list', {
+    const response = await fetch('https://i00597.myprovys.com/api/objects/list', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -92,7 +92,7 @@ serve(async (req) => {
       const errorText = await response.text();
       console.error('PROVYS API error response:', errorText);
       console.error('Request was:', JSON.stringify({
-        url: 'https://i00598.myprovys.com/api/objects/list',
+        url: 'https://i00597.myprovys.com/api/objects/list',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
