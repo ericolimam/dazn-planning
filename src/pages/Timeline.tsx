@@ -727,6 +727,11 @@ export default function Timeline() {
                                             RY
                                           </div>
                                         )}
+                                        {event.PREMIERE === 'Recorded' && (
+                                          <div className="flex items-center justify-center w-4 h-4 rounded-full bg-black text-white text-[7px] font-bold flex-shrink-0">
+                                            RC
+                                          </div>
+                                        )}
                                       </div>
                                    </div>
                                  </div>
