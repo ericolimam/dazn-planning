@@ -451,6 +451,9 @@ export default function Schedule() {
     // Show PROGRAMA type or events with TXSLOT_NAME = "SEM EMISSÃO"
     if (event.PROG_REQTYPE !== "PROGRAMA" && event.TXSLOT_NAME !== "SEM EMISSÃO") return acc;
     
+    // Filter by selected week to ensure only correct days are shown
+    if (selectedWeek !== null && event.WEEK !== selectedWeek) return acc;
+    
     // Use TXDAY_DATE and START_TC if available, fallback to DATE and START_TIME
     const dateStr = event.TXDAY_DATE || event.DATE;
     const timeStr = event.START_TC || event.START_TIME;
