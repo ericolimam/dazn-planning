@@ -14,7 +14,6 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { getTeamLogo } from "@/utils/teamLogos";
 import { useCurrentTimeIndicator } from "@/hooks/useCurrentTimeIndicator";
-import "../styles/schedule-scroll.css";
 
 export interface ScheduleEvent {
   ID: number;
@@ -498,23 +497,22 @@ export default function Schedule() {
           </div>
         ) : (
           <Card className="p-4">
-            <div className="schedule-scroll-wrapper" style={{ maxHeight: 'calc(100vh - 320px)', overflow: 'hidden' }}>
-              <ScrollArea className="w-full h-full schedule-scroll-inner">
-                <div className="flex min-w-max">
-                  {/* Time column */}
-                  <div className="flex-shrink-0 w-20 border-r sticky left-0 bg-background z-30">
-                    <div className="h-16 border-b sticky top-0 bg-background z-40 flex items-center justify-center font-semibold text-sm">
-                      Hora
-                    </div>
-                    {timeSlots.map((slot) => (
-                      <div key={slot} className="h-16 border-b flex items-center justify-center text-xs font-medium bg-background">
-                        {slot}
-                      </div>
-                    ))}
+            <ScrollArea className="w-full h-[calc(100vh-320px)]">
+              <div className="flex min-w-max">
+                {/* Time column */}
+                <div className="flex-shrink-0 w-20 border-r sticky left-0 bg-background z-30">
+                  <div className="h-16 border-b sticky top-0 bg-background z-40 flex items-center justify-center font-semibold text-sm">
+                    Hora
                   </div>
+                  {timeSlots.map((slot) => (
+                    <div key={slot} className="h-16 border-b flex items-center justify-center text-xs font-medium bg-background">
+                      {slot}
+                    </div>
+                  ))}
+                </div>
 
-                  {/* Channel+Date columns */}
-                  {channelDateColumns.map((col: any) => {
+                {/* Channel+Date columns */}
+                {channelDateColumns.map((col: any) => {
                   const dateStr = col.date;
                   const dateFormatted = dateStr 
                     ? (() => {
@@ -640,7 +638,6 @@ export default function Schedule() {
               })}
               </div>
             </ScrollArea>
-            </div>
           </Card>
         )}
 
