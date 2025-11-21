@@ -217,7 +217,18 @@ export default function Schedule() {
             return `${day}/${month}/${year}`;
           })()
         : '';
-      return `${col.channel}\n${dateFormatted}`;
+      
+      // Get weekday abbreviation in Portuguese
+      const weekdayAbbr = dateStr 
+        ? (() => {
+            const [month, day, year] = dateStr.split('/');
+            const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+            const days = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+            return days[date.getDay()];
+          })()
+        : '';
+      
+      return `${col.channel}\n${weekdayAbbr} ${dateFormatted}`;
     });
 
     const tableHead = [['Hora', ...channelHeaders]];
@@ -510,13 +521,25 @@ export default function Schedule() {
                       })()
                     : '';
                   
+                  // Get weekday abbreviation in Portuguese
+                  const weekdayAbbr = dateStr 
+                    ? (() => {
+                        const [month, day, year] = dateStr.split('/');
+                        const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                        const days = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+                        return days[date.getDay()];
+                      })()
+                    : '';
+                  
                   return (
                     <div key={`${col.channel}_${col.date}`} className="flex-1 min-w-[180px] border-r relative">
                       {/* Channel header */}
                       <div className="h-16 border-b sticky top-0 bg-background z-30 flex flex-col items-center justify-center px-2">
                         <div className="font-semibold text-sm">{col.channel}</div>
                         {dateFormatted && (
-                          <div className="text-xs text-muted-foreground">{dateFormatted}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {weekdayAbbr} {dateFormatted}
+                          </div>
                         )}
                       </div>
                     
