@@ -186,23 +186,33 @@ export default function Schedule() {
   const timeSlots = generateTimeSlots();
 
   const exportToPDF = () => {
-    const doc = new jsPDF({
-      orientation: 'landscape',
-      unit: 'mm',
-      format: 'a4'
-    });
-
-    const img = new Image();
-    img.src = daznLogo;
-    
-    // Group events by channel
-    const eventsByChannel: Record<string, any[]> = {};
-    channelDateColumns.forEach((col: any) => {
-      if (!eventsByChannel[col.channel]) {
-        eventsByChannel[col.channel] = [];
+    try {
+      console.log('Starting PDF export...');
+      console.log('channelDateColumns:', channelDateColumns);
+      
+      if (!channelDateColumns || channelDateColumns.length === 0) {
+        console.error('No data to export');
+        alert('Não há dados para exportar. Por favor, selecione semana e canais.');
+        return;
       }
-      eventsByChannel[col.channel].push(col);
-    });
+
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const img = new Image();
+      img.src = daznLogo;
+      
+      // Group events by channel
+      const eventsByChannel: Record<string, any[]> = {};
+      channelDateColumns.forEach((col: any) => {
+        if (!eventsByChannel[col.channel]) {
+          eventsByChannel[col.channel] = [];
+        }
+        eventsByChannel[col.channel].push(col);
+      });
 
     // Generate one page per channel
     const channelNames = Object.keys(eventsByChannel).sort();
@@ -399,7 +409,13 @@ export default function Schedule() {
       });
     });
 
-    doc.save(`grade-programacao-semana-${selectedWeek}.pdf`);
+      console.log('PDF generation complete, saving...');
+      doc.save(`grade-programacao-semana-${selectedWeek}.pdf`);
+      console.log('PDF saved successfully');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Erro ao gerar PDF. Verifique o console para mais detalhes.');
+    }
   };
 
   // Process events by channel and date - create separate entries for each day
