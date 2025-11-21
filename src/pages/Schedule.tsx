@@ -317,6 +317,12 @@ export default function Schedule() {
         tableBody.push(row);
       });
 
+      // Calculate column width based on number of date columns
+      // Page width in landscape A4 is ~277mm, minus margins (20mm) = 257mm
+      // Time column takes 15mm, remaining space divided by number of date columns
+      const availableWidth = 257 - 15; // Total width minus time column
+      const dateColumnWidth = Math.floor(availableWidth / dateHeaders.length);
+
       autoTable(doc, {
         startY: 30,
         head: tableHead,
@@ -337,7 +343,10 @@ export default function Schedule() {
           valign: 'middle'
         },
         columnStyles: {
-          0: { cellWidth: 15, halign: 'center', fontStyle: 'bold', valign: 'middle' }
+          0: { cellWidth: 15, halign: 'center', fontStyle: 'bold', valign: 'middle' },
+          ...Object.fromEntries(
+            dateHeaders.map((_, index) => [index + 1, { cellWidth: dateColumnWidth }])
+          )
         },
         margin: { left: 10, right: 10 },
         didParseCell: (data) => {
