@@ -31,7 +31,6 @@ export interface ScheduleEvent {
   GENRE: string;
   PROGCATEGORY: string;
   PREMIERE?: string;
-  VERSION?: string;
   TXDAY_DATE?: string;
   START_TC?: string;
   DURATION_TC?: string;
@@ -643,7 +642,7 @@ export default function Schedule() {
                                 {event.PREMIERE === 'Premiere' && (
                                   <Star className="w-3 h-3 fill-yellow-400 text-yellow-400 flex-shrink-0" />
                                 )}
-                                {event.VERSION === 'Live' && (
+                                {event.PREMIERE === 'Live' && (
                                   <div className="text-[8px] px-1.5 py-0.5 rounded bg-red-600 text-white font-bold flex-shrink-0">
                                     LIVE
                                   </div>
