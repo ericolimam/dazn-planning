@@ -208,17 +208,16 @@ export default function Schedule() {
     const filterText = `Semana ${selectedWeek} | ${selectedChannels.join(', ')}`;
     doc.text(filterText, 14, 24);
 
-    // Create channel headers with dates
-    const channelHeaders = selectedChannels.map(channel => {
-      const firstEvent = eventsByChannel[channel]?.[0];
-      const dateStr = firstEvent?.TXDAY_DATE || firstEvent?.DATE;
+    // Create channel headers with dates from channelDateColumns
+    const channelHeaders = channelDateColumns.map((col: any) => {
+      const dateStr = col.date;
       const dateFormatted = dateStr 
         ? (() => {
             const [month, day, year] = dateStr.split('/');
             return `${day}/${month}/${year}`;
           })()
         : '';
-      return `${channel}\n${dateFormatted}`;
+      return `${col.channel}\n${dateFormatted}`;
     });
 
     const tableHead = [['Hora', ...channelHeaders]];
@@ -226,8 +225,9 @@ export default function Schedule() {
 
     // Track which events have been added to avoid duplicates
     const addedEvents = new Map<string, Set<number>>();
-    selectedChannels.forEach(channel => {
-      addedEvents.set(channel, new Set());
+    channelDateColumns.forEach((col: any) => {
+      const key = `${col.channel}_${col.date}`;
+      addedEvents.set(key, new Set());
     });
 
     // For each time slot, create a row
@@ -242,10 +242,11 @@ export default function Schedule() {
       })();
       const slotEndMinutes = slotStartMinutes + 30;
 
-      // For each channel, find the event that starts in this time slot
-      selectedChannels.forEach((channel) => {
-        const events = eventsByChannel[channel] || [];
-        const channelAdded = addedEvents.get(channel)!;
+      // For each channel+date column, find the event that starts in this time slot
+      channelDateColumns.forEach((col: any) => {
+        const key = `${col.channel}_${col.date}`;
+        const events = col.events || [];
+        const channelAdded = addedEvents.get(key)!;
         
         // Find event that starts at this time slot
         const eventStartingHere = events.find((event: any) => {
@@ -303,9 +304,9 @@ export default function Schedule() {
         if (data.section === 'body' && data.column.index > 0) {
           const cellText = String(data.cell.text.join('\n'));
           
-          if (cellText && cellText.trim() !== '') {
-            const channel = selectedChannels[data.column.index - 1];
-            const events = eventsByChannel[channel] || [];
+        if (cellText && cellText.trim() !== '') {
+            const col = channelDateColumns[data.column.index - 1] as any;
+            const events = col?.events || [];
             
             // Find the event that corresponds to this cell
             const lines = cellText.split('\n');
@@ -338,9 +339,9 @@ export default function Schedule() {
         if (data.section === 'body' && data.column.index > 0) {
           const cellText = String(data.cell.text.join('\n'));
           
-          if (cellText && cellText.trim() !== '') {
-            const channel = selectedChannels[data.column.index - 1];
-            const events = eventsByChannel[channel] || [];
+        if (cellText && cellText.trim() !== '') {
+            const col = channelDateColumns[data.column.index - 1] as any;
+            const events = col?.events || [];
             const rowIndex = data.row.index;
             
             const slotStartMinutes = (() => {
@@ -373,7 +374,7 @@ export default function Schedule() {
     doc.save(`grade-programacao-semana-${selectedWeek}.pdf`);
   };
 
-  // Process events by channel - group by date first
+  // Process events by channel and date - create separate entries for each day
   const eventsByChannelAndDate = scheduleData?.ROWS?.reduce((acc: any, event: ScheduleEvent) => {
     if (!selectedChannels.includes(event.CHANNEL)) return acc;
     // Show PROGRAMA type or events with TXSLOT_NAME = "SEM EMISSÃO"
@@ -391,8 +392,7 @@ export default function Schedule() {
     const duration = parseDuration(durationStr);
     
     // Create a key combining channel and date
-    const dateKey = dateStr; // Use the actual date as key
-    const channelDateKey = `${event.CHANNEL}_${dateKey}`;
+    const channelDateKey = `${event.CHANNEL}_${dateStr}`;
     
     if (!acc[channelDateKey]) {
       acc[channelDateKey] = {
@@ -421,12 +421,22 @@ export default function Schedule() {
     return acc;
   }, {}) || {};
 
-  // For display, we need to show one date per channel - use the first event's date
-  const eventsByChannel = Object.values(eventsByChannelAndDate).reduce((acc: any, channelData: any) => {
-    const channel = channelData.channel;
-    if (!acc[channel]) {
-      acc[channel] = channelData.events;
+  // Convert to array and sort by date then channel for display
+  const channelDateColumns = Object.values(eventsByChannelAndDate)
+    .sort((a: any, b: any) => {
+      // First sort by date
+      const dateCompare = a.date.localeCompare(b.date);
+      if (dateCompare !== 0) return dateCompare;
+      // Then by channel
+      return a.channel.localeCompare(b.channel);
+    });
+
+  // For PDF export compatibility - keep the old structure
+  const eventsByChannel = channelDateColumns.reduce((acc: any, col: any) => {
+    if (!acc[col.channel]) {
+      acc[col.channel] = [];
     }
+    acc[col.channel].push(...col.events);
     return acc;
   }, {});
 
@@ -448,7 +458,7 @@ export default function Schedule() {
 
       <main className="container mx-auto p-6">
         <h1 className="text-3xl font-bold mb-6">Guia de Programação</h1>
-        <Card className="p-4 mb-6">
+          <Card className="p-4 mb-6">
           <ScheduleFilters
             selectedYear={selectedYear}
             selectedWeek={selectedWeek}
@@ -460,7 +470,7 @@ export default function Schedule() {
             onWeekChange={setSelectedWeek}
             onChannelsChange={setSelectedChannels}
           />
-          {!isLoading && eventsByChannel && Object.keys(eventsByChannel).length > 0 && (
+          {!isLoading && channelDateColumns && channelDateColumns.length > 0 && (
             <div className="flex justify-end mt-4">
               <Button onClick={exportToPDF} variant="outline" size="sm">
                 <FileDown className="h-4 w-4 mr-2" />
@@ -490,11 +500,9 @@ export default function Schedule() {
                   ))}
                 </div>
 
-                {/* Channels columns */}
-                {selectedChannels.map((channel) => {
-                  // Get the first event's date for this channel
-                  const firstEvent = eventsByChannel[channel]?.[0];
-                  const dateStr = firstEvent?.TXDAY_DATE || firstEvent?.DATE;
+                {/* Channel+Date columns */}
+                {channelDateColumns.map((col: any) => {
+                  const dateStr = col.date;
                   const dateFormatted = dateStr 
                     ? (() => {
                         const [month, day, year] = dateStr.split('/');
@@ -503,10 +511,10 @@ export default function Schedule() {
                     : '';
                   
                   return (
-                    <div key={channel} className="flex-1 min-w-[180px] border-r relative">
+                    <div key={`${col.channel}_${col.date}`} className="flex-1 min-w-[180px] border-r relative">
                       {/* Channel header */}
                       <div className="h-16 border-b sticky top-0 bg-background z-10 flex flex-col items-center justify-center px-2">
-                        <div className="font-semibold text-sm">{channel}</div>
+                        <div className="font-semibold text-sm">{col.channel}</div>
                         {dateFormatted && (
                           <div className="text-xs text-muted-foreground">{dateFormatted}</div>
                         )}
@@ -534,7 +542,7 @@ export default function Schedule() {
                       )}
                       
                       {/* Programs positioned absolutely */}
-                      {eventsByChannel[channel]?.map((event: any, idx: number) => {
+                      {col.events?.map((event: any, idx: number) => {
                         const color = getEventColor(event);
                         const topPosition = (event.positionMinutes / 30) * 64; // 64px = h-16
                         const height = Math.max((event.durationMinutes / 30) * 64, 32); // Minimum 32px
