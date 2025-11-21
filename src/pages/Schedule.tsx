@@ -139,7 +139,7 @@ export default function Schedule() {
   const [selectedEvent, setSelectedEvent] = useState<ScheduleEvent | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  const columnsPerPage = 3; // Show 3 channel+date columns at a time
+  const columnsPerPage = 7; // Show 7 days (Monday to Sunday) at a time
   const { currentPositionMinutes, isEventCurrentlyAiring } = useCurrentTimeIndicator();
 
   const { data: allScheduleData } = useQuery({
