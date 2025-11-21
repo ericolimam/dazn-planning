@@ -469,7 +469,15 @@ export default function Schedule() {
       </header>
 
       <main className="container mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-6">Guia de Programação</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">Guia de Programação</h1>
+          {!isLoading && channelDateColumns && channelDateColumns.length > 0 && (
+            <Button onClick={exportToPDF} variant="outline" size="sm">
+              <FileDown className="h-4 w-4 mr-2" />
+              Exportar PDF
+            </Button>
+          )}
+        </div>
           <Card className="p-4 mb-6">
           <ScheduleFilters
             selectedYear={selectedYear}
@@ -482,14 +490,6 @@ export default function Schedule() {
             onWeekChange={setSelectedWeek}
             onChannelsChange={setSelectedChannels}
           />
-          {!isLoading && channelDateColumns && channelDateColumns.length > 0 && (
-            <div className="flex justify-end mt-4">
-              <Button onClick={exportToPDF} variant="outline" size="sm">
-                <FileDown className="h-4 w-4 mr-2" />
-                Exportar PDF
-              </Button>
-            </div>
-          )}
         </Card>
 
         {isLoading ? (
