@@ -487,14 +487,14 @@ export default function Schedule() {
         ) : (
           <Card className="p-4">
             <ScrollArea className="w-full h-[calc(100vh-320px)]">
-              <div className="flex">
+              <div className="flex min-w-max">
                 {/* Time column */}
-                <div className="flex-shrink-0 w-20 border-r">
-                  <div className="h-16 border-b sticky top-0 bg-background z-20 flex items-center justify-center font-semibold text-sm">
+                <div className="flex-shrink-0 w-20 border-r sticky left-0 bg-background z-30">
+                  <div className="h-16 border-b sticky top-0 bg-background z-40 flex items-center justify-center font-semibold text-sm">
                     Hora
                   </div>
                   {timeSlots.map((slot) => (
-                    <div key={slot} className="h-16 border-b flex items-center justify-center text-xs font-medium">
+                    <div key={slot} className="h-16 border-b flex items-center justify-center text-xs font-medium bg-background">
                       {slot}
                     </div>
                   ))}
@@ -513,7 +513,7 @@ export default function Schedule() {
                   return (
                     <div key={`${col.channel}_${col.date}`} className="flex-1 min-w-[180px] border-r relative">
                       {/* Channel header */}
-                      <div className="h-16 border-b sticky top-0 bg-background z-10 flex flex-col items-center justify-center px-2">
+                      <div className="h-16 border-b sticky top-0 bg-background z-30 flex flex-col items-center justify-center px-2">
                         <div className="font-semibold text-sm">{col.channel}</div>
                         {dateFormatted && (
                           <div className="text-xs text-muted-foreground">{dateFormatted}</div>
