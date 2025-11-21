@@ -382,8 +382,15 @@ export default function Schedule() {
               const events = col?.events || [];
               const rowIndex = data.row.index;
               
+              // Validate rowIndex is within bounds
+              if (rowIndex < 0 || rowIndex >= timeSlots.length) {
+                return;
+              }
+              
               const slotStartMinutes = (() => {
                 const timeSlot = timeSlots[rowIndex];
+                if (!timeSlot) return 0;
+                
                 const [hours, minutes] = timeSlot.split(':').map(Number);
                 let adjustedHours = hours;
                 if (hours < 5) adjustedHours += 24;
