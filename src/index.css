@@ -36,7 +36,7 @@ All colors MUST be HSL.
     --input: 0 0% 90%;
     --ring: 0 0% 20%;
 
-    --radius: 0.5rem;
+    --radius: 1.5rem;
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 0 0% 10%;
@@ -120,6 +120,7 @@ All colors MUST be HSL.
     --state-red-pastel-hover: 0 65% 40%;
     --state-blue-pastel: 210 60% 40%;
     --state-blue-pastel-hover: 210 65% 45%;
+    --radius: 1.5rem;
   }
 }
 
