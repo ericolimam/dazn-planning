@@ -71,7 +71,7 @@ Deno.serve(async (req) => {
         { "ALIAS": "PROGCATEGORY", "FORMAT": "NAME", "ATTR_NM": "TXREQ_ID.PROG_ID.SERIES_ID.PROGCATEGORY_RF" },
         { "ALIAS": "PREMIERE", "FORMAT": "NAME", "ATTR_NM": "TXREQ_ID.PREMIERE_RF" },
         { "ALIAS": "NARRATOR", "FORMAT": "NAME", "ATTR_NM": "TXREQ_ID.PROG_ID.NARRATOR_RF" },
-        { "ALIAS": "YEAR", "ATTR_NM": "TXREQ_ID.PROG_ID.YEAR" }
+        { "ALIAS": "YEAR", "FORMAT": "YYYY", "ATTR_NM": "TXREQ_ID.PROG_ID.SERIES_ID.CREATION_DATE" }
       ],
       "FILTERS": filters
     };
