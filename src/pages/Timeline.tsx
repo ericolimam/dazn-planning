@@ -709,11 +709,16 @@ export default function Timeline() {
                                    }}
                                  >
                                    <div className="px-2 py-1 text-white text-xs h-full flex flex-col justify-center">
-                                     <div className="font-semibold truncate flex items-center gap-1">
-                                       {isCurrentlyAiring && <Clock className="h-3 w-3 animate-pulse" />}
-                                       {getPremiereIcon(event.PREMIERE)}
-                                       {event.PROGRAMME || event.SERIES || event.TXSLOT_NAME || 'Sem programação'}
-                                     </div>
+                                      <div className="font-semibold truncate flex items-center gap-1">
+                                        {isCurrentlyAiring && <Clock className="h-3 w-3 animate-pulse" />}
+                                        {getPremiereIcon(event.PREMIERE)}
+                                        {event.VERSION === 'Live' && (
+                                          <div className="text-[8px] px-1.5 py-0.5 rounded bg-red-600 text-white font-bold flex-shrink-0">
+                                            LIVE
+                                          </div>
+                                        )}
+                                        {event.PROGRAMME || event.SERIES || event.TXSLOT_NAME || 'Sem programação'}
+                                      </div>
                                       <div className="text-[10px] opacity-90">
                                         {formatTime(event.startDate)} - {formatTime(event.endDate)}
                                       </div>

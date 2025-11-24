@@ -36,6 +36,7 @@ export interface ScheduleEvent {
   DURATION_TC?: string;
   NARRATOR?: string;
   YEAR?: number;
+  VERSION?: string;
 }
 
 const stringToColor = (str: string): string => {
@@ -718,6 +719,11 @@ export default function Schedule() {
                             <div className="flex items-start gap-1.5 mb-0.5">
                               {isCurrentlyAiring && <Clock className="h-3 w-3 animate-pulse flex-shrink-0" />}
                               {getPremiereIcon(event.PREMIERE)}
+                              {event.VERSION === 'Live' && (
+                                <div className="text-[8px] px-1.5 py-0.5 rounded bg-red-600 text-white font-bold flex-shrink-0">
+                                  LIVE
+                                </div>
+                              )}
                               <div className="flex items-center gap-1.5 flex-1 min-w-0">
                                 {getTeamLogo(event.PROGRAMME, 24) && (
                                   <img 
