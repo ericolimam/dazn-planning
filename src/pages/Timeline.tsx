@@ -671,19 +671,10 @@ export default function Timeline() {
 
                             {/* Current time indicator */}
                             {(() => {
-                              // Check if this is today's date
+                              // Check if this is today's date - format must match backend date format (YYYY-MM-DD)
                               const today = new Date();
-                              const todayFormatted = `${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}/${today.getFullYear()}`;
+                              const todayFormatted = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
                               const isToday = date === todayFormatted;
-                              
-                              // Debug log
-                              console.log('Timeline - Checking current time indicator:', {
-                                date,
-                                todayFormatted,
-                                isToday,
-                                currentPositionMinutes,
-                                hourRange
-                              });
                               
                               return isToday && currentPositionMinutes >= 0 && currentPositionMinutes <= (hourRange * 60) && (
                                 <div
