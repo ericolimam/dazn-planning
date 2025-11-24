@@ -670,19 +670,26 @@ export default function Timeline() {
                             </div>
 
                             {/* Current time indicator */}
-                            {currentPositionMinutes >= 0 && currentPositionMinutes <= (hourRange * 60) && (
-                              <div
-                                className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-20"
-                                style={{
-                                  left: `${(currentPositionMinutes / 60) * hourWidth}px`,
-                                }}
-                              >
-                                <div className="absolute -top-2 -left-3 bg-red-500 text-white text-[10px] px-1 rounded flex items-center gap-1">
-                                  <Clock className="h-2.5 w-2.5" />
-                                  AGORA
+                            {(() => {
+                              // Check if this is today's date
+                              const today = new Date();
+                              const todayFormatted = `${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}/${today.getFullYear()}`;
+                              const isToday = date === todayFormatted;
+                              
+                              return isToday && currentPositionMinutes >= 0 && currentPositionMinutes <= (hourRange * 60) && (
+                                <div
+                                  className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-20"
+                                  style={{
+                                    left: `${(currentPositionMinutes / 60) * hourWidth}px`,
+                                  }}
+                                >
+                                  <div className="absolute -top-2 -left-3 bg-red-500 text-white text-[10px] px-1 rounded flex items-center gap-1">
+                                    <Clock className="h-2.5 w-2.5" />
+                                    AGORA
+                                  </div>
                                 </div>
-                              </div>
-                            )}
+                              );
+                            })()}
 
                             {/* Events */}
                             {events.map((event) => {
