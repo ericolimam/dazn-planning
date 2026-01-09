@@ -20,14 +20,13 @@ Deno.serve(async (req) => {
       throw new Error('API credentials not configured');
     }
 
-    // Fetch only weeks data - much lighter query
+    // Fetch only weeks and channels data - much lighter query
     const provysRequestBody = {
       "ENTITY_NM": "TXWEEK",
       "ACTION_NM": "LIST",
       "COLUMNS": [
         { "ALIAS": "WEEK", "ATTR_NM": "WEEK" },
-        { "ALIAS": "CHANNEL", "FORMAT": "NAME", "ATTR_NM": "CHANNEL_RF" },
-        { "ALIAS": "YEAR", "FORMAT": "YYYY", "ATTR_NM": "START_DATE" }
+        { "ALIAS": "CHANNEL", "FORMAT": "NAME", "ATTR_NM": "CHANNEL_RF" }
       ]
     };
 
@@ -53,11 +52,14 @@ Deno.serve(async (req) => {
     const data = await response.json();
     console.log('Total weeks received:', data?.ROWS?.length || 0);
     
-    // Extract unique weeks, channels, and years
+    // Extract unique weeks and channels
     const rows = data?.ROWS || [];
     const weeks = [...new Set(rows.map((r: any) => r.WEEK).filter(Boolean))].sort((a: any, b: any) => a - b);
     const channels = [...new Set(rows.map((r: any) => r.CHANNEL).filter(Boolean))].sort();
-    const years = [...new Set(rows.map((r: any) => r.YEAR).filter(Boolean))].sort((a: any, b: any) => a - b);
+    
+    // Generate years based on current year (we can't get it from TXWEEK)
+    const currentYear = new Date().getFullYear();
+    const years = [currentYear - 1, currentYear, currentYear + 1];
 
     return new Response(JSON.stringify({ weeks, channels, years }), {
       headers: {
