@@ -3,6 +3,15 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Get current week number
+const getCurrentWeek = () => {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 1);
+  const diff = now.getTime() - start.getTime();
+  const oneWeek = 1000 * 60 * 60 * 24 * 7;
+  return Math.ceil(diff / oneWeek);
+};
+
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -16,10 +25,12 @@ Deno.serve(async (req) => {
     try {
       requestBody = await req.json();
     } catch (e) {
-      console.log('No body provided, using empty filters');
+      console.log('No body provided, using default filters');
     }
     
-    const { week, channel } = requestBody;
+    // If no week provided, default to current week to avoid memory issues
+    const week = requestBody.week ?? getCurrentWeek();
+    const { channel } = requestBody;
     console.log('Filters requested:', { week, channel });
     
     const apiUsername = Deno.env.get('PROVYS_API_USERNAME');
@@ -27,9 +38,7 @@ Deno.serve(async (req) => {
 
     console.log('Checking credentials...');
     console.log('Username exists:', !!apiUsername);
-    console.log('Username length:', apiUsername?.length || 0);
     console.log('Password exists:', !!apiPassword);
-    console.log('Password length:', apiPassword?.length || 0);
 
     if (!apiUsername || !apiPassword) {
       console.error('API credentials not configured');
@@ -41,13 +50,8 @@ Deno.serve(async (req) => {
       { "OPERATOR": "NL", "VALUE": null, "ATTR_NM": "TECHSLOT" }
     ];
 
-    // Add week filter if provided
-    if (week) {
-      filters.push({ "OPERATOR": "=", "VALUE": week.toString(), "ATTR_NM": "TXSCHED_ID.TXWEEK_ID.WEEK" });
-    }
-    
-    // Note: Channel filter is handled on the client side to avoid API issues
-    // The API returns all channels and the frontend filters them
+    // Always add week filter to limit data size and prevent memory issues
+    filters.push({ "OPERATOR": "=", "VALUE": week.toString(), "ATTR_NM": "TXSCHED_ID.TXWEEK_ID.WEEK" });
     
     console.log('Applied filters:', JSON.stringify(filters, null, 2));
 
@@ -99,26 +103,7 @@ Deno.serve(async (req) => {
     const data = await response.json();
     console.log('=== PROVYS SCHEDULE RESPONSE ===');
     console.log('Total rows received:', data?.ROWS?.length || 0);
-    
-    // Count events with PREMIERE
-    const premiereCount = data?.ROWS?.filter((row: any) => row.PREMIERE).length || 0;
-    console.log('Events with PREMIERE:', premiereCount);
-    
-    if (data?.ROWS && data.ROWS.length > 0) {
-      console.log('First 3 events:');
-      data.ROWS.slice(0, 3).forEach((row: any, i: number) => {
-        console.log(`  ${i + 1}. ${row.PROGRAMME || row.SERIES} - Channel: ${row.CHANNEL}, Week: ${row.WEEK}, Date: ${row.DATE}, PREMIERE: ${row.PREMIERE || 'N/A'}`);
-      });
-      
-      // Find and log first event with PREMIERE
-      const premiereEvent = data.ROWS.find((row: any) => row.PREMIERE);
-      if (premiereEvent) {
-        console.log('=== FIRST EVENT WITH PREMIERE ===');
-        console.log(JSON.stringify(premiereEvent, null, 2));
-      } else {
-        console.log('⚠️ NO EVENTS HAVE PREMIERE VALUE SET');
-      }
-    }
+    console.log('Week filter applied:', week);
 
     return new Response(JSON.stringify(data), {
       headers: {

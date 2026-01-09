@@ -145,22 +145,20 @@ export default function Schedule() {
   const columnsPerPage = 7; // Show 7 days (Monday to Sunday) at a time
   const { currentPositionMinutes, isEventCurrentlyAiring } = useCurrentTimeIndicator();
 
-  const { data: allScheduleData } = useQuery({
-    queryKey: ["schedule-all"],
+  // Fetch weeks, channels, and years from a lightweight endpoint
+  const { data: filterOptions } = useQuery({
+    queryKey: ["schedule-filter-options"],
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke("list-schedule", { body: {} });
+      const { data, error } = await supabase.functions.invoke("list-schedule-weeks", { body: {} });
       if (error) throw error;
       return data;
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 10 * 60 * 1000,
   });
 
-  const weeks: number[] = allScheduleData?.ROWS ? Array.from(new Set(allScheduleData.ROWS.map((row: any) => row.WEEK).filter(Boolean))) as number[] : [];
-  weeks.sort((a, b) => a - b);
-  const channels: string[] = allScheduleData?.ROWS ? Array.from(new Set(allScheduleData.ROWS.map((row: any) => row.CHANNEL).filter(Boolean))) as string[] : [];
-  channels.sort((a, b) => a.localeCompare(b, undefined, { numeric: true })); // Sort DAZN 1, DAZN 2, etc.
-  const years: number[] = allScheduleData?.ROWS ? Array.from(new Set(allScheduleData.ROWS.map((row: any) => extractYearFromDate(row.DATE)).filter((y): y is number => y !== null))) as number[] : [];
-  years.sort((a, b) => a - b);
+  const weeks: number[] = filterOptions?.weeks || [];
+  const channels: string[] = (filterOptions?.channels || []).sort((a: string, b: string) => a.localeCompare(b, undefined, { numeric: true }));
+  const years: number[] = filterOptions?.years || [];
 
   // Auto-select only DAZN 1 by default
   useEffect(() => {

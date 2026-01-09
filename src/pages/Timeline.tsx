@@ -149,40 +149,33 @@ export default function Timeline() {
   const [modalOpen, setModalOpen] = useState(false);
   const { currentPositionMinutes, isEventCurrentlyAiring } = useCurrentTimeIndicator();
 
-  const { data: allScheduleData } = useQuery({
-    queryKey: ["schedule-all"],
+  // Fetch weeks, channels, and years from a lightweight endpoint
+  const { data: filterOptions } = useQuery({
+    queryKey: ["schedule-filter-options"],
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke("list-schedule", {
-        body: {},
-      });
+      const { data, error } = await supabase.functions.invoke("list-schedule-weeks", { body: {} });
       if (error) throw error;
       return data;
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 10 * 60 * 1000,
   });
 
-  const weeks = allScheduleData?.ROWS 
-    ? [...new Set<number>(allScheduleData.ROWS.map((r: ScheduleEvent) => r.WEEK).filter((w: number) => w))].sort((a: number, b: number) => a - b)
-    : [];
-  
-  const channels = allScheduleData?.ROWS 
-    ? [...new Set<string>(allScheduleData.ROWS.map((r: ScheduleEvent) => r.CHANNEL).filter((c: string) => c))].sort()
-    : [];
+  const weeks: number[] = filterOptions?.weeks || [];
+  const channels: string[] = (filterOptions?.channels || []).sort();
+  const years: number[] = filterOptions?.years || [];
 
-  const years = allScheduleData?.ROWS 
-    ? [...new Set<number>(allScheduleData.ROWS.map((r: ScheduleEvent) => extractYearFromDate(r.DATE)).filter((y): y is number => y !== null))].sort((a: number, b: number) => b - a)
-    : [];
-
+  // Fetch schedule data for selected week
   const { data: scheduleData, isLoading } = useQuery({
     queryKey: ["schedule-filtered", selectedWeek, selectedChannels, selectedYear],
     queryFn: async () => {
-      if (!allScheduleData?.ROWS) return { ROWS: [] };
+      const filters: any = {};
+      if (selectedWeek !== null) filters.week = selectedWeek;
       
-      let filtered = [...allScheduleData.ROWS];
+      const { data, error } = await supabase.functions.invoke("list-schedule", { body: filters });
+      if (error) throw error;
       
-      if (selectedWeek !== null) {
-        filtered = filtered.filter((r: ScheduleEvent) => r.WEEK === selectedWeek);
-      }
+      // Apply client-side filtering for channels and year
+      let filtered = data?.ROWS || [];
       
       if (selectedChannels.length > 0) {
         filtered = filtered.filter((r: ScheduleEvent) => selectedChannels.includes(r.CHANNEL));
@@ -197,7 +190,8 @@ export default function Timeline() {
       
       return { ROWS: filtered };
     },
-    enabled: !!allScheduleData,
+    enabled: selectedWeek !== null && selectedChannels.length > 0,
+    staleTime: 5 * 60 * 1000,
   });
 
   const timelineData = useMemo(() => {
